@@ -1,0 +1,63 @@
+.fantasy-calendar-settings .fantasy-calendars {
+    border-bottom: 1px solid var(--background-modifier-border);
+    border-top: 1px solid var(--background-modifier-border);
+    padding: 18px 0 0 0;
+}
+
+.fantasy-calendar-settings .fantasy-calendars .existing-calendars > span {
+    display: block;
+    text-align: center;
+    margin-bottom: 18px;
+    color: var(--text-muted);
+}
+
+.fantasy-calendar-settings
+    .fantasy-calendars
+    > .setting-item:not(.setting-item-heading) {
+    border: 0px;
+}
+
+/** Create Calendar Modal */
+.modal-container.create-fantasy-calendar > .modal {
+    transition: width 0.5s ease-in-out, height 0.5s ease-in-out;
+}
+
+.create-fantasy-calendar .modal-content {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 0.5rem;
+}
+
+.create-fantasy-calendar details {
+    padding: 0.5rem;
+}
+.create-fantasy-calendar details[open] {
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 0.5rem;
+}
+
+.create-fantasy-calendar .fantasy-calendar-container .existing-items > span {
+    display: block;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.create-fantasy-calendar details .setting-item {
+    border: 0px;
+}
+
+.create-fantasy-calendar summary * {
+    display: inline;
+    margin: 0;
+}
+
+.create-fantasy-calendar .fantasy-context-buttons {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.create-fantasy-calendar button[disabled] {
+    cursor: not-allowed;
+}

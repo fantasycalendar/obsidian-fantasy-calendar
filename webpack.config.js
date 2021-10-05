@@ -1,5 +1,6 @@
 const path = require("path");
 const CopyPlugin = require("copy-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const sveltePreprocess = require("svelte-preprocess");
 
 const isDevMode = process.env.NODE_ENV === "development";
@@ -36,6 +37,18 @@ module.exports = {
                 ]
             },
             {
+                test: /\.css?$/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    {
+                        loader: "css-loader",
+                        options: {
+                            url: false
+                        }
+                    }
+                ]
+            },
+            {
                 test: /\.(svg|njk|html)$/,
                 type: "asset/source"
             }
@@ -47,6 +60,10 @@ module.exports = {
                 { from: "./manifest.json", to: "." },
                 { from: "./src/main.css", to: "./styles.css" }
             ]
+        }),
+
+        new MiniCssExtractPlugin({
+            filename: "styles.css"
         })
     ],
     resolve: {
