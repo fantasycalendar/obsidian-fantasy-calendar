@@ -1,0 +1,17 @@
+{
+    "extends": "@tsconfig/svelte/tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": ".",
+
+        "inlineSources": true,
+        "module": "ESNext",
+        "target": "es6",
+        "allowJs": true,
+        "noImplicitAny": true,
+        "moduleResolution": "node",
+        "importHelpers": true,
+        "types": ["svelte", "node"],
+        "lib": ["dom", "esnext", "scripthost", "es2015"]
+    },
+    "include": ["src/*"]
+}
