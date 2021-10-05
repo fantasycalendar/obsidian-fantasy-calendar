@@ -60,7 +60,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                                 day: 1
                             };
                             this.data.calendars.push({ ...calendar });
-                            await this.plugin.saveSettings();
+                            await this.plugin.saveCalendar();
 
                             this.showCalendars(existing);
                         };
@@ -93,7 +93,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                         modal.onClose = async () => {
                             if (!modal.saved) return;
                             calendar = { ...modal.calendar };
-                            await this.plugin.saveSettings();
+                            await this.plugin.saveCalendar();
 
                             this.showCalendars(element);
                         };
@@ -109,7 +109,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                                 this.plugin.data.calendars.filter(
                                     (c) => c.id != calendar.id
                                 );
-                            await this.plugin.saveSettings();
+                            await this.plugin.saveCalendar();
 
                             this.showCalendars(element);
                         };
@@ -155,7 +155,7 @@ class CreateCalendarModal extends Modal {
         return this.calendar.static;
     }
     get week() {
-        return this.static.week;
+        return this.static.weekdays;
     }
     get months() {
         return this.static.months;
@@ -212,7 +212,7 @@ class CreateCalendarModal extends Modal {
             .addText((t) => {
                 t.setValue(`${this.calendar.static.firstWeekDay}`).onChange(
                     (v) => {
-                        this.calendar.static.firstWeekDay = Number(v);
+                        this.calendar.static.firstWeekDay = Number(v) - 1;
                     }
                 );
                 t.inputEl.setAttr("type", "number");
@@ -240,11 +240,11 @@ class CreateCalendarModal extends Modal {
         });
 
         weekday.$on("weekday-update", (e) => {
-            this.calendar.static.week = e.detail;
+            this.calendar.static.weekdays = e.detail;
 
             if (
                 !this.calendar.static.firstWeekDay &&
-                this.calendar.static.week.length
+                this.calendar.static.weekdays.length
             ) {
                 this.calendar.static.firstWeekDay = 1;
                 this.buildInfo();
@@ -260,7 +260,8 @@ class CreateCalendarModal extends Modal {
             this.months.every((m) => m.length > 0) &&
             this.week.length &&
             this.week.every((d) => d.name?.length) &&
-            this.calendar.name.length
+            this.calendar.name.length &&
+            this.calendar.static.firstWeekDay < this.week.length
         ) {
             this.canSave = true;
         }
@@ -310,6 +311,12 @@ class CreateCalendarModal extends Modal {
                         new Notice("Every month must have a name.");
                     } else if (!this.months.every((m) => m.length)) {
                         new Notice("Every month must have a length.");
+                    } else if (
+                        this.calendar.static.firstWeekDay >= this.week.length
+                    ) {
+                        new Notice(
+                            "The first day of the week must be a valid weekday."
+                        );
                     }
                     return;
                 }

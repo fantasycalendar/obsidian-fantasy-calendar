@@ -6,6 +6,12 @@ import type { Calendar, FantasyCalendarData } from "./@types";
 
 import FantasyCalendarView, { VIEW_TYPE } from "./view/view";
 
+declare module "obsidian" {
+    interface Workspace {
+        on(name: "fantasy-calendars-updated", callback: () => any): EventRef;
+    }
+}
+
 export const DEFAULT_CALENDAR: Calendar = {
     name: null,
     description: null,
@@ -13,7 +19,7 @@ export const DEFAULT_CALENDAR: Calendar = {
     static: {
         firstWeekDay: null,
         overflow: true,
-        week: [],
+        weekdays: [],
         months: [],
         leapDays: [],
         moons: [],
@@ -54,6 +60,9 @@ export default class FantasyCalendar extends Plugin {
 
     async onunload() {
         console.log("Unloading Fantasy Calendars v" + this.manifest.version);
+        this.app.workspace
+            .getLeavesOfType(VIEW_TYPE)
+            .forEach((leaf) => leaf.detach());
     }
 
     async addCalendarView() {
@@ -71,6 +80,11 @@ export default class FantasyCalendar extends Plugin {
             ...DEFAULT_DATA,
             ...(await this.loadData())
         };
+    }
+
+    async saveCalendar() {
+        await this.saveSettings();
+        this.app.workspace.trigger("fantasy-calendars-updated");
     }
 
     async saveSettings() {

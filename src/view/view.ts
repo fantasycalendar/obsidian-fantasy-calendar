@@ -1,7 +1,10 @@
-import { addIcon, ItemView, WorkspaceLeaf } from "obsidian";
+import { addIcon, DropdownComponent, ItemView, WorkspaceLeaf } from "obsidian";
+import type { Calendar } from "src/@types";
 import type FantasyCalendar from "../main";
 
 export const VIEW_TYPE = "FANTASY_CALENDAR";
+
+import CalendarUI from "./ui/Calendar.svelte";
 
 addIcon(
     VIEW_TYPE,
@@ -9,8 +12,49 @@ addIcon(
 );
 
 export default class FantasyCalendarView extends ItemView {
-    constructor(public plugin: FantasyCalendar, public leaf: WorkspaceLeaf) {
+    calendarDropdownEl: HTMLDivElement;
+    private _app: CalendarUI;
+    constructor(
+        public plugin: FantasyCalendar,
+        public leaf: WorkspaceLeaf,
+        public calendar?: Calendar
+    ) {
         super(leaf);
+
+        this.calendarDropdownEl = this.contentEl.createDiv();
+
+        this.updateCalendars();
+        this.plugin.registerEvent(
+            this.plugin.app.workspace.on("fantasy-calendars-updated", () => {
+                this.updateCalendars();
+            })
+        );
+    }
+    updateCalendars() {
+        this.calendarDropdownEl.empty();
+        const dropdown = new DropdownComponent(this.calendarDropdownEl)
+            .addOptions(
+                Object.fromEntries(
+                    this.plugin.data.calendars.map((c) => [c.id, c.name])
+                )
+            )
+            .setValue(this.calendar ? this.calendar.id : null)
+            .onChange((v) => {
+                this.setCurrentCalendar(
+                    this.plugin.data.calendars.find((c) => c.id == v)
+                );
+            });
+    }
+    setCurrentCalendar(calendar: Calendar) {
+        this.calendar = calendar;
+        if (this._app) {
+            this._app.$destroy();
+        }
+        this._app = new CalendarUI({
+            target: this.contentEl,
+            props: { data: this.calendar }
+        });
+        this.updateCalendars();
     }
 
     async onOpen() {}

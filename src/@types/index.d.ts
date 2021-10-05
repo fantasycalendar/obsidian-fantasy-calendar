@@ -60,7 +60,7 @@ export interface Event {
 interface StaticCalendarData {
     firstWeekDay: number;
     overflow: boolean;
-    week: Week;
+    weekdays: Week;
     months: Month[];
     leapDays: LeapDay[];
     moons: Moon[];
