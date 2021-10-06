@@ -5,13 +5,20 @@
     export let centered: boolean = true;
     export let events: Event[] = [];
 
-    const MAX_DOTS_PER_SOURCE = 3;
+    const MAX_EVENTS = 3;
 </script>
 
-<div class="dot-container" class:centered>
-    {#each events.slice(0, MAX_DOTS_PER_SOURCE) as event}
-        <Dot/>
-    {/each}
+<div>
+    <div class="dot-container" class:centered>
+        {#each events.slice(0, MAX_EVENTS) as event}
+            <Dot />
+        {/each}
+    </div>
+    <div class="overflow">
+        {#if events.length > MAX_EVENTS}
+            <span>+{events.length - MAX_EVENTS}</span>
+        {/if}
+    </div>
 </div>
 
 <style>
@@ -23,5 +30,12 @@
     }
     .centered {
         justify-content: center;
+    }
+    .overflow {
+        color: var(--text-muted);
+        font-size: xx-small;
+        display: flex;
+        justify-content: flex-end;
+        width: 100%;
     }
 </style>

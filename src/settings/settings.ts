@@ -12,6 +12,7 @@ import {
 } from "obsidian";
 import { DEFAULT_CALENDAR } from "../main";
 import type FantasyCalendar from "../main";
+import Importer from "./import/importer";
 
 import Weekdays from "./ui/Weekdays.svelte";
 import Months from "./ui/Months.svelte";
@@ -43,6 +44,44 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
         this.containerEl.empty();
         this.containerEl.createEl("h2", { text: "Fantasy Calendars" });
         this.containerEl.addClass("fantasy-calendar-settings");
+
+        const importSetting = new Setting(this.containerEl)
+            .setName("Import Calendar")
+            .setDesc("Import calendar from Fantasy-Calendars.com");
+        const input = createEl("input", {
+            attr: {
+                type: "file",
+                name: "merge",
+                accept: ".json",
+                style: "display: none;"
+            }
+        });
+        input.onchange = async () => {
+            const { files } = input;
+
+            if (!files.length) return;
+            try {
+                const data = await files[0].text();
+                const calendars = Importer.import([JSON.parse(data)]);
+                this.plugin.data.calendars.push(...calendars);
+                await this.plugin.saveSettings();
+            } catch (e) {
+                new Notice(
+                    `There was an error while importing the calendar${
+                        files.length == 1 ? "" : "s"
+                    }.`
+                );
+                console.error(e);
+            }
+
+            input.value = null;
+        };
+        importSetting.addButton((b) => {
+            b.setButtonText("Choose File");
+            b.buttonEl.addClass("calendar-file-upload");
+            b.buttonEl.appendChild(input);
+            b.onClick(() => input.click());
+        });
 
         this.calendarUI = this.containerEl.createDiv("fantasy-calendars");
 
@@ -90,9 +129,13 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
             return;
         }
         for (let calendar of this.data.calendars) {
+            console.log(
+                "🚀 ~ file: settings.ts ~ line 132 ~ calendar",
+                calendar.description
+            );
             new Setting(element)
                 .setName(calendar.name)
-                .setDesc(calendar.description)
+                .setDesc(calendar.description ?? "")
                 .addExtraButton((b) => {
                     b.setIcon("pencil").onClick(() => {
                         const modal = new CreateCalendarModal(
@@ -347,6 +390,9 @@ class CreateCalendarModal extends Modal {
             .setCta()
             .setButtonText(this.editing ? "Save" : "Create")
             .onClick(() => {
+                if (!this.canSave) {
+                    this.checkCanSave();
+                }
                 console.log(
                     "🚀 ~ file: settings.ts ~ line 278 ~ this.canSave",
                     this.canSave

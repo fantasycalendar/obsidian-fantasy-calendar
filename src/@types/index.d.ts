@@ -16,7 +16,6 @@ export interface FantasyCalendarData {
 export interface TimeSpan {
     type: string;
     name: string;
-    length: number;
     id: string;
 }
 
@@ -26,22 +25,23 @@ export interface Day extends TimeSpan {
 export type Week = Day[];
 export interface Month extends TimeSpan {
     type: "month";
+    length: number;
 }
 
-interface LeapDay extends Day {
+export interface LeapDay extends Day {
     interval: number;
     after: number;
     month: Month;
 }
 
-interface Season {
+export interface Season {
     name: string;
     start: {
         month: Month;
         day: Day;
     };
 }
-interface Moon {
+export interface Moon {
     name: string;
     cycle: number;
     offset: number;
@@ -62,17 +62,17 @@ export interface Event {
     /* recurring: keyof typeof Recurring; */
 }
 
-interface StaticCalendarData {
+export interface StaticCalendarData {
     firstWeekDay: number;
     overflow: boolean;
     weekdays: Week;
     months: Month[];
-    leapDays: LeapDay[];
+    /*     leapDays: LeapDay[];
     moons: Moon[];
-    seasons: Season[];
+    seasons: Season[]; */
 }
 
-interface CurrentCalendarData {
+export interface CurrentCalendarData {
     year: number;
     month: number;
     day: number;
