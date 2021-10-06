@@ -32,6 +32,10 @@ export default class FantasyCalendarView extends ItemView {
     }
     updateCalendars() {
         this.calendarDropdownEl.empty();
+        if (this.plugin.data.calendars.length == 1) {
+            this.setCurrentCalendar(this.plugin.data.calendars[0]);
+            return;
+        }
         const dropdown = new DropdownComponent(this.calendarDropdownEl)
             .addOptions(
                 Object.fromEntries(
@@ -45,6 +49,7 @@ export default class FantasyCalendarView extends ItemView {
                 );
             });
     }
+
     setCurrentCalendar(calendar: Calendar) {
         this.calendar = calendar;
         if (this._app) {
@@ -54,7 +59,6 @@ export default class FantasyCalendarView extends ItemView {
             target: this.contentEl,
             props: { data: this.calendar }
         });
-        this.updateCalendars();
     }
 
     async onOpen() {}

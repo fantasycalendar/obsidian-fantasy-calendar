@@ -16,6 +16,20 @@ export default class CalendarHelper extends Events {
         this.object.current.month = n;
         this.trigger("month-update");
     }
+    goToNext() {
+        const next = this.wrap(this.current.month + 1, this.months.length);
+        if (next < this.current.month) {
+            this.current.year += 1;
+        }
+        this.setCurrentMonth(next);
+    }
+    goToPrevious() {
+        const previous = this.wrap(this.current.month - 1, this.months.length);
+        if (previous > this.current.month) {
+            this.current.year -= 1;
+        }
+        this.setCurrentMonth(previous);
+    }
     get months() {
         return this.data.months;
     }
@@ -27,6 +41,12 @@ export default class CalendarHelper extends Events {
     }
     get daysOfCurrentMonth() {
         return [...Array(this.currentMonth.length).keys()].map((k) => k + 1);
+    }
+    get paddedDays() {
+        return [
+            ...new Array(this.firstDayOfMonth(this.currentMonth) - 1).fill(""),
+            ...this.daysOfCurrentMonth
+        ];
     }
     /**
      *
@@ -61,17 +81,15 @@ export default class CalendarHelper extends Events {
             .reduce((a, b) => a + b.length, 0);
     }
     firstDayOfMonth(month: Month) {
-        if (!this.data.overflow) return this.data.weekdays[0];
+        if (!this.data.overflow) return 0;
 
         const days = this.daysBeforeMonth(month);
         const firstOfYear = this.firstDayOfYear();
 
-        return this.data.weekdays[
-            this.wrap(
-                (days % this.data.weekdays.length) + firstOfYear,
-                this.data.weekdays.length
-            )
-        ];
+        return this.wrap(
+            (days % this.data.weekdays.length) + firstOfYear,
+            this.data.weekdays.length
+        );
     }
 
     firstDayOfYear() {

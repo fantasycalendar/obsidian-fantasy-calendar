@@ -3,28 +3,40 @@
     import CalendarHelper from "src/calendar/index";
 
     import MonthView from "./MonthView.svelte";
+    import Nav from "./Nav.svelte";
 
     export let data: Calendar;
     const calendar = new CalendarHelper(data);
 
     calendar.on("month-update", () => {
         weeks = calendar.weeksPerCurrentMonth;
-        days = calendar.daysOfCurrentMonth;
+        days = calendar.paddedDays;
+        year = calendar.current.year;
+        month = calendar.currentMonth;
     });
 
     $: weekdays = calendar.weekdays;
     $: weeks = calendar.weeksPerCurrentMonth;
-    $: days = calendar.daysOfCurrentMonth;
+    $: days = calendar.paddedDays;
+    $: month = calendar.currentMonth;
+    $: year = calendar.current.year;
 
     console.log(calendar.firstDayOfMonth(calendar.months[3]));
 </script>
 
 <div
+    id="calendar-container"
     class="fantasy-calendar"
     style="--calendar-columns: {calendar.weekdays
         .length}; --calendar-rows: {calendar.weeksPerCurrentMonth};"
 >
-    <MonthView columns={weekdays.length} rows={weeks} {days} />
+    <Nav
+        month={month.name}
+        {year}
+        on:next={() => calendar.goToNext()}
+        on:previous={() => calendar.goToPrevious()}
+    />
+    <MonthView columns={weekdays.length} {weekdays} rows={weeks + 1} {days} />
 </div>
 
 <style>
