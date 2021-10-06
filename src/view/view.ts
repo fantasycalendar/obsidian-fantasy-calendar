@@ -1,10 +1,13 @@
+import { nanoid } from "nanoid";
 import { addIcon, DropdownComponent, ItemView, WorkspaceLeaf } from "obsidian";
 import type { Calendar } from "src/@types";
+import type { DayHelper } from "src/calendar";
+import { CreateEventModal } from "src/settings/settings";
 import type FantasyCalendar from "../main";
 
 export const VIEW_TYPE = "FANTASY_CALENDAR";
 
-import CalendarUI from "./ui/Calendar.svelte";
+import CalendarUI from "./ui/side/Calendar.svelte";
 
 addIcon(
     VIEW_TYPE,
@@ -13,7 +16,7 @@ addIcon(
 
 export default class FantasyCalendarView extends ItemView {
     calendarDropdownEl: HTMLDivElement;
-    private _app: CalendarUI;
+    protected _app: CalendarUI;
     constructor(
         public plugin: FantasyCalendar,
         public leaf: WorkspaceLeaf,
@@ -58,6 +61,25 @@ export default class FantasyCalendarView extends ItemView {
         this._app = new CalendarUI({
             target: this.contentEl,
             props: { data: this.calendar }
+        });
+        this._app.$on("day-click", (event: CustomEvent<DayHelper>) => {
+            const day = event.detail;
+
+            if (day.events.length) {
+            } else {
+                const modal = new CreateEventModal(this.app, null, day.date);
+
+                modal.onClose = () => {
+                    if (!modal.saved) return;
+                    this.calendar.events.push(modal.event);
+
+                    //this._app.$set({ data: this.calendar });
+
+                    this.plugin.saveCalendar();
+                };
+
+                modal.open();
+            }
         });
     }
 

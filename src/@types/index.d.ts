@@ -1,3 +1,5 @@
+import type { Recurring } from "src/settings/settings";
+
 export interface Calendar {
     id: string;
     name: string;
@@ -51,10 +53,13 @@ export interface Event {
     name: string;
     description: string;
     date: {
-        month: Month;
-        day: Day;
-        time: string;
+        month: number;
+        day: number;
+        year: number;
     };
+    id: string;
+    note: string;
+    /* recurring: keyof typeof Recurring; */
 }
 
 interface StaticCalendarData {

@@ -61,3 +61,41 @@
 .create-fantasy-calendar button[disabled] {
     cursor: not-allowed;
 }
+
+.fantasy-calendar-create-event .event-info {
+    display: flex;
+    flex-flow: column nowrap;
+    width: 100%;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.fantasy-calendar-create-event .event-info > *,
+.fantasy-calendar-create-event .setting-item {
+    width: 100%;
+    padding-top: 0;
+    padding-bottom: 0.75rem;
+    border: 0;
+}
+.fantasy-calendar-create-event .event-info > .event-description {
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.fantasy-calendar-create-event .event-info textarea {
+    resize: vertical;
+}
+
+.fantasy-calendar-create-event .event-date-fields {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding-bottom: 0.75rem;
+}
+
+.fantasy-calendar-create-event .event-date-fields .event-date-field {
+    display: flex;
+    flex-flow: column nowrap;
+}

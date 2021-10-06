@@ -2,7 +2,7 @@
     import type { Calendar } from "src/@types";
     import CalendarHelper from "src/calendar/index";
 
-    import MonthView from "./MonthView.svelte";
+    import MonthView from "./Month.svelte";
     import Nav from "./Nav.svelte";
 
     export let data: Calendar;
@@ -20,8 +20,6 @@
     $: days = calendar.paddedDays;
     $: month = calendar.currentMonth;
     $: year = calendar.current.year;
-
-    console.log(calendar.firstDayOfMonth(calendar.months[3]));
 </script>
 
 <div
@@ -36,8 +34,34 @@
         on:next={() => calendar.goToNext()}
         on:previous={() => calendar.goToPrevious()}
     />
-    <MonthView columns={weekdays.length} {weekdays} rows={weeks + 1} {days} />
+    <div class="weekdays">
+        {#each weekdays as day}
+            <span class="weekday fantasy-weekday">{day.name.slice(0, 3)}</span>
+        {/each}
+    </div>
+    <MonthView columns={weekdays.length} {days} />
 </div>
 
 <style>
+    #calendar-container.fantasy-calendar {
+        width: 100%;
+        margin: 0.5rem;
+
+        display: flex;
+        flex-flow: column;
+    }
+    .weekdays {
+        display: grid;
+        grid-template-columns: repeat(var(--calendar-columns), 1fr);
+        grid-template-rows: auto;
+    }
+    .weekday {
+        background-color: var(--color-background-heading);
+        color: var(--color-text-heading);
+        font-size: 0.6em;
+        letter-spacing: 1px;
+        padding: 4px;
+        text-transform: uppercase;
+        text-align: center;
+    }
 </style>

@@ -1,4 +1,4 @@
-import { Plugin, WorkspaceLeaf } from "obsidian";
+import { Platform, Plugin, WorkspaceLeaf } from "obsidian";
 
 import FantasyCalendarSettings from "./settings/settings";
 
@@ -6,11 +6,15 @@ import type { Calendar, FantasyCalendarData } from "./@types";
 
 import FantasyCalendarView, { VIEW_TYPE } from "./view/view";
 
+import FullCalendarView, { FULL_VIEW } from "./view/full";
+
 declare module "obsidian" {
     interface Workspace {
         on(name: "fantasy-calendars-updated", callback: () => any): EventRef;
     }
 }
+
+export const MODIFIER_KEY = Platform.isMacOS ? "Meta" : "Control";
 
 export const DEFAULT_CALENDAR: Calendar = {
     name: null,
@@ -56,12 +60,25 @@ export default class FantasyCalendar extends Plugin {
             (leaf: WorkspaceLeaf) => new FantasyCalendarView(this, leaf)
         );
         this.app.workspace.onLayoutReady(() => this.addCalendarView());
+        this.addRibbonIcon(VIEW_TYPE, "Open Fantasy Calendar", (evt) => {
+            this.app.workspace
+                .getLeaf(evt.getModifierState(MODIFIER_KEY))
+                .setViewState({ type: FULL_VIEW });
+        });
+
+        this.registerView(FULL_VIEW, (leaf: WorkspaceLeaf) => {
+            return new FullCalendarView(leaf, this);
+        });
+        this.app.workspace.getLeaf(false).setViewState({ type: FULL_VIEW });
     }
 
     async onunload() {
         console.log("Unloading Fantasy Calendars v" + this.manifest.version);
         this.app.workspace
             .getLeavesOfType(VIEW_TYPE)
+            .forEach((leaf) => leaf.detach());
+        this.app.workspace
+            .getLeavesOfType(FULL_VIEW)
             .forEach((leaf) => leaf.detach());
     }
 

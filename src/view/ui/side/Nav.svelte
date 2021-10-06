@@ -9,14 +9,13 @@
     export let year: number;
 
     const left = (node: HTMLElement) => {
-        new ExtraButtonComponent(node).setIcon("left-arrow").onClick(() => {
-            dispatch("previous");
-        });
+        new ExtraButtonComponent(node).setIcon("left-arrow");
     };
     const right = (node: HTMLElement) => {
-        new ExtraButtonComponent(node).setIcon("right-arrow").onClick(() => {
-            dispatch("next");
-        });
+        new ExtraButtonComponent(node).setIcon("right-arrow");
+    };
+    const expand = (node: HTMLElement) => {
+        new ExtraButtonComponent(node).setIcon("fullscreen");
     };
 </script>
 
@@ -26,11 +25,27 @@
         <span class="fantasy-year year">{year}</span>
     </h3>
     <div class="right-nav fantasy-right-nav">
-        <div class="arrow" use:left aria-label="Previous Month" />
+        <div
+            class="arrow"
+            use:left
+            aria-label="Previous Month"
+            on:click={() => dispatch("previous")}
+        />
         <div class="reset-button" on:click={() => dispatch("reset")}>
             <span>Today</span>
         </div>
-        <div class="arrow right" use:right aria-label="Next Month" />
+        <div
+            class="arrow right"
+            use:right
+            aria-label="Next Month"
+            on:click={() => dispatch("next")}
+        />
+        <div
+            class="arrow full-view"
+            use:expand
+            aria-label="Open Full Calendar"
+            on:click={() => dispatch("expand")}
+        />
     </div>
 </div>
 
