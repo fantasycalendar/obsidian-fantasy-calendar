@@ -1,6 +1,11 @@
 <script lang="ts">
+    import type { Day } from "src/@types";
     import type { DayHelper } from "src/calendar";
     import DayView from "./Day.svelte";
+
+    import { createEventDispatcher } from "svelte";
+
+    const dispatch = createEventDispatcher();
 
     export let days: {
         previous: DayHelper[];
@@ -8,17 +13,23 @@
         next: DayHelper[];
     };
     export let columns: number;
+    export let fullView: boolean = false;
+
 </script>
 
-<div class="fantasy-month" style="--calendar-columns: {columns};">
+<div
+    class="fantasy-month"
+    class:full-view={fullView}
+    style="--calendar-columns: {columns};"
+>
     {#each days.previous as day}
-        <DayView {day} adjacent={true} />
+        <DayView {day} adjacent={true} on:day-click />
     {/each}
     {#each days.current as day}
-        <DayView {day} adjacent={false} />
+        <DayView {day} adjacent={false} on:day-click />
     {/each}
     {#each days.next as day}
-        <DayView {day} adjacent={true} />
+        <DayView {day} adjacent={true} on:day-click />
     {/each}
 </div>
 
@@ -26,6 +37,9 @@
     .fantasy-month {
         display: grid;
         grid-template-columns: repeat(var(--calendar-columns), 1fr);
+    }
+
+    .full-view {
         height: 100%;
     }
 </style>

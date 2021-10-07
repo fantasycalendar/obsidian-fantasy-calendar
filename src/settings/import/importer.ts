@@ -13,29 +13,19 @@ export default class Import {
     static import(objects: any[]) {
         const calendars: Calendar[] = [];
         for (let data of objects) {
-            console.log("🚀 ~ file: importer.ts ~ line 14 ~ data", data);
             const name = data.name ?? "Imported Calendar";
             const static_data = data.static_data;
-            console.log(
-                "🚀 ~ file: importer.ts ~ line 16 ~ static_data",
-                static_data
-            );
+
             if (!static_data) continue;
 
             const year_data = static_data.year_data;
-            console.log(
-                "🚀 ~ file: importer.ts ~ line 20 ~ year_data",
-                year_data
-            );
+
             if (!year_data) continue;
 
             const firstWeekDay = year_data.first_day ?? 0;
             const overflow = year_data.overflow ?? true;
             const global_week = year_data.global_week;
-            console.log(
-                "🚀 ~ file: importer.ts ~ line 26 ~ global_week",
-                global_week
-            );
+
 
             if (!global_week) continue;
 
@@ -48,10 +38,7 @@ export default class Import {
             });
 
             const timespans = year_data.timespans;
-            console.log(
-                "🚀 ~ file: importer.ts ~ line 39 ~ timespans",
-                timespans
-            );
+
 
             if (!timespans) continue;
 
@@ -78,7 +65,7 @@ export default class Import {
             const dynamicData = {
                 year: 1,
                 day: 1,
-                month: 1
+                month: 0
             };
             if (data.dynamic_data) {
                 dynamicData.year = data.dynamic_data.year ?? dynamicData.year;
@@ -106,7 +93,7 @@ export default class Import {
                         Array.isArray(event.data?.date)
                     ) {
                         date.day = event.data.date[2];
-                        date.month = event.data.date[1] + 1;
+                        date.month = event.data.date[1];
                         date.year = event.data.date[0];
                     } else if (
                         event.data &&
@@ -139,17 +126,11 @@ export default class Import {
 
                     let description: string;
                     if (event.description) {
-                        console.log(
-                            "🚀 ~ file: importer.ts ~ line 142 ~ event.description",
-                            event.description
-                        );
+
                         const descriptionEl = createDiv();
                         descriptionEl.innerHTML = event.description;
                         description = descriptionEl.textContent;
-                        console.log(
-                            "🚀 ~ file: importer.ts ~ line 146 ~ descriptionEl.textContent",
-                            descriptionEl.textContent
-                        );
+
                     }
 
                     events.push({

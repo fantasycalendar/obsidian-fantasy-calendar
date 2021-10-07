@@ -6,7 +6,7 @@ import type FantasyCalendar from "../main";
 
 export const VIEW_TYPE = "FANTASY_CALENDAR";
 
-import CalendarUI from "./ui/side/Calendar.svelte";
+import CalendarUI from "./ui/Calendar.svelte";
 
 addIcon(
     VIEW_TYPE,

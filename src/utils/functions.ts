@@ -28,10 +28,10 @@ export function dateString(event: Event, months: Month[]) {
     }
     const { day, month, year } = event.date;
     if (month != undefined && year != undefined) {
-        return `${months[month - 1].name} ${ordinal(day)}, ${year}`;
+        return `${months[month].name} ${ordinal(day)}, ${year}`;
     }
     if (month != undefined) {
-        return `${months[month - 1].name} ${ordinal(day)} of every year`;
+        return `${months[month].name} ${ordinal(day)} of every year`;
     }
     return `${ordinal(day)} of every month`;
 }

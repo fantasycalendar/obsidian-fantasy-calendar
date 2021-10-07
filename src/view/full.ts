@@ -5,7 +5,7 @@ import FantasyCalendarView from "src/view/view";
 
 export const FULL_VIEW = "FANTASY_CALENDAR_FULL_VIEW";
 
-import CalendarUI from "./ui/full/Calendar.svelte";
+import CalendarUI from "./ui/Calendar.svelte";
 
 import "./view.css";
 
@@ -32,7 +32,7 @@ export default class FullView extends FantasyCalendarView {
         }
         this._app = new CalendarUI({
             target: this.contentEl,
-            props: { data: this.calendar }
+            props: { data: this.calendar, fullView: true }
         });
     }
 }

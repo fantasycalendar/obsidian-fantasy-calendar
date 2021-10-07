@@ -6,6 +6,7 @@
     import Nav from "./Nav.svelte";
 
     export let data: Calendar;
+    export let fullView: boolean = false;
     const calendar = new CalendarHelper(data);
 
     calendar.on("month-update", () => {
@@ -25,8 +26,9 @@
 <div
     id="calendar-container"
     class="fantasy-calendar"
+    class:full-view={fullView}
     style="--calendar-columns: {calendar.weekdays
-        .length}; --calendar-rows: {calendar.weeksPerCurrentMonth};"
+        .length};"
 >
     <Nav
         month={month.name}
@@ -39,11 +41,16 @@
             <span class="weekday fantasy-weekday">{day.name.slice(0, 3)}</span>
         {/each}
     </div>
-    <MonthView columns={weekdays.length} {days} />
+    <MonthView
+        columns={weekdays.length}
+        {days}
+        {fullView}
+        on:day-click
+    />
 </div>
 
 <style>
-    #calendar-container.fantasy-calendar {
+    #calendar-container.fantasy-calendar.full-view {
         width: 100%;
         height: 100%;
         margin: 0.5rem;

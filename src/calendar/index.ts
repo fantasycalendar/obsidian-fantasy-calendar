@@ -12,6 +12,7 @@ export class MonthHelper {
     }
 
     get firstWeekday() {
+        if (!this.calendar.data.overflow) return 0;
         return this.days[0].weekday;
     }
     get lastWeekday() {
@@ -57,17 +58,16 @@ export class DayHelper {
         };
     }
     get weekday() {
-        if (!this.calendar.data.overflow) return 0;
-
         const days = this.month.daysBefore + this.number - 1;
         const firstOfYear = this.calendar.firstDayOfYear();
+
         return wrap(
             (days % this.calendar.weekdays.length) + firstOfYear,
             this.calendar.weekdays.length
         );
     }
     get isCurrentDay() {
-        return 
+        return;
     }
     constructor(public month: MonthHelper, public number: number) {}
 }
@@ -83,7 +83,7 @@ export default class CalendarHelper extends Events {
         window.calendar = this;
 
         this.months = this.data.months.map(
-            (m, i) => new MonthHelper(m, i + 1, this)
+            (m, i) => new MonthHelper(m, i, this)
         );
     }
     get data() {
@@ -185,18 +185,24 @@ export default class CalendarHelper extends Events {
         return this.months.reduce((a, b) => a + b.days.length, 0);
     }
     daysBeforeMonth(month: MonthHelper) {
+        if (this.months.indexOf(month) == 0) {
+            return 0;
+        }
         return this.months
             .slice(0, month.number)
             .reduce((a, b) => a + b.days.length, 0);
     }
 
+    get firstWeekday() {
+        return this.data.firstWeekDay;
+    }
     firstDayOfYear() {
-        if (this.current.year == 1) return this.data.firstWeekDay;
+        if (this.current.year == 1) return this.firstWeekday;
 
         return wrap(
             ((Math.abs(this.current.year - 1) * this.daysPerYear) %
                 this.data.weekdays.length) +
-                this.data.firstWeekDay,
+                this.firstWeekday,
             this.data.weekdays.length
         );
     }

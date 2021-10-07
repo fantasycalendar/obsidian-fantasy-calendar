@@ -1,5 +1,5 @@
 import type { Recurring } from "src/settings/settings";
-import type Calendar__SvelteComponent_ from "src/view/ui/side/Calendar.svelte";
+import type Calendar__SvelteComponent_ from "src/view/ui/Calendar.svelte";
 
 export interface Calendar {
     id: string;
@@ -22,12 +22,9 @@ export interface TimeSpan {
     id: string;
 }
 
-export interface Day extends TimeSpan {
-    type: "day";
-}
+export interface Day extends TimeSpan {}
 export type Week = Day[];
 export interface Month extends TimeSpan {
-    type: "month";
     length: number;
 }
 

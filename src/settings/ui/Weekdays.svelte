@@ -4,6 +4,7 @@
     import { dndzone, SOURCES, TRIGGERS } from "svelte-dnd-action";
     import {
         ButtonComponent,
+        DropdownComponent,
         ExtraButtonComponent,
         setIcon,
         Setting,
@@ -12,6 +13,7 @@
     import type { Day } from "src/@types";
 
     import { nanoid } from "src/utils/functions";
+    export let firstWeekday: number = 0;
 
     const add = (node: HTMLElement) => {
         new ButtonComponent(node)
@@ -48,6 +50,7 @@
             .onChange((v) => {
                 item.name = v;
                 dispatch("weekday-update", weekdays);
+                weekdays = weekdays;
             });
         comp.inputEl.setAttr("style", "width: 100%;");
     };
@@ -88,6 +91,11 @@
     export let weekdays: Day[] = [];
     $: {
         dispatch("weekday-update", weekdays);
+        //TODO: add new days to dropdown, remove removed days from dropdown
+    }
+
+    $: {
+        dispatch("first-weekday-update", firstWeekday);
     }
 </script>
 
@@ -123,6 +131,30 @@
         </div>
     {/if}
     <div class="add-new" use:add />
+    {#if weekdays.length}
+        <div class="first-weekday">
+            <div class="setting-item">
+                <div class="setting-item-info">
+                    <div class="setting-item-name">First Day</div>
+                    <div class="setting-item-description">
+                        This only effects which day of the week the first year
+                        starts on.
+                    </div>
+                </div>
+                <div class="setting-item-control">
+                    <select class="dropdown" bind:value={firstWeekday}>
+                        {#each weekdays as weekday, index}
+                            <option
+                                value={index}
+                                selected={index == firstWeekday}
+                                >{weekday.name ?? ""}</option
+                            >
+                        {/each}
+                    </select>
+                </div>
+            </div>
+        </div>
+    {/if}
 </div>
 
 <style>
@@ -142,7 +174,7 @@
     }
     .add-new {
         padding-top: 0.75rem;
-        padding-bottom: 0;
+        padding-bottom: 0.75rem;
         display: flex;
         justify-content: flex-end;
     }

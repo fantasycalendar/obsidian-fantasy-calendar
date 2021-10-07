@@ -7,7 +7,6 @@ import type { Calendar, FantasyCalendarData } from "./@types";
 import FantasyCalendarView, { VIEW_TYPE } from "./view/view";
 
 import FullCalendarView, { FULL_VIEW } from "./view/full";
-import Calendar__SvelteComponent_ from "./view/ui/side/Calendar.svelte";
 
 declare module "obsidian" {
     interface Workspace {
@@ -49,6 +48,12 @@ export default class FantasyCalendar extends Plugin {
         if (leaf && leaf.view && leaf.view instanceof FantasyCalendarView)
             return leaf.view;
     }
+    get full() {
+        const leaves = this.app.workspace.getLeavesOfType(FULL_VIEW);
+        const leaf = leaves.length ? leaves[0] : null;
+        if (leaf && leaf.view && leaf.view instanceof FantasyCalendarView)
+            return leaf.view;
+    }
     async onload() {
         console.log("Loading Fantasy Calendars v" + this.manifest.version);
 
@@ -69,7 +74,22 @@ export default class FantasyCalendar extends Plugin {
         this.registerView(FULL_VIEW, (leaf: WorkspaceLeaf) => {
             return new FullCalendarView(leaf, this);
         });
-        this.app.workspace.getLeaf(false).setViewState({ type: FULL_VIEW });
+
+        this.addCommand({
+            id: "open-fantasy-calendar",
+            name: "Open Fantasy Calendar",
+            callback: () => {
+                this.addCalendarView();
+            }
+        });
+
+        this.addCommand({
+            id: "open-big-fantasy-calendar",
+            name: "Open Big Fantasy Calendar",
+            callback: () => {
+                this.addFullCalendarView();
+            }
+        });
     }
 
     async onunload() {
@@ -83,15 +103,15 @@ export default class FantasyCalendar extends Plugin {
     }
 
     async addCalendarView() {
-        if (this.app.workspace.getLeavesOfType(VIEW_TYPE).length) {
-            return;
-        }
         await this.app.workspace.getRightLeaf(false).setViewState({
             type: VIEW_TYPE
         });
-        this.app.workspace.revealLeaf(this.view.leaf);
+        if (this.view) this.app.workspace.revealLeaf(this.view.leaf);
     }
-
+    async addFullCalendarView() {
+        this.app.workspace.getLeaf(false).setViewState({ type: FULL_VIEW });
+        if (this.full) this.app.workspace.revealLeaf(this.full.leaf);
+    }
     async loadSettings() {
         this.data = {
             ...DEFAULT_DATA,

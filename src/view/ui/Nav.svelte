@@ -14,9 +14,6 @@
     const right = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("right-arrow");
     };
-    const expand = (node: HTMLElement) => {
-        new ExtraButtonComponent(node).setIcon("fullscreen");
-    };
 </script>
 
 <div class="fantasy-nav nav">
@@ -40,12 +37,6 @@
             aria-label="Next Month"
             on:click={() => dispatch("next")}
         />
-        <div
-            class="arrow full-view"
-            use:expand
-            aria-label="Open Full Calendar"
-            on:click={() => dispatch("expand")}
-        />
     </div>
 </div>
 
@@ -54,7 +45,6 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        width: 100%;
     }
     .fantasy-title {
         margin: 0;

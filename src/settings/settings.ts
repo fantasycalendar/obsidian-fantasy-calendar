@@ -14,6 +14,7 @@ import {
 import { DEFAULT_CALENDAR } from "../main";
 import type FantasyCalendar from "../main";
 import Importer from "./import/importer";
+import { PRESET_CALENDARS } from "../utils/presets";
 
 import Weekdays from "./ui/Weekdays.svelte";
 import Months from "./ui/Months.svelte";
@@ -58,7 +59,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                 d.onChange((v) => {
                     if (v === "none") {
                         this.plugin.data.defaultCalendar = null;
-                    this.plugin.saveSettings();
+                        this.plugin.saveSettings();
                         return;
                     }
                     const calendar = this.plugin.data.calendars.find(
@@ -76,7 +77,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
         importSetting.descEl.createEl("a", {
             href: "https://app.fantasy-calendar.com",
             text: "Fantasy Calendar",
-            cls: 'external-link'
+            cls: "external-link"
         });
         const input = createEl("input", {
             attr: {
@@ -212,7 +213,9 @@ class ConfirmModal extends Modal {
         this.contentEl.createEl("p", {
             text: "Are you sure you want to delete this calendar?"
         });
-        const buttonEl = this.contentEl.createDiv("confirm-buttons");
+        const buttonEl = this.contentEl.createDiv(
+            "fantasy-calendar-confirm-buttons"
+        );
         new ButtonComponent(buttonEl).setButtonText("Delete").onClick(() => {
             this.delete = true;
             this.close();
@@ -239,6 +242,7 @@ class CreateCalendarModal extends Modal {
     buttonsEl: HTMLDivElement;
     canSave: boolean = false;
     eventEl: HTMLDivElement;
+    preset: Calendar;
     get static() {
         return this.calendar.static;
     }
@@ -266,6 +270,27 @@ class CreateCalendarModal extends Modal {
         this.contentEl.createEl("h3", {
             text: this.editing ? "Edit Calendar" : "New Calendar"
         });
+
+        const presetEl = this.contentEl.createDiv(
+            "fantasy-calendar-apply-preset"
+        );
+        new Setting(presetEl)
+            .setName("Apply Preset")
+            .setDesc("Apply a common fantasy calendar as a preset.")
+            .addButton((b) => {
+                b.setCta()
+                    .setButtonText("Choose Preset")
+                    .onClick(() => {
+                        const modal = new CalendarPresetModal(this.app);
+                        modal.onClose = () => {
+                            if (!modal.saved) return;
+
+                            this.calendar = { ...modal.preset };
+                            this.display();
+                        };
+                        modal.open();
+                    });
+            });
 
         this.infoEl = this.contentEl.createDiv();
         this.buildInfo();
@@ -296,19 +321,7 @@ class CreateCalendarModal extends Modal {
                 (v) => (this.calendar.description = v)
             );
         });
-        new Setting(element)
-            .setName("First Day")
-            .setDesc(
-                "This only effects which day of the week the first year starts on."
-            )
-            .addText((t) => {
-                t.setValue(`${this.calendar.static.firstWeekDay}`).onChange(
-                    (v) => {
-                        this.calendar.static.firstWeekDay = Number(v) - 1;
-                    }
-                );
-                t.inputEl.setAttr("type", "number");
-            });
+
         new Setting(element)
             .setName("Overflow Weeks")
             .setDesc(
@@ -327,7 +340,8 @@ class CreateCalendarModal extends Modal {
         const weekday = new Weekdays({
             target: element,
             props: {
-                weekdays: this.week
+                weekdays: this.week,
+                firstWeekday: this.calendar.static.firstWeekDay
             }
         });
 
@@ -338,11 +352,16 @@ class CreateCalendarModal extends Modal {
                 !this.calendar.static.firstWeekDay &&
                 this.calendar.static.weekdays.length
             ) {
-                this.calendar.static.firstWeekDay = 1;
-                this.buildInfo();
+                this.calendar.static.firstWeekDay = 0;
+                weekday.$set({
+                    firstWeekday: this.calendar.static.firstWeekDay
+                });
             }
 
             this.checkCanSave();
+        });
+        weekday.$on("first-weekday-update", (e: CustomEvent<number>) => {
+            this.calendar.static.firstWeekDay = e.detail;
         });
     }
     buildMonths() {
@@ -399,7 +418,6 @@ class CreateCalendarModal extends Modal {
         });
 
         events.$on("edit-events", (e: CustomEvent<Event[]>) => {
-            console.log("🚀 ~ file: settings.ts ~ line 373 ~ e", e);
             this.calendar.events = e.detail;
         });
 
@@ -433,10 +451,6 @@ class CreateCalendarModal extends Modal {
                 if (!this.canSave) {
                     this.checkCanSave();
                 }
-                console.log(
-                    "🚀 ~ file: settings.ts ~ line 278 ~ this.canSave",
-                    this.canSave
-                );
                 if (!this.canSave) {
                     if (!this.calendar.name?.length) {
                         new Notice("The calendar name is required!");
@@ -469,6 +483,55 @@ class CreateCalendarModal extends Modal {
     }
     onOpen() {
         this.display();
+    }
+}
+
+export class CalendarPresetModal extends Modal {
+    preset: Calendar;
+    saved: boolean;
+    async onOpen() {
+        await this.display();
+    }
+    async display() {
+        this.containerEl.addClass("fantasy-calendar-choose-preset");
+        this.contentEl.empty();
+        this.contentEl.createEl("h3", {
+            text: "Choose a Preset Calendar"
+        });
+
+        const presetEl = this.contentEl.createDiv(
+            "fantasy-calendar-preset-container"
+        );
+
+        for (const preset of PRESET_CALENDARS) {
+            const button = new ButtonComponent(presetEl).onClick(() => {
+                this.preset = preset;
+                this.display();
+            });
+            if (this.preset == preset) button.setCta();
+            button.buttonEl.createDiv({
+                cls: "setting-item-name",
+                text: preset.name
+            });
+            button.buttonEl.createDiv({
+                cls: "setting-item-description",
+                text: preset.description
+            });
+        }
+
+        const buttonEl = this.contentEl.createDiv(
+            "fantasy-calendar-confirm-buttons"
+        );
+        new ButtonComponent(buttonEl)
+            .setButtonText("Apply")
+            .onClick(() => {
+                this.saved = true;
+                this.close();
+            })
+            .setCta();
+        new ExtraButtonComponent(buttonEl).setIcon("cross").onClick(() => {
+            this.close();
+        });
     }
 }
 
@@ -595,7 +658,6 @@ export class CreateEventModal extends Modal {
                 const index = this.calendar.static.months.find(
                     (m) => m.name == v
                 );
-                console.log("🚀 ~ file: settings.ts ~ line 576 ~ index", index);
                 this.event.date.month =
                     this.calendar.static.months.indexOf(index) + 1;
             });
