@@ -5,11 +5,12 @@ import FantasyCalendarView from "src/view/view";
 
 export const FULL_VIEW = "FANTASY_CALENDAR_FULL_VIEW";
 
+import CalendarUI from "./ui/full/Calendar.svelte";
 
 import "./view.css";
 
 export default class FullView extends FantasyCalendarView {
-
+    protected _app: CalendarUI;
     constructor(public leaf: WorkspaceLeaf, public plugin: FantasyCalendar) {
         super(plugin, leaf);
         this.contentEl.addClass("fantasy-calendar-full");
@@ -24,7 +25,7 @@ export default class FullView extends FantasyCalendarView {
     getViewType() {
         return FULL_VIEW;
     }
-/*     setCurrentCalendar(calendar: Calendar) {
+    setCurrentCalendar(calendar: Calendar) {
         this.calendar = calendar;
         if (this._app) {
             this._app.$destroy();
@@ -33,5 +34,5 @@ export default class FullView extends FantasyCalendarView {
             target: this.contentEl,
             props: { data: this.calendar }
         });
-    } */
+    }
 }
