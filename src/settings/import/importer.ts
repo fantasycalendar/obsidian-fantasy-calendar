@@ -5,7 +5,9 @@ import type {
     StaticCalendarData,
     Week
 } from "../../@types";
-import { nanoid } from "nanoid";
+import { nanoid } from "src/utils/functions";
+
+import { decode } from "he";
 
 export default class Import {
     static import(objects: any[]) {
@@ -59,7 +61,7 @@ export default class Import {
 
             const months: Month[] = month_spans.map((m: any) => {
                 return {
-                    name: m.name,
+                    name: decode(m.name),
                     type: "month",
                     length: m.length,
                     id: nanoid(6)
@@ -104,7 +106,7 @@ export default class Import {
                         Array.isArray(event.data?.date)
                     ) {
                         date.day = event.data.date[2];
-                        date.month = event.data.date[1];
+                        date.month = event.data.date[1] + 1;
                         date.year = event.data.date[0];
                     } else if (
                         event.data &&
@@ -135,9 +137,24 @@ export default class Import {
                         } catch (e) {}
                     }
 
+                    let description: string;
+                    if (event.description) {
+                        console.log(
+                            "🚀 ~ file: importer.ts ~ line 142 ~ event.description",
+                            event.description
+                        );
+                        const descriptionEl = createDiv();
+                        descriptionEl.innerHTML = event.description;
+                        description = descriptionEl.textContent;
+                        console.log(
+                            "🚀 ~ file: importer.ts ~ line 146 ~ descriptionEl.textContent",
+                            descriptionEl.textContent
+                        );
+                    }
+
                     events.push({
                         name: event.name,
-                        description: event.description,
+                        description: description,
                         id: event.id,
                         note: null,
                         date

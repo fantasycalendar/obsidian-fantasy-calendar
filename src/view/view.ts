@@ -1,4 +1,3 @@
-import { nanoid } from "nanoid";
 import { addIcon, DropdownComponent, ItemView, WorkspaceLeaf } from "obsidian";
 import type { Calendar } from "src/@types";
 import type { DayHelper } from "src/calendar";
@@ -24,7 +23,13 @@ export default class FantasyCalendarView extends ItemView {
     ) {
         super(leaf);
 
-        this.calendarDropdownEl = this.contentEl.createDiv();
+        this.calendarDropdownEl = this.contentEl.createDiv(
+            "fantasy-calendar-picker"
+        );
+
+        if (this.plugin.data.defaultCalendar) {
+            this.setCurrentCalendar(this.plugin.data.defaultCalendar);
+        }
 
         this.updateCalendars();
         this.plugin.registerEvent(
@@ -39,18 +44,27 @@ export default class FantasyCalendarView extends ItemView {
             this.setCurrentCalendar(this.plugin.data.calendars[0]);
             return;
         }
-        const dropdown = new DropdownComponent(this.calendarDropdownEl)
+        const dropdown = new DropdownComponent(
+            this.calendarDropdownEl
+        ).onChange((v) => {
+            this.setCurrentCalendar(
+                this.plugin.data.calendars.find((c) => c.id == v)
+            );
+        });
+        dropdown.selectEl.createEl("option", {
+            attr: {
+                selected: true,
+                disabled: true
+            },
+            text: "Choose a Calendar"
+        });
+        dropdown
             .addOptions(
                 Object.fromEntries(
                     this.plugin.data.calendars.map((c) => [c.id, c.name])
                 )
             )
-            .setValue(this.calendar ? this.calendar.id : null)
-            .onChange((v) => {
-                this.setCurrentCalendar(
-                    this.plugin.data.calendars.find((c) => c.id == v)
-                );
-            });
+            .setValue(this.calendar ? this.calendar.id : null);
     }
 
     setCurrentCalendar(calendar: Calendar) {
@@ -67,7 +81,12 @@ export default class FantasyCalendarView extends ItemView {
 
             if (day.events.length) {
             } else {
-                const modal = new CreateEventModal(this.app, null, day.date);
+                const modal = new CreateEventModal(
+                    this.app,
+                    this.calendar,
+                    null,
+                    day.date
+                );
 
                 modal.onClose = () => {
                     if (!modal.saved) return;

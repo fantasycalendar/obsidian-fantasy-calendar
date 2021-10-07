@@ -26,13 +26,6 @@
 </div>
 
 <style>
-    .dot-container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        line-height: 6px;
-        min-height: 6px;
-    }
     .day {
         background-color: var(--color-background-day);
         border-radius: 4px;

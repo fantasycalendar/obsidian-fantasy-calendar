@@ -2,9 +2,11 @@
     import { createEventDispatcher } from "svelte";
     import { ButtonComponent, ExtraButtonComponent } from "obsidian";
 
-    import type { Event } from "src/@types";
+    import type { Event, Month } from "src/@types";
+    import { dateString } from "src/utils/functions";
 
     export let events: Event[] = [];
+    export let months: Month[] = [];
 
     const dispatch = createEventDispatcher();
 
@@ -16,23 +18,36 @@
                 dispatch("new-event");
             });
     };
-    const trash = (node: HTMLElement, item: Event) => {
+    const trash = (node: HTMLElement) => {
         let b = new ExtraButtonComponent(node)
             .setIcon("trash")
-            .setTooltip("Delete")
-            .onClick(
-                () => (events = events.filter((event) => event.id !== item.id))
-            );
+            .setTooltip("Delete");
         b.extraSettingsEl.setAttr("style", "margin-left: 0;");
     };
-    const edit = (node: HTMLElement, item: Event) => {
-        new ExtraButtonComponent(node)
-            .setIcon("pencil")
-            .setTooltip("Edit")
-            .onClick(() => {
-                dispatch("new-event", item);
-            });
+    const edit = (node: HTMLElement) => {
+        new ExtraButtonComponent(node).setIcon("pencil").setTooltip("Edit");
     };
+
+    const editEvent = (item: Event) => {
+        dispatch("new-event", item);
+    };
+
+    const deleteEvent = (item: Event) => {
+        events = events.filter((event) => event.id !== item.id);
+        dispatch("edit-events", events);
+    };
+
+    $: {
+        events.sort((a, b) => {
+            if (a.date.year != b.date.year) {
+                return a.date.year - b.date.year;
+            }
+            if (a.date.month != b.date.month) {
+                return a.date.month - b.date.month;
+            }
+            return a.date.day - b.date.day;
+        });
+    }
 </script>
 
 <div class="fantasy-calendar-container">
@@ -42,33 +57,29 @@
         </div>
     {:else}
         <div class="existing-items">
-            {#each events as event}
+            {#each events as event, index}
                 <div class="event">
                     <div class="event-info">
                         <span class="setting-item-name">{event.name}</span>
                         <div class="setting-item-description">
                             <div class="date">
-                                {#if event.date.day}
-                                    <span>{event.date.day}</span>
-                                {/if}
-                                {#if event.date.month}
-                                    <span
-                                        >{event.date.month}{event.date.year
-                                            ? ","
-                                            : ""}</span
-                                    >
-                                {/if}
-                                {#if event.date.year}
-                                    <span>{event.date.year}</span>
-                                {/if}
+                                {dateString(event, months)}
                             </div>
-                            <span class="clamp">{event.description}</span>
+                            <span class="clamp">{event.description ?? ""}</span>
                         </div>
                     </div>
 
                     <div class="icons">
-                        <div class="icon" use:edit={event} />
-                        <div class="icon" use:trash={event} />
+                        <div
+                            class="icon"
+                            use:edit
+                            on:click={() => editEvent(event)}
+                        />
+                        <div
+                            class="icon"
+                            use:trash
+                            on:click={() => deleteEvent(event)}
+                        />
                     </div>
                 </div>
             {/each}
@@ -95,6 +106,7 @@
 
     .icons {
         display: flex;
+        align-self: flex-start;
         justify-self: flex-end;
         align-items: center;
     }

@@ -12,7 +12,7 @@
     } from "obsidian";
     import type { Month } from "src/@types";
 
-    import { nanoid } from "nanoid";
+    import { nanoid } from "src/utils/functions";
 
     const add = (node: HTMLElement) => {
         new ButtonComponent(node)

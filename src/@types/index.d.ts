@@ -1,4 +1,5 @@
 import type { Recurring } from "src/settings/settings";
+import type Calendar__SvelteComponent_ from "src/view/ui/side/Calendar.svelte";
 
 export interface Calendar {
     id: string;
@@ -11,6 +12,8 @@ export interface Calendar {
 
 export interface FantasyCalendarData {
     calendars: Calendar[];
+    currentCalendar: Calendar;
+    defaultCalendar: Calendar;
 }
 
 export interface TimeSpan {

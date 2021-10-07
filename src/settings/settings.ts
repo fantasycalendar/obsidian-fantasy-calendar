@@ -2,6 +2,7 @@ import {
     addIcon,
     App,
     ButtonComponent,
+    DropdownComponent,
     ExtraButtonComponent,
     Modal,
     Notice,
@@ -19,7 +20,7 @@ import Months from "./ui/Months.svelte";
 import EventsUI from "./ui/Events.svelte";
 
 import "./settings.css";
-import { nanoid } from "nanoid";
+import { dateString, nanoid } from "src/utils/functions";
 import type { Calendar, Event } from "src/@types";
 export enum Recurring {
     none = "None",
@@ -45,9 +46,38 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
         this.containerEl.createEl("h2", { text: "Fantasy Calendars" });
         this.containerEl.addClass("fantasy-calendar-settings");
 
+        new Setting(this.containerEl)
+            .setName("Default Calendar to Open")
+            .setDesc("Views will open to this calendar by default.")
+            .addDropdown((d) => {
+                d.addOption("none", "None");
+                for (let calendar of this.data.calendars) {
+                    d.addOption(calendar.id, calendar.name);
+                }
+                d.setValue(this.plugin.data.defaultCalendar?.id);
+                d.onChange((v) => {
+                    if (v === "none") {
+                        this.plugin.data.defaultCalendar = null;
+                    this.plugin.saveSettings();
+                        return;
+                    }
+                    const calendar = this.plugin.data.calendars.find(
+                        (c) => c.id == v
+                    );
+
+                    this.plugin.data.defaultCalendar = calendar;
+                    this.plugin.saveSettings();
+                });
+            });
+
         const importSetting = new Setting(this.containerEl)
             .setName("Import Calendar")
-            .setDesc("Import calendar from Fantasy-Calendars.com");
+            .setDesc("Import calendar from ");
+        importSetting.descEl.createEl("a", {
+            href: "https://app.fantasy-calendar.com",
+            text: "Fantasy Calendar",
+            cls: 'external-link'
+        });
         const input = createEl("input", {
             attr: {
                 type: "file",
@@ -65,6 +95,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                 const calendars = Importer.import([JSON.parse(data)]);
                 this.plugin.data.calendars.push(...calendars);
                 await this.plugin.saveSettings();
+                this.buildCalendarUI();
             } catch (e) {
                 new Notice(
                     `There was an error while importing the calendar${
@@ -129,10 +160,6 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
             return;
         }
         for (let calendar of this.data.calendars) {
-            console.log(
-                "🚀 ~ file: settings.ts ~ line 132 ~ calendar",
-                calendar.description
-            );
             new Setting(element)
                 .setName(calendar.name)
                 .setDesc(calendar.description ?? "")
@@ -144,7 +171,12 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                         );
                         modal.onClose = async () => {
                             if (!modal.saved) return;
-                            calendar = { ...modal.calendar };
+                            this.data.calendars.splice(
+                                this.data.calendars.indexOf(calendar),
+                                1,
+                                { ...modal.calendar }
+                            );
+
                             await this.plugin.saveCalendar();
 
                             this.showCalendars(element);
@@ -176,21 +208,24 @@ class ConfirmModal extends Modal {
     delete: boolean = false;
     async display() {
         this.contentEl.empty();
-        this.contentEl.createSpan({
+        this.contentEl.addClass("confirm-modal");
+        this.contentEl.createEl("p", {
             text: "Are you sure you want to delete this calendar?"
         });
-        new ButtonComponent(this.contentEl)
-            .setButtonText("Delete")
-            .onClick(() => {
-                this.delete = true;
-                this.close();
-            });
-        new ButtonComponent(this.contentEl)
+        const buttonEl = this.contentEl.createDiv("confirm-buttons");
+        new ButtonComponent(buttonEl).setButtonText("Delete").onClick(() => {
+            this.delete = true;
+            this.close();
+        });
+        new ButtonComponent(buttonEl)
             .setButtonText("Cancel")
             .setCta()
             .onClick(() => {
                 this.close();
             });
+    }
+    onOpen() {
+        this.display();
     }
 }
 
@@ -218,7 +253,6 @@ class CreateCalendarModal extends Modal {
     }
     constructor(public plugin: FantasyCalendar, existing?: Calendar) {
         super(plugin.app);
-        console.log("🚀 ~ file: settings.ts ~ line 147 ~ existing", existing);
         this.calendar.id = nanoid(6);
         if (existing) {
             this.editing = true;
@@ -335,11 +369,16 @@ class CreateCalendarModal extends Modal {
         const events = new EventsUI({
             target: element,
             props: {
-                events: this.events
+                events: this.events,
+                months: this.calendar.static.months
             }
         });
         events.$on("new-event", async (e: CustomEvent<Event>) => {
-            const modal = new CreateEventModal(this.app, e.detail);
+            const modal = new CreateEventModal(
+                this.app,
+                this.calendar,
+                e.detail
+            );
             modal.onClose = () => {
                 if (!modal.saved) return;
                 if (modal.editing) {
@@ -349,11 +388,7 @@ class CreateCalendarModal extends Modal {
                         )
                     );
 
-                    this.calendar.events = this.calendar.events.splice(
-                        index,
-                        1,
-                        { ...modal.event }
-                    );
+                    this.calendar.events.splice(index, 1, { ...modal.event });
                 } else {
                     this.calendar.events.push({ ...modal.event });
                 }
@@ -361,6 +396,11 @@ class CreateCalendarModal extends Modal {
                 this.plugin.saveCalendar();
             };
             modal.open();
+        });
+
+        events.$on("edit-events", (e: CustomEvent<Event[]>) => {
+            console.log("🚀 ~ file: settings.ts ~ line 373 ~ e", e);
+            this.calendar.events = e.detail;
         });
 
         this.eventEl.setAttr(
@@ -453,8 +493,10 @@ export class CreateEventModal extends Modal {
     dayEl: HTMLDivElement;
     yearEl: HTMLDivElement;
     fieldsEl: HTMLDivElement;
+    stringEl: HTMLDivElement;
     constructor(
         app: App,
+        public calendar: Calendar,
         event?: Event,
         date?: { month: number; day: number; year: number }
     ) {
@@ -507,16 +549,16 @@ export class CreateEventModal extends Modal {
 
         this.buildDateFields();
 
-        /* new Setting(this.contentEl)
-            .setName("Recurring")
-            .setDesc("Event will re-occur on the specified interval.")
-            .addDropdown((d) => {
-                d.addOptions(Recurring)
-                    .setValue(this.event.recurring)
-                    .onChange((v: keyof typeof Recurring) => {
-                        this.event.recurring = v;
-                    });
-            }); */
+        this.stringEl = this.dateEl.createDiv(
+            "event-date-string setting-item-description"
+        );
+        this.buildDateString();
+    }
+    buildDateString() {
+        this.stringEl.empty();
+        this.stringEl.createSpan({
+            text: dateString(this.event, this.calendar.static.months)
+        });
     }
     buildDateFields() {
         this.fieldsEl.empty();
@@ -532,13 +574,38 @@ export class CreateEventModal extends Modal {
 
         const monthEl = this.fieldsEl.createDiv("event-date-field");
         monthEl.createEl("label", { text: "Month" });
-        const month = new TextComponent(monthEl)
+        new DropdownComponent(monthEl)
+            .addOptions(
+                Object.fromEntries([
+                    ["select", "Select Month"],
+                    ...this.calendar.static.months.map((month) => [
+                        month.name,
+                        month.name
+                    ])
+                ])
+            )
+            .setValue(
+                this.event.date.month
+                    ? this.calendar.static.months[this.event.date.month - 1]
+                          .name
+                    : "select"
+            )
+            .onChange((v) => {
+                if (v === "select") this.event.date.month = null;
+                const index = this.calendar.static.months.find(
+                    (m) => m.name == v
+                );
+                console.log("🚀 ~ file: settings.ts ~ line 576 ~ index", index);
+                this.event.date.month =
+                    this.calendar.static.months.indexOf(index) + 1;
+            });
+        /* const month = new TextComponent(monthEl)
             .setPlaceholder("Month")
             .setValue(`${this.event.date.month}`)
             .onChange((v) => {
                 this.event.date.month = Number(v);
             });
-        month.inputEl.setAttr("type", "number");
+        month.inputEl.setAttr("type", "number"); */
 
         const yearEl = this.fieldsEl.createDiv("event-date-field");
         yearEl.createEl("label", { text: "Year" });

@@ -1,3 +1,9 @@
+.confirm-modal .confirm-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
 .fantasy-calendar-settings .fantasy-calendars {
     border-bottom: 1px solid var(--background-modifier-border);
     border-top: 1px solid var(--background-modifier-border);

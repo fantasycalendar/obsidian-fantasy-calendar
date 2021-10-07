@@ -11,7 +11,7 @@
     } from "obsidian";
     import type { Day } from "src/@types";
 
-    import { nanoid } from "nanoid";
+    import { nanoid } from "src/utils/functions";
 
     const add = (node: HTMLElement) => {
         new ButtonComponent(node)
@@ -23,7 +23,6 @@
                     {
                         type: "day",
                         name: null,
-                        length: 1,
                         id: nanoid(6)
                     }
                 ];

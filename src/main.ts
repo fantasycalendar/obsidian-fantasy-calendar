@@ -7,6 +7,7 @@ import type { Calendar, FantasyCalendarData } from "./@types";
 import FantasyCalendarView, { VIEW_TYPE } from "./view/view";
 
 import FullCalendarView, { FULL_VIEW } from "./view/full";
+import Calendar__SvelteComponent_ from "./view/ui/side/Calendar.svelte";
 
 declare module "obsidian" {
     interface Workspace {
@@ -24,10 +25,7 @@ export const DEFAULT_CALENDAR: Calendar = {
         firstWeekDay: null,
         overflow: true,
         weekdays: [],
-        months: [],
-        leapDays: [],
-        moons: [],
-        seasons: []
+        months: []
     },
     current: {
         year: null,
@@ -38,7 +36,9 @@ export const DEFAULT_CALENDAR: Calendar = {
 };
 
 export const DEFAULT_DATA: FantasyCalendarData = {
-    calendars: []
+    calendars: [],
+    currentCalendar: null,
+    defaultCalendar: null
 };
 
 export default class FantasyCalendar extends Plugin {

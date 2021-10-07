@@ -66,6 +66,9 @@ export class DayHelper {
             this.calendar.weekdays.length
         );
     }
+    get isCurrentDay() {
+        return 
+    }
     constructor(public month: MonthHelper, public number: number) {}
 }
 
