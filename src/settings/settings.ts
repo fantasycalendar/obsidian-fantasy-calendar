@@ -262,7 +262,7 @@ class CreateCalendarModal extends Modal {
             this.editing = true;
             this.calendar = { ...existing };
         }
-        this.containerEl.addClass("create-fantasy-calendar");
+        this.containerEl.addClass("fantasy-calendar-create-calendar");
     }
     async display() {
         this.contentEl.empty();
@@ -292,7 +292,7 @@ class CreateCalendarModal extends Modal {
                     });
             });
 
-        this.infoEl = this.contentEl.createDiv();
+        this.infoEl = this.contentEl.createDiv("calendar-info");
         this.buildInfo();
 
         this.weekdayEl = this.contentEl.createDiv();
@@ -316,21 +316,14 @@ class CreateCalendarModal extends Modal {
                 (v) => (this.calendar.name = v)
             );
         });
-        new Setting(element).setName("Calendar Description").addText((t) => {
-            t.setValue(this.calendar.description).onChange(
-                (v) => (this.calendar.description = v)
-            );
-        });
 
-        new Setting(element)
-            .setName("Overflow Weeks")
-            .setDesc(
-                "Turn this off to make each month start on the first of the week."
-            )
-            .addToggle((t) => {
-                t.setValue(this.calendar.static.overflow).onChange((v) => {
-                    this.calendar.static.overflow = v;
-                });
+        const descriptionEl = element.createDiv("calendar-description");
+        descriptionEl.createEl("label", { text: "Calendar Description" });
+        new TextAreaComponent(descriptionEl)
+            .setPlaceholder("Calendar Description")
+            .setValue(this.calendar.description)
+            .onChange((v) => {
+                this.calendar.description = v;
             });
     }
     buildWeekdays() {
@@ -341,7 +334,8 @@ class CreateCalendarModal extends Modal {
             target: element,
             props: {
                 weekdays: this.week,
-                firstWeekday: this.calendar.static.firstWeekDay
+                firstWeekday: this.calendar.static.firstWeekDay,
+                overflow: this.calendar.static.overflow
             }
         });
 
@@ -362,6 +356,15 @@ class CreateCalendarModal extends Modal {
         });
         weekday.$on("first-weekday-update", (e: CustomEvent<number>) => {
             this.calendar.static.firstWeekDay = e.detail;
+        });
+        weekday.$on("overflow-update", (e: CustomEvent<boolean>) => {
+            this.calendar.static.overflow = e.detail;
+            if (!this.calendar.static.overflow)
+                this.calendar.static.firstWeekDay = 0;
+
+            weekday.$set({
+                firstWeekday: this.calendar.static.firstWeekDay
+            });
         });
     }
     buildMonths() {

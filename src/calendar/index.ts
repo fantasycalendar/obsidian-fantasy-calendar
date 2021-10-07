@@ -1,5 +1,6 @@
 import { Events, Notice } from "obsidian";
-import type { Calendar, Month } from "../@types";
+import type FantasyCalendar from "src/main";
+import type { Calendar, CurrentCalendarData, Month } from "../@types";
 
 export class MonthHelper {
     days: DayHelper[] = [];
@@ -38,7 +39,7 @@ export class DayHelper {
         return {
             day: this.number,
             month: this.month.number,
-            year: this.calendar.current.year
+            year: this.calendar.displayed.year
         };
     }
     get events() {
@@ -54,7 +55,7 @@ export class DayHelper {
         return {
             day: this.number,
             month: this.month.name,
-            year: this.calendar.current.year
+            year: this.calendar.displayed.year
         };
     }
     get weekday() {
@@ -67,7 +68,11 @@ export class DayHelper {
         );
     }
     get isCurrentDay() {
-        return;
+        return (
+            this.number == this.calendar.current.day &&
+            this.calendar.displayed.month == this.calendar.current.month &&
+            this.calendar.displayed.year == this.calendar.current.year
+        );
     }
     constructor(public month: MonthHelper, public number: number) {}
 }
@@ -85,6 +90,7 @@ export default class CalendarHelper extends Events {
         this.months = this.data.months.map(
             (m, i) => new MonthHelper(m, i, this)
         );
+        this.displayed = { ...this.current };
     }
     get data() {
         return this.object.static;
@@ -92,36 +98,47 @@ export default class CalendarHelper extends Events {
     get current() {
         return this.object.current;
     }
+    displayed: CurrentCalendarData = {
+        year: null,
+        month: null,
+        day: null
+    };
+
+    reset() {
+        this.displayed = { ...this.current };
+        this.trigger("month-update");
+    }
+
     setCurrentMonth(n: number) {
-        this.object.current.month = n;
+        this.displayed.month = n;
 
         this.trigger("month-update");
     }
     get nextMonthIndex() {
-        return wrap(this.current.month + 1, this.months.length);
+        return wrap(this.displayed.month + 1, this.months.length);
     }
     get nextMonth() {
         return this.months[this.nextMonthIndex];
     }
     goToNext() {
-        if (this.nextMonthIndex < this.current.month) {
-            this.current.year += 1;
+        if (this.nextMonthIndex < this.displayed.month) {
+            this.displayed.year += 1;
         }
         this.setCurrentMonth(this.nextMonthIndex);
     }
     get prevMonthIndex() {
-        return wrap(this.current.month - 1, this.months.length);
+        return wrap(this.displayed.month - 1, this.months.length);
     }
     get previousMonth() {
         return this.months[this.prevMonthIndex];
     }
     goToPrevious() {
-        if (this.prevMonthIndex > this.current.month) {
-            if (this.current.year == 1) {
+        if (this.prevMonthIndex > this.displayed.month) {
+            if (this.displayed.year == 1) {
                 new Notice("This is the earliest year.");
                 return;
             }
-            this.current.year -= 1;
+            this.displayed.year -= 1;
         }
         this.setCurrentMonth(this.prevMonthIndex);
     }
@@ -130,7 +147,7 @@ export default class CalendarHelper extends Events {
         return this.data.weekdays;
     }
     get currentMonth() {
-        return this.months[this.current.month];
+        return this.months[this.displayed.month];
     }
     get daysOfCurrentMonth() {
         return this.currentMonth.days;
@@ -170,7 +187,7 @@ export default class CalendarHelper extends Events {
      */
     get weeksPerCurrentMonth() {
         return Math.ceil(
-            this.data.months[this.current.month].length /
+            this.data.months[this.displayed.month].length /
                 this.data.weekdays.length
         );
     }
@@ -197,10 +214,10 @@ export default class CalendarHelper extends Events {
         return this.data.firstWeekDay;
     }
     firstDayOfYear() {
-        if (this.current.year == 1) return this.firstWeekday;
+        if (this.displayed.year == 1) return this.firstWeekday;
 
         return wrap(
-            ((Math.abs(this.current.year - 1) * this.daysPerYear) %
+            ((Math.abs(this.displayed.year - 1) * this.daysPerYear) %
                 this.data.weekdays.length) +
                 this.firstWeekday,
             this.data.weekdays.length

@@ -1,5 +1,8 @@
 .fantasy-calendar-picker {
     padding: 5px 15px;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
 }
 .fantasy-calendar-full.view-content {
     display: flex;

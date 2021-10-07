@@ -1,10 +1,17 @@
-import { addIcon, DropdownComponent, ItemView, WorkspaceLeaf } from "obsidian";
+import {
+    addIcon,
+    DropdownComponent,
+    ItemView,
+    Menu,
+    WorkspaceLeaf
+} from "obsidian";
 import type { Calendar } from "src/@types";
 import type { DayHelper } from "src/calendar";
 import { CreateEventModal } from "src/settings/settings";
 import type FantasyCalendar from "../main";
 
 export const VIEW_TYPE = "FANTASY_CALENDAR";
+export const FULL_VIEW = "FANTASY_CALENDAR_FULL_VIEW";
 
 import CalendarUI from "./ui/Calendar.svelte";
 
@@ -14,12 +21,16 @@ addIcon(
 );
 
 export default class FantasyCalendarView extends ItemView {
+    get full() {
+        return this.options.full ?? false;
+    }
+    calendar: Calendar;
     calendarDropdownEl: HTMLDivElement;
     protected _app: CalendarUI;
     constructor(
         public plugin: FantasyCalendar,
         public leaf: WorkspaceLeaf,
-        public calendar?: Calendar
+        public options: { calendar?: Calendar; full?: boolean } = {}
     ) {
         super(leaf);
 
@@ -32,7 +43,7 @@ export default class FantasyCalendarView extends ItemView {
         }
 
         this.updateCalendars();
-        this.plugin.registerEvent(
+        this.registerEvent(
             this.plugin.app.workspace.on("fantasy-calendars-updated", () => {
                 this.updateCalendars();
             })
@@ -44,19 +55,15 @@ export default class FantasyCalendarView extends ItemView {
             this.setCurrentCalendar(this.plugin.data.calendars[0]);
             return;
         }
+        this.calendarDropdownEl.createEl("label", {
+            text: "Choose a Calendar"
+        });
         const dropdown = new DropdownComponent(
             this.calendarDropdownEl
         ).onChange((v) => {
             this.setCurrentCalendar(
                 this.plugin.data.calendars.find((c) => c.id == v)
             );
-        });
-        dropdown.selectEl.createEl("option", {
-            attr: {
-                selected: true,
-                disabled: true
-            },
-            text: "Choose a Calendar"
         });
         dropdown
             .addOptions(
@@ -74,32 +81,57 @@ export default class FantasyCalendarView extends ItemView {
         }
         this._app = new CalendarUI({
             target: this.contentEl,
-            props: { data: this.calendar }
+            props: { data: this.calendar, fullView: this.full }
         });
         this._app.$on("day-click", (event: CustomEvent<DayHelper>) => {
             const day = event.detail;
 
             if (day.events.length) {
             } else {
-                const modal = new CreateEventModal(
-                    this.app,
-                    this.calendar,
-                    null,
-                    day.date
-                );
-
-                modal.onClose = () => {
-                    if (!modal.saved) return;
-                    this.calendar.events.push(modal.event);
-
-                    //this._app.$set({ data: this.calendar });
-
-                    this.plugin.saveCalendar();
-                };
-
-                modal.open();
+                this.createEventForDay(day);
             }
         });
+
+        this._app.$on(
+            "day-context-menu",
+            (event: CustomEvent<{ day: DayHelper; evt: MouseEvent }>) => {
+                const { day, evt } = event.detail;
+
+                const menu = new Menu(this.app);
+
+                menu.setNoIcon();
+                menu.addItem((item) => {
+                    item.setTitle("Set as Today").onClick(() => {
+                        this.calendar.current = day.date;
+
+                        this.plugin.saveCalendar();
+                    });
+                });
+                menu.addItem((item) =>
+                    item.setTitle("New Event").onClick(() => {
+                        this.createEventForDay(day);
+                    })
+                );
+                menu.showAtMouseEvent(evt);
+            }
+        );
+    }
+    createEventForDay(day: DayHelper) {
+        const modal = new CreateEventModal(
+            this.app,
+            this.calendar,
+            null,
+            day.date
+        );
+
+        modal.onClose = () => {
+            if (!modal.saved) return;
+            this.calendar.events.push(modal.event);
+
+            this._app.$set({ data: this.calendar });
+        };
+
+        modal.open();
     }
 
     async onOpen() {}

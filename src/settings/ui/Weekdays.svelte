@@ -4,7 +4,6 @@
     import { dndzone, SOURCES, TRIGGERS } from "svelte-dnd-action";
     import {
         ButtonComponent,
-        DropdownComponent,
         ExtraButtonComponent,
         setIcon,
         Setting,
@@ -14,6 +13,7 @@
 
     import { nanoid } from "src/utils/functions";
     export let firstWeekday: number = 0;
+    export let overflow: boolean = true;
 
     const add = (node: HTMLElement) => {
         new ButtonComponent(node)
@@ -55,8 +55,20 @@
         comp.inputEl.setAttr("style", "width: 100%;");
     };
 
+    const overflowNode = (node: HTMLElement) => {
+        new Setting(node)
+            .setName("Overflow Weeks")
+            .setDesc(
+                "Turn this off to make each month start on the first of the week."
+            )
+            .addToggle((t) => {
+                t.setValue(overflow).onChange((v) => {
+                    overflow = v;
+                });
+            });
+    };
+
     function startDrag(e: Event) {
-        // preventing default to prevent lag on touch devices (because of the browser checking for screen scrolling)
         e.preventDefault();
         dragDisabled = false;
     }
@@ -97,9 +109,45 @@
     $: {
         dispatch("first-weekday-update", firstWeekday);
     }
+
+    $: {
+        dispatch("overflow-update", overflow);
+    }
 </script>
 
 <div class="fantasy-calendar-container">
+    <div class="overflow" use:overflowNode />
+    {#if weekdays.length}
+        <div class="first-weekday">
+            <div class="setting-item">
+                <div class="setting-item-info">
+                    <div class="setting-item-name">First Day</div>
+                    <div class="setting-item-description">
+                        This only effects which day of the week the first year
+                        starts on.
+                    </div>
+                </div>
+                <div class="setting-item-control">
+                    <select
+                        class="dropdown"
+                        bind:value={firstWeekday}
+                        aria-label={!overflow
+                            ? "Cannot be modified without overflow."
+                            : undefined}
+                    >
+                        {#each weekdays as weekday, index}
+                            <option
+                                disabled={!overflow}
+                                value={index}
+                                selected={index == firstWeekday}
+                                >{weekday.name ?? ""}</option
+                            >
+                        {/each}
+                    </select>
+                </div>
+            </div>
+        </div>
+    {/if}
     {#if !weekdays.length}
         <div class="existing-items">
             <span>Create a new weekday to see it here.</span>
@@ -131,33 +179,12 @@
         </div>
     {/if}
     <div class="add-new" use:add />
-    {#if weekdays.length}
-        <div class="first-weekday">
-            <div class="setting-item">
-                <div class="setting-item-info">
-                    <div class="setting-item-name">First Day</div>
-                    <div class="setting-item-description">
-                        This only effects which day of the week the first year
-                        starts on.
-                    </div>
-                </div>
-                <div class="setting-item-control">
-                    <select class="dropdown" bind:value={firstWeekday}>
-                        {#each weekdays as weekday, index}
-                            <option
-                                value={index}
-                                selected={index == firstWeekday}
-                                >{weekday.name ?? ""}</option
-                            >
-                        {/each}
-                    </select>
-                </div>
-            </div>
-        </div>
-    {/if}
 </div>
 
 <style>
+    .overflow {
+        padding-top: 0.75rem;
+    }
     .weekday {
         display: grid;
         grid-template-columns: auto 1fr auto;

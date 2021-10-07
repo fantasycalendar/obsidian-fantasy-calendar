@@ -22,10 +22,9 @@ export default class Import {
 
             if (!year_data) continue;
 
-            const firstWeekDay = year_data.first_day ?? 0;
+            const firstWeekDay = year_data.first_day - 1 ?? 0;
             const overflow = year_data.overflow ?? true;
             const global_week = year_data.global_week;
-
 
             if (!global_week) continue;
 
@@ -38,7 +37,6 @@ export default class Import {
             });
 
             const timespans = year_data.timespans;
-
 
             if (!timespans) continue;
 
@@ -126,11 +124,9 @@ export default class Import {
 
                     let description: string;
                     if (event.description) {
-
                         const descriptionEl = createDiv();
                         descriptionEl.innerHTML = event.description;
                         description = descriptionEl.textContent;
-
                     }
 
                     events.push({

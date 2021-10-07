@@ -4,9 +4,7 @@ import FantasyCalendarSettings from "./settings/settings";
 
 import type { Calendar, FantasyCalendarData } from "./@types";
 
-import FantasyCalendarView, { VIEW_TYPE } from "./view/view";
-
-import FullCalendarView, { FULL_VIEW } from "./view/full";
+import FantasyCalendarView, { VIEW_TYPE, FULL_VIEW } from "./view/view";
 
 declare module "obsidian" {
     interface Workspace {
@@ -65,14 +63,14 @@ export default class FantasyCalendar extends Plugin {
             (leaf: WorkspaceLeaf) => new FantasyCalendarView(this, leaf)
         );
         this.app.workspace.onLayoutReady(() => this.addCalendarView());
-        this.addRibbonIcon(VIEW_TYPE, "Open Fantasy Calendar", (evt) => {
+        this.addRibbonIcon(VIEW_TYPE, "Open Big Fantasy Calendar", (evt) => {
             this.app.workspace
                 .getLeaf(evt.getModifierState(MODIFIER_KEY))
                 .setViewState({ type: FULL_VIEW });
         });
 
         this.registerView(FULL_VIEW, (leaf: WorkspaceLeaf) => {
-            return new FullCalendarView(leaf, this);
+            return new FantasyCalendarView(this, leaf, { full: true });
         });
 
         this.addCommand({

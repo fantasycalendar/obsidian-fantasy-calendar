@@ -5,7 +5,7 @@ export const PRESET_CALENDARS: Calendar[] = [
         name: "Gregorian Calendar",
         description: "A calendar for the real world.",
         static: {
-            firstWeekDay: 1,
+            firstWeekDay: 0,
             overflow: true,
             weekdays: [
                 {
@@ -300,7 +300,7 @@ export const PRESET_CALENDARS: Calendar[] = [
         name: "Calendar of Harptos",
         description: "Calendar of Faerûn of the Forgotten Realms.",
         static: {
-            firstWeekDay: 1,
+            firstWeekDay: 0,
             overflow: false,
             weekdays: [
                 {
@@ -558,7 +558,7 @@ export const PRESET_CALENDARS: Calendar[] = [
         name: "Calendar of Greyhawk",
         description: "Calendar of the world of Greyhawk.",
         static: {
-            firstWeekDay: 1,
+            firstWeekDay: 0,
             overflow: false,
             weekdays: [
                 {
@@ -889,7 +889,7 @@ export const PRESET_CALENDARS: Calendar[] = [
         name: "Calendar of Golarion",
         description: "Calendar for the world of Pathfinder.",
         static: {
-            firstWeekDay: 1,
+            firstWeekDay: 0,
             overflow: true,
             weekdays: [
                 {
@@ -1987,7 +1987,7 @@ export const PRESET_CALENDARS: Calendar[] = [
         name: "Calendar of Galifar",
         description: "Calendar of the world of Eberron.",
         static: {
-            firstWeekDay: 1,
+            firstWeekDay: 0,
             overflow: false,
             weekdays: [
                 {
@@ -2485,7 +2485,7 @@ export const PRESET_CALENDARS: Calendar[] = [
         name: "Barovian Calendar",
         description: "Calendar of the realm of Barovia, home of Strahd.",
         static: {
-            firstWeekDay: 1,
+            firstWeekDay: 0,
             overflow: true,
             weekdays: [
                 {
@@ -2683,7 +2683,7 @@ export const PRESET_CALENDARS: Calendar[] = [
         name: "Exandrian Calendar",
         description: "Calendar of the world of Wildemount.",
         static: {
-            firstWeekDay: 3,
+            firstWeekDay: 2,
             overflow: true,
             weekdays: [
                 {

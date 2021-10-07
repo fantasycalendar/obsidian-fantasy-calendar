@@ -1,40 +1,46 @@
 <script lang="ts">
     import type { Calendar } from "src/@types";
-    import CalendarHelper from "src/calendar/index";
+    import CalendarHelper, { DayHelper, MonthHelper } from "src/calendar/index";
 
     import MonthView from "./Month.svelte";
     import Nav from "./Nav.svelte";
 
     export let data: Calendar;
     export let fullView: boolean = false;
-    const calendar = new CalendarHelper(data);
-
-    calendar.on("month-update", () => {
-        weeks = calendar.weeksPerCurrentMonth;
-        days = calendar.paddedDays;
-        year = calendar.current.year;
-        month = calendar.currentMonth;
-    });
+    $: calendar = new CalendarHelper(data);
+    let days: {
+            previous: DayHelper[];
+            current: DayHelper[];
+            next: DayHelper[];
+        },
+        year: number,
+        month: MonthHelper;
 
     $: weekdays = calendar.weekdays;
-    $: weeks = calendar.weeksPerCurrentMonth;
-    $: days = calendar.paddedDays;
-    $: month = calendar.currentMonth;
-    $: year = calendar.current.year;
+    $: {
+        days = calendar.paddedDays;
+        year = calendar.displayed.year;
+        month = calendar.currentMonth;
+        calendar.on("month-update", () => {
+            days = calendar.paddedDays;
+            year = calendar.displayed.year;
+            month = calendar.currentMonth;
+        });
+    }
 </script>
 
 <div
     id="calendar-container"
     class="fantasy-calendar"
     class:full-view={fullView}
-    style="--calendar-columns: {calendar.weekdays
-        .length};"
+    style="--calendar-columns: {calendar.weekdays.length};"
 >
     <Nav
         month={month.name}
         {year}
         on:next={() => calendar.goToNext()}
         on:previous={() => calendar.goToPrevious()}
+        on:reset={() => calendar.reset()}
     />
     <div class="weekdays">
         {#each weekdays as day}
@@ -46,6 +52,7 @@
         {days}
         {fullView}
         on:day-click
+        on:day-context-menu
     />
 </div>
 

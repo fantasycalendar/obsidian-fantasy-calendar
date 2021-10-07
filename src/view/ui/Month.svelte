@@ -14,7 +14,6 @@
     };
     export let columns: number;
     export let fullView: boolean = false;
-
 </script>
 
 <div
@@ -23,13 +22,19 @@
     style="--calendar-columns: {columns};"
 >
     {#each days.previous as day}
-        <DayView {day} adjacent={true} on:day-click />
+        <DayView {day} adjacent={true} {fullView} />
     {/each}
     {#each days.current as day}
-        <DayView {day} adjacent={false} on:day-click />
+        <DayView
+            {day}
+            adjacent={false}
+            {fullView}
+            on:day-click
+            on:day-context-menu
+        />
     {/each}
     {#each days.next as day}
-        <DayView {day} adjacent={true} on:day-click />
+        <DayView {day} adjacent={true} {fullView} />
     {/each}
 </div>
 
