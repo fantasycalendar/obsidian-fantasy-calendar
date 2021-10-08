@@ -1,6 +1,4 @@
 <script lang="ts">
-    import type { Event } from "src/@types";
-
     export let isFilled: boolean = true;
     export let isActive: boolean = false;
 </script>

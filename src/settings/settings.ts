@@ -328,10 +328,8 @@ class CreateCalendarModal extends Modal {
     }
     buildWeekdays() {
         this.weekdayEl.empty();
-        const element = this.weekdayEl.createEl("details", {});
-        element.createEl("summary").createEl("h4", { text: "Weekdays" });
         const weekday = new Weekdays({
-            target: element,
+            target: this.weekdayEl,
             props: {
                 weekdays: this.week,
                 firstWeekday: this.calendar.static.firstWeekDay,
@@ -369,10 +367,8 @@ class CreateCalendarModal extends Modal {
     }
     buildMonths() {
         this.monthEl.empty();
-        const element = this.monthEl.createEl("details", {});
-        element.createEl("summary").createEl("h4", { text: "Months" });
         const months = new Months({
-            target: element,
+            target: this.monthEl,
             props: {
                 months: this.months
             }
@@ -386,13 +382,12 @@ class CreateCalendarModal extends Modal {
     }
     buildEvents() {
         this.eventEl.empty();
-        const element = this.eventEl.createEl("details", {});
-        element.createEl("summary").createEl("h4", { text: "Events" });
         const events = new EventsUI({
-            target: element,
+            target: this.eventEl,
             props: {
                 events: this.events,
-                months: this.calendar.static.months
+                months: this.calendar.static.months,
+                categories: this.calendar.categories
             }
         });
         events.$on("new-event", async (e: CustomEvent<Event>) => {

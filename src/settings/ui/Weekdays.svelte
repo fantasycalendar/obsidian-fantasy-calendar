@@ -12,6 +12,7 @@
     import type { Day } from "src/@types";
 
     import { nanoid } from "src/utils/functions";
+    import Detail from "./Detail.svelte";
     export let firstWeekday: number = 0;
     export let overflow: boolean = true;
 
@@ -115,7 +116,7 @@
     }
 </script>
 
-<div class="fantasy-calendar-container">
+<Detail label="Weekdays">
     <div class="overflow" use:overflowNode />
     {#if weekdays.length}
         <div class="first-weekday">
@@ -178,8 +179,7 @@
             {/each}
         </div>
     {/if}
-    <div class="add-new" use:add />
-</div>
+</Detail>
 
 <style>
     .overflow {
@@ -198,11 +198,5 @@
     }
     .weekday {
         margin-top: 0.5rem;
-    }
-    .add-new {
-        padding-top: 0.75rem;
-        padding-bottom: 0.75rem;
-        display: flex;
-        justify-content: flex-end;
     }
 </style>

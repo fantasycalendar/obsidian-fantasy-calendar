@@ -1,10 +1,12 @@
 import type {
     Calendar,
     Event,
+    EventCategory,
     Month,
     StaticCalendarData,
     Week
 } from "../../@types";
+import distinct from "distinct-colors";
 import { nanoid } from "src/utils/functions";
 
 import { decode } from "he";
@@ -73,6 +75,7 @@ export default class Import {
             }
 
             const events: Event[] = [];
+            const categories: Map<string, string> = new Map();
             if (
                 data.events &&
                 Array.isArray(data.events) &&
@@ -129,15 +132,39 @@ export default class Import {
                         description = descriptionEl.textContent;
                     }
 
+                    if (
+                        event.event_category_id &&
+                        event.event_category_id.length
+                    ) {
+                        categories.set(event.event_category_id, nanoid(6));
+                    }
                     events.push({
                         name: event.name,
                         description: description,
                         id: event.id,
                         note: null,
-                        date
+                        date,
+                        category:
+                            categories.get(event.event_category_id) ?? null
                     });
                 }
             }
+
+            const colors = distinct({ count: categories.size });
+
+            const eventCatories: EventCategory[] = Array.from(categories).map(
+                ([name, id], i) => {
+                    return {
+                        name: name,
+                        color: colors[i].hex(),
+                        id: id
+                    };
+                }
+            );
+            console.log(
+                "🚀 ~ file: importer.ts ~ line 162 ~ eventCatories",
+                eventCatories
+            );
 
             const calendarData: Calendar = {
                 name,
@@ -145,7 +172,8 @@ export default class Import {
                 static: staticData,
                 current: dynamicData,
                 events,
-                id: nanoid(6)
+                id: nanoid(6),
+                categories: eventCatories
             };
 
             calendars.push(calendarData);

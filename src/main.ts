@@ -29,7 +29,8 @@ export const DEFAULT_CALENDAR: Calendar = {
         month: null,
         day: null
     },
-    events: []
+    events: [],
+    categories: []
 };
 
 export const DEFAULT_DATA: FantasyCalendarData = {

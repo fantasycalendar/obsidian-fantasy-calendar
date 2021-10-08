@@ -8,6 +8,7 @@ export interface Calendar {
     static: StaticCalendarData;
     current: CurrentCalendarData;
     events: Event[];
+    categories: EventCategory[];
 }
 
 export interface FantasyCalendarData {
@@ -59,7 +60,14 @@ export interface Event {
     };
     id: string;
     note: string;
+    category?: string;
     /* recurring: keyof typeof Recurring; */
+}
+
+export interface EventCategory {
+    name: string;
+    color: string;
+    id: string;
 }
 
 export interface StaticCalendarData {

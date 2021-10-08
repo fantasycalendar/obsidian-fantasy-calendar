@@ -2,21 +2,25 @@
     import { createEventDispatcher } from "svelte";
     import { ButtonComponent, ExtraButtonComponent } from "obsidian";
 
-    import type { Event, Month } from "src/@types";
+    import type { Event, Month, EventCategory } from "src/@types";
     import { dateString } from "src/utils/functions";
+    import Dot from "./Dot.svelte";
+    import Detail from "./Detail.svelte";
 
+    export let categories: EventCategory[] = [];
     export let events: Event[] = [];
     export let months: Month[] = [];
 
     const dispatch = createEventDispatcher();
 
     const add = (node: HTMLElement) => {
-        new ButtonComponent(node)
+        const b = new ButtonComponent(node)
             .setTooltip("Add Event")
             .setButtonText("+")
             .onClick(async () => {
                 dispatch("new-event");
             });
+        b.buttonEl.style.width = "100%";
     };
     const trash = (node: HTMLElement) => {
         let b = new ExtraButtonComponent(node)
@@ -27,11 +31,9 @@
     const edit = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("pencil").setTooltip("Edit");
     };
-
     const editEvent = (item: Event) => {
         dispatch("new-event", item);
     };
-
     const deleteEvent = (item: Event) => {
         events = events.filter((event) => event.id !== item.id);
         dispatch("edit-events", events);
@@ -48,9 +50,12 @@
             return a.date.day - b.date.day;
         });
     }
+    const getCategory = (category: string) => {
+        return categories.find(({ name }) => name == category);
+    };
 </script>
 
-<div class="fantasy-calendar-container">
+<Detail label="Event">
     {#if !events.length}
         <div class="existing-items">
             <span>Create a new event to see it here.</span>
@@ -60,7 +65,15 @@
             {#each events as event, index}
                 <div class="event">
                     <div class="event-info">
-                        <span class="setting-item-name">{event.name}</span>
+                        <span class="setting-item-name">
+                            {#if event.category && getCategory(event.category) != null}
+                                <Dot
+                                    color={getCategory(event.category)?.color}
+                                    label={getCategory(event.category)?.name}
+                                />
+                            {/if}
+                            {event.name}
+                        </span>
                         <div class="setting-item-description">
                             <div class="date">
                                 {dateString(event, months)}
@@ -85,8 +98,7 @@
             {/each}
         </div>
     {/if}
-    <div class="add-new" use:add />
-</div>
+</Detail>
 
 <style>
     .event {
@@ -116,9 +128,10 @@
     }
     .add-new {
         padding-top: 0.75rem;
-        padding-bottom: 0;
+        padding-bottom: 0.75rem;
+
         display: flex;
-        justify-content: flex-end;
+        width: 100%;
     }
     .date {
         display: flex;

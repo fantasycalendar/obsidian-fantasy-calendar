@@ -13,6 +13,7 @@
     import type { Month } from "src/@types";
 
     import { nanoid } from "src/utils/functions";
+    import Detail from "./Detail.svelte";
 
     const add = (node: HTMLElement) => {
         new ButtonComponent(node)
@@ -118,7 +119,7 @@
     }
 </script>
 
-<div class="fantasy-calendar-container">
+<Detail label="Months">
     {#if !months.length}
         <div class="existing-items">
             <span>Create a new month to see it here.</span>
@@ -147,8 +148,7 @@
             {/each}
         </div>
     {/if}
-    <div class="add-new" use:add />
-</div>
+</Detail>
 
 <style>
     .month {
@@ -164,11 +164,5 @@
     }
     .month {
         margin-top: 0.5rem;
-    }
-    .add-new {
-        padding-top: 0.75rem;
-        padding-bottom: 0;
-        display: flex;
-        justify-content: flex-end;
     }
 </style>
