@@ -1,15 +1,20 @@
 <script lang="ts">
     import Flag from "./Flag.svelte";
-    import type { Event } from "src/@types";
+    import type { Event, EventCategory } from "src/@types";
     export let events: Event[] = [];
+    export let categories: EventCategory[];
 
     const MAX_EVENTS = 5;
+
+    const color = (event: Event) => {
+        return categories.find(c => c.id == event.category)?.color;
+    }
 </script>
 
 <div>
     <div class="flag-container">
         {#each events.slice(0, MAX_EVENTS) as event}
-            <Flag {event} />
+            <Flag {event} color={color(event)}/>
         {/each}
     </div>
     <div class="overflow">

@@ -60,8 +60,11 @@ export interface Event {
     };
     id: string;
     note: string;
-    category?: string;
-    /* recurring: keyof typeof Recurring; */
+    category: string;
+}
+
+export interface ColorEvent extends Event {
+    color: string;
 }
 
 export interface EventCategory {

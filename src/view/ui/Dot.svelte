@@ -1,6 +1,7 @@
 <script lang="ts">
     export let isFilled: boolean = true;
     export let isActive: boolean = false;
+    export let color: string;
 </script>
 
 <svg
@@ -11,8 +12,8 @@
     xmlns="http://www.w3.org/2000/svg"
 >
     <circle
-        stroke={!isFilled ? "currentColor" : "none"}
-        fill={isFilled ? "currentColor" : "none"}
+        stroke={color ?? "currentColor"}
+        fill={color ?? "currentColor"}
         cx="3"
         cy="3"
         r="2"

@@ -6,8 +6,8 @@ import {
     WorkspaceLeaf
 } from "obsidian";
 import type { Calendar } from "src/@types";
-import type { DayHelper } from "src/calendar";
-import { CreateEventModal } from "src/settings/settings";
+import type { DayHelper } from "src/helper";
+import { CreateEventModal } from "src/modals/event";
 import type FantasyCalendar from "../main";
 
 export const VIEW_TYPE = "FANTASY_CALENDAR";

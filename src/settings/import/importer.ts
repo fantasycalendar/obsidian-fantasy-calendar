@@ -134,7 +134,8 @@ export default class Import {
 
                     if (
                         event.event_category_id &&
-                        event.event_category_id.length
+                        event.event_category_id.length &&
+                        !categories.has(event.event_category_id)
                     ) {
                         categories.set(event.event_category_id, nanoid(6));
                     }

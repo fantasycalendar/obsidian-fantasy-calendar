@@ -2,9 +2,14 @@
     import type { Event } from "src/@types";
 
     export let event: Event;
+    export let color: string = "#808080";
 </script>
 
-<div class="flag" aria-label={event.name}>
+<div
+    class="flag"
+    aria-label={event.name}
+    style="--hex-alpha: {color}40; --color:{color}"
+>
     <span>{event.name} </span>
 </div>
 
@@ -17,8 +22,7 @@
         text-overflow: ellipsis;
         width: 100%;
 
-        background-color: hsl(240, 100%, 50%, 0.125);
-        border: 1px solid hsla(240, 100%, 50%, 0.25);
-        border-left: 2px solid blue;
+        background-color: var(--hex-alpha);
+        border-left: 2px solid var(--color);
     }
 </style>

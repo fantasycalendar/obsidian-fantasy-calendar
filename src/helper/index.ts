@@ -1,6 +1,11 @@
 import { Events, Notice } from "obsidian";
-import type FantasyCalendar from "src/main";
-import type { Calendar, CurrentCalendarData, Month } from "../@types";
+import type {
+    Calendar,
+    CurrentCalendarData,
+    Month,
+    Event,
+    ColorEvent
+} from "../@types";
 
 export class MonthHelper {
     days: DayHelper[] = [];
@@ -42,7 +47,7 @@ export class DayHelper {
             year: this.calendar.displayed.year
         };
     }
-    get events() {
+    get events(): Event[] {
         return this.calendar.object.events.filter((e) => {
             return (
                 e.date.day == this.date.day &&

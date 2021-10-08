@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { DayHelper } from "src/calendar";
+    import type { DayHelper } from "src/helper";
     import Dots from "./Dots.svelte";
 
     import { createEventDispatcher } from "svelte";
@@ -10,6 +10,8 @@
     export let day: DayHelper;
     export let adjacent: boolean;
     export let fullView: boolean;
+
+    $: categories = day.calendar.object.categories;
 
     const contextMenu = (evt: MouseEvent) => {
         dispatch("day-context-menu", { day, evt });
@@ -31,9 +33,9 @@
         {day.number}
     </span>
     {#if fullView}
-        <Flags events={day.events} />
+        <Flags events={day.events} {categories} />
     {:else}
-        <Dots events={day.events} />
+        <Dots events={day.events} {categories} />
     {/if}
 </div>
 

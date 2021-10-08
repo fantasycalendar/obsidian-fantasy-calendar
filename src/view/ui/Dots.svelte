@@ -1,17 +1,21 @@
 <script lang="ts">
     import Dot from "./Dot.svelte";
-    import type { Event } from "src/@types";
+    import type { Event, EventCategory } from "src/@types";
 
     export let centered: boolean = true;
     export let events: Event[] = [];
+    export let categories: EventCategory[];
 
     const MAX_EVENTS = 3;
+    const color = (event: Event) => {
+        return categories.find((c) => c.id == event.category)?.color;
+    };
 </script>
 
 <div>
     <div class="dot-container" class:centered>
         {#each events.slice(0, MAX_EVENTS) as event}
-            <Dot />
+            <Dot color={color(event)} />
         {/each}
     </div>
     <div class="overflow">

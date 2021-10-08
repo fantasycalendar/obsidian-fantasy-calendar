@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { Calendar } from "src/@types";
-    import CalendarHelper, { DayHelper, MonthHelper } from "src/calendar/index";
+    import CalendarHelper, { DayHelper, MonthHelper } from "src/helper/index";
 
     import MonthView from "./Month.svelte";
     import Nav from "./Nav.svelte";

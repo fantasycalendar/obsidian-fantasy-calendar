@@ -1,11 +1,6 @@
 <script lang="ts">
-    import type { Day } from "src/@types";
-    import type { DayHelper } from "src/calendar";
+    import type { DayHelper } from "src/helper";
     import DayView from "./Day.svelte";
-
-    import { createEventDispatcher } from "svelte";
-
-    const dispatch = createEventDispatcher();
 
     export let days: {
         previous: DayHelper[];

@@ -1,15 +1,12 @@
 import {
     addIcon,
-    App,
     ButtonComponent,
-    DropdownComponent,
     ExtraButtonComponent,
     Modal,
     Notice,
     PluginSettingTab,
     Setting,
-    TextAreaComponent,
-    TextComponent
+    TextAreaComponent
 } from "obsidian";
 import { DEFAULT_CALENDAR } from "../main";
 import type FantasyCalendar from "../main";
@@ -19,10 +16,14 @@ import { PRESET_CALENDARS } from "../utils/presets";
 import Weekdays from "./ui/Weekdays.svelte";
 import Months from "./ui/Months.svelte";
 import EventsUI from "./ui/Events.svelte";
+import Categories from "./ui/Categories.svelte";
 
 import "./settings.css";
-import { dateString, nanoid } from "src/utils/functions";
-import type { Calendar, Event } from "src/@types";
+import { nanoid } from "src/utils/functions";
+import type { Calendar, Event, EventCategory } from "src/@types";
+
+import { CreateEventModal } from "../modals/event";
+
 export enum Recurring {
     none = "None",
     monthly = "Monthly",
@@ -243,6 +244,8 @@ class CreateCalendarModal extends Modal {
     canSave: boolean = false;
     eventEl: HTMLDivElement;
     preset: Calendar;
+    categoryEl: HTMLDivElement;
+    eventsUI: EventsUI;
     get static() {
         return this.calendar.static;
     }
@@ -301,6 +304,10 @@ class CreateCalendarModal extends Modal {
         this.buildMonths();
         this.eventEl = this.contentEl.createDiv("fantasy-calendar-container");
         this.buildEvents();
+        this.categoryEl = this.contentEl.createDiv(
+            "fantasy-calendar-container"
+        );
+        this.buildCategories();
 
         this.buttonsEl = this.contentEl.createDiv("fantasy-context-buttons");
         this.buildButtons();
@@ -382,7 +389,7 @@ class CreateCalendarModal extends Modal {
     }
     buildEvents() {
         this.eventEl.empty();
-        const events = new EventsUI({
+        this.eventsUI = new EventsUI({
             target: this.eventEl,
             props: {
                 events: this.events,
@@ -390,7 +397,7 @@ class CreateCalendarModal extends Modal {
                 categories: this.calendar.categories
             }
         });
-        events.$on("new-event", async (e: CustomEvent<Event>) => {
+        this.eventsUI.$on("new-event", async (e: CustomEvent<Event>) => {
             const modal = new CreateEventModal(
                 this.app,
                 this.calendar,
@@ -409,13 +416,13 @@ class CreateCalendarModal extends Modal {
                 } else {
                     this.calendar.events.push({ ...modal.event });
                 }
-                events.$set({ events: this.events });
+                this.eventsUI.$set({ events: this.events });
                 this.plugin.saveCalendar();
             };
             modal.open();
         });
 
-        events.$on("edit-events", (e: CustomEvent<Event[]>) => {
+        this.eventsUI.$on("edit-events", (e: CustomEvent<Event[]>) => {
             this.calendar.events = e.detail;
         });
 
@@ -425,6 +432,41 @@ class CreateCalendarModal extends Modal {
                 this.eventEl.getBoundingClientRect().width
             }px;`
         );
+    }
+    buildCategories() {
+        this.categoryEl.empty();
+        const category = new Categories({
+            target: this.categoryEl,
+            props: {
+                categories: this.calendar.categories
+            }
+        });
+
+        category.$on("update", (event: CustomEvent<EventCategory>) => {
+            const existing = this.calendar.categories.find(
+                (c) => c.id == event.detail.id
+            );
+
+            this.calendar.categories.splice(
+                this.calendar.categories.indexOf(existing),
+                1,
+                event.detail
+            );
+            this.eventsUI.$set({
+                categories: this.calendar.categories,
+                events: this.events
+            });
+        });
+        category.$on("delete", (event: CustomEvent<EventCategory>) => {
+            this.calendar.categories.splice(
+                this.calendar.categories.indexOf(event.detail),
+                1
+            );
+            this.eventsUI.$set({
+                categories: this.calendar.categories,
+                events: this.events
+            });
+        });
     }
     checkCanSave() {
         if (
@@ -530,192 +572,5 @@ export class CalendarPresetModal extends Modal {
         new ExtraButtonComponent(buttonEl).setIcon("cross").onClick(() => {
             this.close();
         });
-    }
-}
-
-export class CreateEventModal extends Modal {
-    saved = false;
-    event: Event = {
-        name: null,
-        description: null,
-        date: {
-            month: null,
-            day: null,
-            year: null
-        },
-        id: nanoid(6),
-        note: null
-        /* recurring: "none" */
-    };
-    editing: boolean;
-    infoEl: HTMLDivElement;
-    dateEl: HTMLElement;
-    monthEl: HTMLDivElement;
-    dayEl: HTMLDivElement;
-    yearEl: HTMLDivElement;
-    fieldsEl: HTMLDivElement;
-    stringEl: HTMLDivElement;
-    constructor(
-        app: App,
-        public calendar: Calendar,
-        event?: Event,
-        date?: { month: number; day: number; year: number }
-    ) {
-        super(app);
-        if (event) {
-            this.event = { ...event };
-            this.editing = true;
-        }
-        if (date) {
-            this.event.date = { ...date };
-        }
-        this.containerEl.addClass("fantasy-calendar-create-event");
-    }
-
-    async display() {
-        this.contentEl.empty();
-        this.contentEl.createEl("h3", {
-            text: this.editing ? "Edit Event" : "New Event"
-        });
-
-        this.infoEl = this.contentEl.createDiv("event-info");
-        this.buildInfo();
-
-        this.dateEl = this.contentEl.createDiv("event-date");
-        this.buildDate();
-
-        new Setting(this.contentEl)
-            .addButton((b) => {
-                b.setButtonText("Save")
-                    .setCta()
-                    .onClick(() => {
-                        if (!this.event.name?.length) {
-                            new Notice("The event must have a name.");
-                            return;
-                        }
-                        this.saved = true;
-                        this.close();
-                    });
-            })
-            .addExtraButton((b) => {
-                b.setIcon("cross")
-                    .setTooltip("Cancel")
-                    .onClick(() => this.close());
-            });
-    }
-    buildDate() {
-        this.dateEl.empty();
-
-        this.fieldsEl = this.dateEl.createDiv("event-date-fields");
-
-        this.buildDateFields();
-
-        this.stringEl = this.dateEl.createDiv(
-            "event-date-string setting-item-description"
-        );
-        this.buildDateString();
-    }
-    buildDateString() {
-        this.stringEl.empty();
-        this.stringEl.createSpan({
-            text: dateString(this.event, this.calendar.static.months)
-        });
-    }
-    buildDateFields() {
-        this.fieldsEl.empty();
-        const dayEl = this.fieldsEl.createDiv("event-date-field");
-        dayEl.createEl("label", { text: "Day" });
-        const day = new TextComponent(dayEl)
-            .setPlaceholder("Day")
-            .setValue(`${this.event.date.day}`)
-            .onChange((v) => {
-                this.event.date.day = Number(v);
-            });
-        day.inputEl.setAttr("type", "number");
-
-        console.log(
-            Object.fromEntries([
-                ["select", "Select Month"],
-                ...this.calendar.static.months.map((month) => [
-                    month.name,
-                    month.name
-                ])
-            ])
-        );
-
-        const monthEl = this.fieldsEl.createDiv("event-date-field");
-        monthEl.createEl("label", { text: "Month" });
-        new DropdownComponent(monthEl)
-            .addOptions(
-                Object.fromEntries([
-                    ["select", "Select Month"],
-                    ...this.calendar.static.months.map((month) => [
-                        month.name,
-                        month.name
-                    ])
-                ])
-            )
-            .setValue(
-                this.event.date.month != undefined
-                    ? this.calendar.static.months[this.event.date.month].name
-                    : "select"
-            )
-            .onChange((v) => {
-                if (v === "select") this.event.date.month = null;
-                const index = this.calendar.static.months.find(
-                    (m) => m.name == v
-                );
-                this.event.date.month =
-                    this.calendar.static.months.indexOf(index);
-            });
-        /* const month = new TextComponent(monthEl)
-            .setPlaceholder("Month")
-            .setValue(`${this.event.date.month}`)
-            .onChange((v) => {
-                this.event.date.month = Number(v);
-            });
-        month.inputEl.setAttr("type", "number"); */
-
-        const yearEl = this.fieldsEl.createDiv("event-date-field");
-        yearEl.createEl("label", { text: "Year" });
-        const year = new TextComponent(yearEl)
-            .setPlaceholder("Year")
-            .setValue(`${this.event.date.year}`)
-            .onChange((v) => {
-                this.event.date.year = Number(v);
-            });
-        year.inputEl.setAttr("type", "number");
-    }
-    buildInfo() {
-        this.infoEl.empty();
-        new Setting(this.infoEl)
-            .setName("Note")
-            .setDesc("Link the event to a note.")
-            .addText((t) =>
-                t
-                    .setValue(this.event.note)
-                    .onChange((v) => (this.event.note = v))
-            );
-
-        new Setting(this.infoEl).setName("Event Name").addText((t) =>
-            t
-                .setPlaceholder("Event Name")
-                .setValue(this.event.name)
-                .onChange((v) => {
-                    this.event.name = v;
-                })
-        );
-
-        const descriptionEl = this.infoEl.createDiv("event-description");
-        descriptionEl.createEl("label", { text: "Event Description" });
-        new TextAreaComponent(descriptionEl)
-            .setPlaceholder("Event Description")
-            .setValue(this.event.description)
-            .onChange((v) => {
-                this.event.description = v;
-            });
-    }
-    async onOpen() {
-        await this.display();
     }
 }
