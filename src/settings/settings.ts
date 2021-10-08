@@ -23,6 +23,7 @@ import { nanoid } from "src/utils/functions";
 import type { Calendar, Event, EventCategory } from "src/@types";
 
 import { CreateEventModal } from "../modals/event";
+import { confirmWithModal } from "../modals/confirm";
 
 export enum Recurring {
     none = "None",
@@ -187,10 +188,25 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                     });
                 })
                 .addExtraButton((b) => {
-                    b.setIcon("trash").onClick(() => {
-                        const modal = new ConfirmModal(this.plugin.app);
+                    b.setIcon("trash").onClick(async () => {
+                        if (
+                            !(await confirmWithModal(
+                                this.app,
+                                "Are you sure you want to delete this calendar?",
+                                {
+                                    cta: "Cancel",
+                                    secondary: "Delete"
+                                }
+                            ))
+                        )
+                            return;
+
+                        /* const modal = new ConfirmModal(
+                            this.plugin.app,
+                            "Are you sure you want to delete this calendar?"
+                        );
                         modal.onClose = async () => {
-                            if (!modal.delete) return;
+                            if (!modal.confirmed) return;
                             this.plugin.data.calendars =
                                 this.plugin.data.calendars.filter(
                                     (c) => c.id != calendar.id
@@ -199,37 +215,10 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
 
                             this.showCalendars(element);
                         };
-                        modal.open();
+                        modal.open(); */
                     });
                 });
         }
-    }
-}
-
-class ConfirmModal extends Modal {
-    delete: boolean = false;
-    async display() {
-        this.contentEl.empty();
-        this.contentEl.addClass("confirm-modal");
-        this.contentEl.createEl("p", {
-            text: "Are you sure you want to delete this calendar?"
-        });
-        const buttonEl = this.contentEl.createDiv(
-            "fantasy-calendar-confirm-buttons"
-        );
-        new ButtonComponent(buttonEl).setButtonText("Delete").onClick(() => {
-            this.delete = true;
-            this.close();
-        });
-        new ButtonComponent(buttonEl)
-            .setButtonText("Cancel")
-            .setCta()
-            .onClick(() => {
-                this.close();
-            });
-    }
-    onOpen() {
-        this.display();
     }
 }
 
@@ -397,7 +386,7 @@ class CreateCalendarModal extends Modal {
                 categories: this.calendar.categories
             }
         });
-        this.eventsUI.$on("new-event", async (e: CustomEvent<Event>) => {
+        this.eventsUI.$on("new-item", async (e: CustomEvent<Event>) => {
             const modal = new CreateEventModal(
                 this.app,
                 this.calendar,

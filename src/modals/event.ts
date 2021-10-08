@@ -5,10 +5,16 @@ import {
     Notice,
     TextComponent,
     DropdownComponent,
-    TextAreaComponent
+    TextAreaComponent,
+    TFile,
+    stringifyYaml
 } from "obsidian";
 import type { Calendar, Event } from "../@types";
+
 import { dateString, nanoid } from "../utils/functions";
+
+import PathSuggestionModal from "../suggester/path";
+import { confirmWithModal } from "./confirm";
 
 export class CreateEventModal extends Modal {
     saved = false;
@@ -110,16 +116,6 @@ export class CreateEventModal extends Modal {
             });
         day.inputEl.setAttr("type", "number");
 
-        console.log(
-            Object.fromEntries([
-                ["select", "Select Month"],
-                ...this.calendar.static.months.map((month) => [
-                    month.name,
-                    month.name
-                ])
-            ])
-        );
-
         const monthEl = this.fieldsEl.createDiv("event-date-field");
         monthEl.createEl("label", { text: "Month" });
         new DropdownComponent(monthEl)
@@ -161,11 +157,21 @@ export class CreateEventModal extends Modal {
         new Setting(this.infoEl)
             .setName("Note")
             .setDesc("Link the event to a note.")
-            .addText((t) =>
-                t
-                    .setValue(this.event.note)
-                    .onChange((v) => (this.event.note = v))
-            );
+            .addText((text) => {
+                let files = this.app.vault.getFiles();
+                text.setPlaceholder("Path").setValue(this.event.note);
+                const modal = new PathSuggestionModal(this.app, text, [
+                    ...files
+                ]);
+
+                modal.onClose = async () => {
+                    text.inputEl.blur();
+
+                    this.event.note = text.inputEl.value;
+
+                    this.tryParse(this.event.note, modal.file);
+                };
+            });
 
         new Setting(this.infoEl).setName("Event Name").addText((t) =>
             t
@@ -192,10 +198,74 @@ export class CreateEventModal extends Modal {
                 })
             );
 
+            console.log(options, this.event.category);
+
             d.addOptions(options)
-                .setValue(options[this.event.category])
+                .setValue(this.event.category)
                 .onChange((v) => (this.event.category = v));
         });
+    }
+    async tryParse(note: string, file: TFile) {
+        if (
+            this.event.name ||
+            this.event.description ||
+            this.event.date.day ||
+            this.event.date.month ||
+            this.event.date.year ||
+            this.event.category
+        ) {
+            if (
+                !(await confirmWithModal(
+                    this.app,
+                    "Parse and overwrite event data?"
+                ))
+            )
+                return;
+        }
+        this.event.name = note;
+        const cache = this.app.metadataCache.getFileCache(file);
+        const content = await this.app.vault.cachedRead(file);
+        this.event.description = content.replace(/^---[\s\S]+---\n/, "");
+
+        const { frontmatter } = cache;
+        if (frontmatter) {
+            if ("fantasy-date" in frontmatter) {
+                const { day, month, year } = frontmatter["fantasy-date"];
+                if (day) this.event.date.day = day - 1;
+                if (month) {
+                    if (typeof month === "string") {
+                        const indexer =
+                            this.calendar.static.months?.find(
+                                (m) => m.name == month
+                            ) ?? this.calendar.static.months?.[0];
+                        this.event.date.month =
+                            this.calendar.static.months?.indexOf(indexer);
+                    }
+                    if (typeof month == "number") {
+                        this.event.date.month = month - 1;
+                    }
+                }
+                if (year) this.event.date.year = year;
+            }
+            if ("fantasy-category" in frontmatter) {
+                if (
+                    !this.calendar.categories.find(
+                        (c) => c.name === frontmatter["fantasy-category"]
+                    )
+                ) {
+                    this.calendar.categories.push({
+                        name: frontmatter["fantasy-category"],
+                        color: "#808080",
+                        id: nanoid(6)
+                    });
+                }
+                this.event.category = this.calendar.categories.find(
+                    (c) => c.name === frontmatter["fantasy-category"]
+                ).id;
+            }
+        }
+
+        await this.display();
     }
     async onOpen() {
         await this.display();

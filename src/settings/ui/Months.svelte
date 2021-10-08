@@ -15,21 +15,16 @@
     import { nanoid } from "src/utils/functions";
     import Detail from "./Detail.svelte";
 
-    const add = (node: HTMLElement) => {
-        new ButtonComponent(node)
-            .setTooltip("Add month")
-            .setButtonText("+")
-            .onClick(async () => {
-                months = [
-                    ...months,
-                    {
-                        type: "month",
-                        name: null,
-                        length: null,
-                        id: nanoid(6)
-                    }
-                ];
-            });
+    const addNew = () => {
+        months = [
+            ...months,
+            {
+                type: "month",
+                name: null,
+                length: null,
+                id: nanoid(6)
+            }
+        ];
     };
 
     const grip = (node: HTMLElement) => {
@@ -119,7 +114,7 @@
     }
 </script>
 
-<Detail label="Months">
+<Detail label="Months" on:new-item={addNew}>
     {#if !months.length}
         <div class="existing-items">
             <span>Create a new month to see it here.</span>

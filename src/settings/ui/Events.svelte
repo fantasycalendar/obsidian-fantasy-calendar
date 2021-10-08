@@ -38,7 +38,7 @@
     };
 </script>
 
-<Detail label="Event">
+<Detail label="Event" on:new-item>
     {#if !events.length}
         <div class="existing-items">
             <span>Create a new event to see it here.</span>

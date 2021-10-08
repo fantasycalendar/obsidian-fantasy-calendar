@@ -16,20 +16,15 @@
     export let firstWeekday: number = 0;
     export let overflow: boolean = true;
 
-    const add = (node: HTMLElement) => {
-        new ButtonComponent(node)
-            .setTooltip("Add Weekday")
-            .setButtonText("+")
-            .onClick(async () => {
-                weekdays = [
-                    ...weekdays,
-                    {
-                        type: "day",
-                        name: null,
-                        id: nanoid(6)
-                    }
-                ];
-            });
+    const addNew = () => {
+        weekdays = [
+            ...weekdays,
+            {
+                type: "day",
+                name: null,
+                id: nanoid(6)
+            }
+        ];
     };
 
     const grip = (node: HTMLElement) => {
@@ -116,7 +111,7 @@
     }
 </script>
 
-<Detail label="Weekdays">
+<Detail label="Weekdays" on:new-item={addNew}>
     <div class="overflow" use:overflowNode />
     {#if weekdays.length}
         <div class="first-weekday">
