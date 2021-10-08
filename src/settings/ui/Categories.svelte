@@ -7,7 +7,7 @@
 
     const dispatch = createEventDispatcher();
 
-    export let categories: EventCategory[];
+    export let categories: EventCategory[] = [];
 
     const name = (node: HTMLElement, category: EventCategory) => {
         const comp = new TextComponent(node)
