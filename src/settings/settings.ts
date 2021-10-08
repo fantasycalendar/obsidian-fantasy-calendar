@@ -40,6 +40,7 @@ addIcon(
 
 export default class FantasyCalendarSettings extends PluginSettingTab {
     calendarUI: HTMLDivElement;
+    infoEl: HTMLDivElement;
     get data() {
         return this.plugin.data;
     }
@@ -51,29 +52,8 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
         this.containerEl.createEl("h2", { text: "Fantasy Calendars" });
         this.containerEl.addClass("fantasy-calendar-settings");
 
-        new Setting(this.containerEl)
-            .setName("Default Calendar to Open")
-            .setDesc("Views will open to this calendar by default.")
-            .addDropdown((d) => {
-                d.addOption("none", "None");
-                for (let calendar of this.data.calendars) {
-                    d.addOption(calendar.id, calendar.name);
-                }
-                d.setValue(this.plugin.data.defaultCalendar?.id);
-                d.onChange((v) => {
-                    if (v === "none") {
-                        this.plugin.data.defaultCalendar = null;
-                        this.plugin.saveSettings();
-                        return;
-                    }
-                    const calendar = this.plugin.data.calendars.find(
-                        (c) => c.id == v
-                    );
-
-                    this.plugin.data.defaultCalendar = calendar;
-                    this.plugin.saveSettings();
-                });
-            });
+        this.infoEl = this.containerEl.createDiv();
+        this.buildInfo();
 
         const importSetting = new Setting(this.containerEl)
             .setName("Import Calendar")
@@ -123,6 +103,32 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
 
         this.buildCalendarUI();
     }
+    buildInfo() {
+        this.infoEl.empty();
+        new Setting(this.infoEl)
+            .setName("Default Calendar to Open")
+            .setDesc("Views will open to this calendar by default.")
+            .addDropdown((d) => {
+                d.addOption("none", "None");
+                for (let calendar of this.data.calendars) {
+                    d.addOption(calendar.id, calendar.name);
+                }
+                d.setValue(this.plugin.data.defaultCalendar?.id);
+                d.onChange((v) => {
+                    if (v === "none") {
+                        this.plugin.data.defaultCalendar = null;
+                        this.plugin.saveSettings();
+                        return;
+                    }
+                    const calendar = this.plugin.data.calendars.find(
+                        (c) => c.id == v
+                    );
+
+                    this.plugin.data.defaultCalendar = calendar;
+                    this.plugin.saveSettings();
+                });
+            });
+    }
     buildCalendarUI() {
         this.calendarUI.empty();
 
@@ -138,12 +144,11 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                         modal.onClose = async () => {
                             if (!modal.saved) return;
                             const calendar = { ...modal.calendar };
-                            calendar.current = {
-                                year: 1,
-                                month: 1,
-                                day: 1
-                            };
+                            ;
                             this.data.calendars.push({ ...calendar });
+                            if (!this.data.defaultCalendar) {
+                                this.data.defaultCalendar = calendar;
+                            }
                             await this.plugin.saveCalendar();
 
                             this.showCalendars(existing);

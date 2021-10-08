@@ -29,6 +29,7 @@ addIcon(
 );
 
 export default class FantasyCalendarView extends ItemView {
+    dropdownEl: HTMLDivElement;
     get full() {
         return this.options.full ?? false;
     }
@@ -42,12 +43,13 @@ export default class FantasyCalendarView extends ItemView {
     ) {
         super(leaf);
 
-        /* this.calendarDropdownEl = this.contentEl.createDiv(
-            "fantasy-calendar-picker"
-        ); */
-
-        if (this.plugin.data.defaultCalendar) {
+        if (this.plugin.data.currentCalendar) {
+            this.setCurrentCalendar(this.plugin.data.currentCalendar);
+        } else if (this.plugin.data.defaultCalendar) {
             this.setCurrentCalendar(this.plugin.data.defaultCalendar);
+        } else {
+            this.dropdownEl = this.contentEl.createDiv();
+            this.buildDropdown();
         }
 
         this.updateCalendars();
@@ -57,21 +59,17 @@ export default class FantasyCalendarView extends ItemView {
             })
         );
     }
-    updateCalendars() {
-        /* this.calendarDropdownEl.empty(); */
-        if (this.plugin.data.calendars.length == 1) {
-            this.setCurrentCalendar(this.plugin.data.calendars[0]);
-            return;
-        }
-        /* this.calendarDropdownEl.createEl("label", {
+    buildDropdown() {
+        this.dropdownEl.empty();
+        this.dropdownEl.createEl("h4", { text: "Switch Calendars" });
+        const dropdownEl = this.dropdownEl.createDiv(
+            "fantasy-calendar-dropdown"
+        );
+        dropdownEl.createEl("label", {
             text: "Choose a Calendar"
         });
-        const dropdown = new DropdownComponent(
-            this.calendarDropdownEl
-        ).onChange((v) => {
-            this.setCurrentCalendar(
-                this.plugin.data.calendars.find((c) => c.id == v)
-            );
+        const dropdown = new DropdownComponent(dropdownEl).onChange((v) => {
+            this.calendar = this.plugin.data.calendars.find((c) => c.id == v);
         });
         dropdown
             .addOptions(
@@ -79,11 +77,19 @@ export default class FantasyCalendarView extends ItemView {
                     this.plugin.data.calendars.map((c) => [c.id, c.name])
                 )
             )
-            .setValue(this.calendar ? this.calendar.id : null); */
+            .setValue(this.calendar ? this.calendar.id : null);
+    }
+    updateCalendars() {
+        if (this.plugin.data.calendars.length == 1) {
+            this.setCurrentCalendar(this.plugin.data.calendars[0]);
+            return;
+        }
     }
 
     setCurrentCalendar(calendar: Calendar) {
+        this.dropdownEl?.detach();
         this.calendar = calendar;
+        this.plugin.data.currentCalendar = calendar;
         if (this._app) {
             this._app.$destroy();
         }
@@ -162,7 +168,8 @@ export default class FantasyCalendarView extends ItemView {
 
                     modal.onClose = () => {
                         if (!modal.confirmed) return;
-                        this.setCurrentCalendar(this.calendar);
+
+                        this.setCurrentCalendar(modal.calendar);
                     };
                     modal.open();
                 });
@@ -373,6 +380,7 @@ class ChangeDateModal extends Modal {
 class ViewEventModal extends Modal {
     constructor(public event: Event, public plugin: FantasyCalendar) {
         super(plugin.app);
+        this.containerEl.addClass("fantasy-calendar-view-event");
     }
     async display() {
         this.contentEl.empty();

@@ -118,6 +118,9 @@ export default class FantasyCalendar extends Plugin {
             ...DEFAULT_DATA,
             ...(await this.loadData())
         };
+        if (!this.data.defaultCalendar && this.data.calendars.length) {
+            this.data.defaultCalendar = this.data.calendars[0];
+        }
     }
 
     async saveCalendar() {
