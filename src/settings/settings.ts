@@ -638,6 +638,16 @@ export class CreateEventModal extends Modal {
             });
         day.inputEl.setAttr("type", "number");
 
+        console.log(
+            Object.fromEntries([
+                ["select", "Select Month"],
+                ...this.calendar.static.months.map((month) => [
+                    month.name,
+                    month.name
+                ])
+            ])
+        );
+
         const monthEl = this.fieldsEl.createDiv("event-date-field");
         monthEl.createEl("label", { text: "Month" });
         new DropdownComponent(monthEl)
@@ -651,9 +661,8 @@ export class CreateEventModal extends Modal {
                 ])
             )
             .setValue(
-                this.event.date.month
-                    ? this.calendar.static.months[this.event.date.month - 1]
-                          .name
+                this.event.date.month != undefined
+                    ? this.calendar.static.months[this.event.date.month].name
                     : "select"
             )
             .onChange((v) => {
@@ -662,7 +671,7 @@ export class CreateEventModal extends Modal {
                     (m) => m.name == v
                 );
                 this.event.date.month =
-                    this.calendar.static.months.indexOf(index) + 1;
+                    this.calendar.static.months.indexOf(index);
             });
         /* const month = new TextComponent(monthEl)
             .setPlaceholder("Month")

@@ -46,8 +46,9 @@ export class DayHelper {
         return this.calendar.object.events.filter((e) => {
             return (
                 e.date.day == this.date.day &&
-                (!e.date.month || e.date.month == this.date.month) &&
-                (!e.date.year || e.date.year == this.date.year)
+                (e.date.month === undefined ||
+                    e.date.month == this.date.month) &&
+                (e.date.year === undefined || e.date.year == this.date.year)
             );
         });
     }
