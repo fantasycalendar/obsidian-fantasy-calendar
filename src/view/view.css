@@ -9,3 +9,10 @@
     flex-flow: column;
     width: 100%;
 }
+
+.fantasy-calendar-dropdown {
+    display: flex;
+    flex-flow: column;
+    width: 100%;
+    padding-bottom: 0.75rem;
+}

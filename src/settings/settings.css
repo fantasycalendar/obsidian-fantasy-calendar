@@ -106,18 +106,7 @@
     resize: vertical;
 }
 
-.fantasy-calendar-create-event .event-date-fields {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 0.5rem;
-    padding-bottom: 0.75rem;
-}
 
-.fantasy-calendar-create-event .event-date-fields .event-date-field {
-    display: flex;
-    flex-flow: column nowrap;
-}
 
 /** Preset Calendar Modal */
 .fantasy-calendar-choose-preset .fantasy-calendar-preset-container {

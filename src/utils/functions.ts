@@ -1,4 +1,4 @@
-import type { Event, Month } from "../@types";
+import type { CurrentCalendarData, Event, Month } from "../@types";
 
 export function nanoid(len: number) {
     return "ID_xyxyxyxyxyxy".replace(/[xy]/g, function (c) {
@@ -22,11 +22,11 @@ function ordinal(i: number) {
     }
     return i + "th";
 }
-export function dateString(event: Event, months: Month[]) {
-    if (!event.date || event.date.day == undefined) {
+export function dateString(date: CurrentCalendarData, months: Month[]) {
+    if (!date || date.day == undefined) {
         return "";
     }
-    const { day, month, year } = event.date;
+    const { day, month, year } = date;
     if (month != undefined && year != undefined) {
         return `${months[month].name} ${ordinal(day)}, ${year}`;
     }

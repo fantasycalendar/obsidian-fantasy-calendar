@@ -6,8 +6,7 @@ import {
     TextComponent,
     DropdownComponent,
     TextAreaComponent,
-    TFile,
-    stringifyYaml
+    TFile
 } from "obsidian";
 import type { Calendar, Event } from "../@types";
 
@@ -89,7 +88,7 @@ export class CreateEventModal extends Modal {
     buildDate() {
         this.dateEl.empty();
 
-        this.fieldsEl = this.dateEl.createDiv("event-date-fields");
+        this.fieldsEl = this.dateEl.createDiv("fantasy-calendar-date-fields");
 
         this.buildDateFields();
 
@@ -101,12 +100,12 @@ export class CreateEventModal extends Modal {
     buildDateString() {
         this.stringEl.empty();
         this.stringEl.createSpan({
-            text: dateString(this.event, this.calendar.static.months)
+            text: dateString(this.event.date, this.calendar.static.months)
         });
     }
     buildDateFields() {
         this.fieldsEl.empty();
-        const dayEl = this.fieldsEl.createDiv("event-date-field");
+        const dayEl = this.fieldsEl.createDiv("fantasy-calendar-date-field");
         dayEl.createEl("label", { text: "Day" });
         const day = new TextComponent(dayEl)
             .setPlaceholder("Day")
@@ -116,7 +115,7 @@ export class CreateEventModal extends Modal {
             });
         day.inputEl.setAttr("type", "number");
 
-        const monthEl = this.fieldsEl.createDiv("event-date-field");
+        const monthEl = this.fieldsEl.createDiv("fantasy-calendar-date-field");
         monthEl.createEl("label", { text: "Month" });
         new DropdownComponent(monthEl)
             .addOptions(
@@ -142,7 +141,7 @@ export class CreateEventModal extends Modal {
                     this.calendar.static.months.indexOf(index);
             });
 
-        const yearEl = this.fieldsEl.createDiv("event-date-field");
+        const yearEl = this.fieldsEl.createDiv("fantasy-calendar-date-field");
         yearEl.createEl("label", { text: "Year" });
         const year = new TextComponent(yearEl)
             .setPlaceholder("Year")
@@ -217,7 +216,7 @@ export class CreateEventModal extends Modal {
             if (
                 !(await confirmWithModal(
                     this.app,
-                    "Parse and overwrite event data?"
+                    "Parse frontmatter and overwrite this event's data?"
                 ))
             )
                 return;
@@ -229,9 +228,9 @@ export class CreateEventModal extends Modal {
 
         const { frontmatter } = cache;
         if (frontmatter) {
-            if ("fantasy-date" in frontmatter) {
-                const { day, month, year } = frontmatter["fantasy-date"];
-                if (day) this.event.date.day = day - 1;
+            if ("fc-date" in frontmatter) {
+                const { day, month, year } = frontmatter["fc-date"];
+                if (day) this.event.date.day = day;
                 if (month) {
                     if (typeof month === "string") {
                         const indexer =
@@ -247,10 +246,10 @@ export class CreateEventModal extends Modal {
                 }
                 if (year) this.event.date.year = year;
             }
-            if ("fantasy-category" in frontmatter) {
+            if ("fc-category" in frontmatter) {
                 if (
                     !this.calendar.categories.find(
-                        (c) => c.name === frontmatter["fantasy-category"]
+                        (c) => c.name === frontmatter["fc-category"]
                     )
                 ) {
                     this.calendar.categories.push({
@@ -260,10 +259,12 @@ export class CreateEventModal extends Modal {
                     });
                 }
                 this.event.category = this.calendar.categories.find(
-                    (c) => c.name === frontmatter["fantasy-category"]
+                    (c) => c.name === frontmatter["fc-category"]
                 ).id;
             }
         }
+
+        console.log(this.event);
 
         await this.display();
     }

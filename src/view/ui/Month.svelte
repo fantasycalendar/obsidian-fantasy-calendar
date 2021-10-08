@@ -25,7 +25,7 @@
             adjacent={false}
             {fullView}
             on:day-click
-            on:day-context-menu
+            on:day-context-menu on:event-click
         />
     {/each}
     {#each days.next as day}

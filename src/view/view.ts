@@ -1,14 +1,22 @@
 import {
     addIcon,
+    ButtonComponent,
     DropdownComponent,
     ItemView,
+    MarkdownRenderer,
     Menu,
+    Modal,
+    Notice,
+    TextComponent,
     WorkspaceLeaf
 } from "obsidian";
-import type { Calendar } from "src/@types";
+import type { Calendar, CurrentCalendarData, Event } from "src/@types";
 import type { DayHelper } from "src/helper";
+import CalendarHelper from "src/helper";
 import { CreateEventModal } from "src/modals/event";
 import type FantasyCalendar from "../main";
+
+import "./view.css";
 
 export const VIEW_TYPE = "FANTASY_CALENDAR";
 export const FULL_VIEW = "FANTASY_CALENDAR_FULL_VIEW";
@@ -25,7 +33,7 @@ export default class FantasyCalendarView extends ItemView {
         return this.options.full ?? false;
     }
     calendar: Calendar;
-    calendarDropdownEl: HTMLDivElement;
+    /* calendarDropdownEl: HTMLDivElement; */
     protected _app: CalendarUI;
     constructor(
         public plugin: FantasyCalendar,
@@ -34,9 +42,9 @@ export default class FantasyCalendarView extends ItemView {
     ) {
         super(leaf);
 
-        this.calendarDropdownEl = this.contentEl.createDiv(
+        /* this.calendarDropdownEl = this.contentEl.createDiv(
             "fantasy-calendar-picker"
-        );
+        ); */
 
         if (this.plugin.data.defaultCalendar) {
             this.setCurrentCalendar(this.plugin.data.defaultCalendar);
@@ -50,12 +58,12 @@ export default class FantasyCalendarView extends ItemView {
         );
     }
     updateCalendars() {
-        this.calendarDropdownEl.empty();
+        /* this.calendarDropdownEl.empty(); */
         if (this.plugin.data.calendars.length == 1) {
             this.setCurrentCalendar(this.plugin.data.calendars[0]);
             return;
         }
-        this.calendarDropdownEl.createEl("label", {
+        /* this.calendarDropdownEl.createEl("label", {
             text: "Choose a Calendar"
         });
         const dropdown = new DropdownComponent(
@@ -71,7 +79,7 @@ export default class FantasyCalendarView extends ItemView {
                     this.plugin.data.calendars.map((c) => [c.id, c.name])
                 )
             )
-            .setValue(this.calendar ? this.calendar.id : null);
+            .setValue(this.calendar ? this.calendar.id : null); */
     }
 
     setCurrentCalendar(calendar: Calendar) {
@@ -81,7 +89,10 @@ export default class FantasyCalendarView extends ItemView {
         }
         this._app = new CalendarUI({
             target: this.contentEl,
-            props: { data: this.calendar, fullView: this.full }
+            props: {
+                calendar: new CalendarHelper(this.calendar, this.plugin),
+                fullView: this.full
+            }
         });
         this._app.$on("day-click", (event: CustomEvent<DayHelper>) => {
             const day = event.detail;
@@ -115,6 +126,56 @@ export default class FantasyCalendarView extends ItemView {
                 menu.showAtMouseEvent(evt);
             }
         );
+
+        this._app.$on("settings", (event: CustomEvent<MouseEvent>) => {
+            console.log("🚀 ~ file: view.ts ~ line 124 ~ event", event);
+            const evt = event.detail;
+            const menu = new Menu(this.app);
+
+            menu.setNoIcon();
+            menu.addItem((item) => {
+                item.setTitle("Change Current Day");
+
+                item.onClick(() => {
+                    const modal = new ChangeDateModal(
+                        this.plugin,
+                        this.calendar
+                    );
+                    modal.onClose = () => {
+                        if (!modal.confirmed) return;
+
+                        this.calendar.current = { ...modal.date };
+
+                        this.setCurrentCalendar(this.calendar);
+
+                        this.plugin.saveSettings();
+                    };
+
+                    modal.open();
+                });
+            });
+            menu.addItem((item) => {
+                item.setTitle("Switch Calendars");
+                item.setDisabled(this.plugin.data.calendars.length <= 1);
+                item.onClick(() => {
+                    const modal = new SwitchModal(this.plugin, this.calendar);
+
+                    modal.onClose = () => {
+                        if (!modal.confirmed) return;
+                        this.setCurrentCalendar(this.calendar);
+                    };
+                    modal.open();
+                });
+            });
+
+            menu.showAtMouseEvent(evt);
+        });
+
+        this._app.$on("event-click", (event: CustomEvent<Event>) => {
+            console.log("🚀 ~ file: view.ts ~ line 178 ~ event", event);
+            const modal = new ViewEventModal(event.detail, this.plugin);
+            modal.open();
+        });
     }
     createEventForDay(day: DayHelper) {
         const modal = new CreateEventModal(
@@ -128,7 +189,9 @@ export default class FantasyCalendarView extends ItemView {
             if (!modal.saved) return;
             this.calendar.events.push(modal.event);
 
-            this._app.$set({ data: this.calendar });
+            this._app.$set({
+                calendar: new CalendarHelper(this.calendar, this.plugin)
+            });
         };
 
         modal.open();
@@ -148,4 +211,181 @@ export default class FantasyCalendarView extends ItemView {
     }
 
     async onunload() {}
+}
+
+class SwitchModal extends Modal {
+    confirmed: boolean = false;
+    constructor(public plugin: FantasyCalendar, public calendar: Calendar) {
+        super(plugin.app);
+    }
+    async display() {
+        this.contentEl.empty();
+        this.contentEl.createEl("h4", { text: "Switch Calendars" });
+        const dropdownEl = this.contentEl.createDiv(
+            "fantasy-calendar-dropdown"
+        );
+        dropdownEl.createEl("label", {
+            text: "Choose a Calendar"
+        });
+        const dropdown = new DropdownComponent(dropdownEl).onChange((v) => {
+            this.calendar = this.plugin.data.calendars.find((c) => c.id == v);
+        });
+        dropdown
+            .addOptions(
+                Object.fromEntries(
+                    this.plugin.data.calendars.map((c) => [c.id, c.name])
+                )
+            )
+            .setValue(this.calendar ? this.calendar.id : null);
+        const buttonEl = this.contentEl.createDiv(
+            "fantasy-calendar-confirm-buttons"
+        );
+        new ButtonComponent(buttonEl)
+            .setButtonText("Switch")
+            .setCta()
+            .onClick(() => {
+                this.confirmed = true;
+                this.close();
+            });
+        new ButtonComponent(buttonEl).setButtonText("Cancel").onClick(() => {
+            this.close();
+        });
+    }
+    onOpen() {
+        this.display();
+    }
+}
+
+class ChangeDateModal extends Modal {
+    confirmed: boolean = false;
+    date: CurrentCalendarData;
+    dateFieldEl: HTMLDivElement;
+    tempCurrentDays: number;
+    constructor(public plugin: FantasyCalendar, public calendar: Calendar) {
+        super(plugin.app);
+        this.date = { ...this.calendar.current };
+        this.tempCurrentDays = this.date.day;
+    }
+    async display() {
+        this.contentEl.empty();
+        this.contentEl.createEl("h4", { text: "Change Current Day" });
+        this.dateFieldEl = this.contentEl.createDiv(
+            "fantasy-calendar-date-fields"
+        );
+        this.buildDateFields();
+        const buttonEl = this.contentEl.createDiv(
+            "fantasy-calendar-confirm-buttons"
+        );
+        new ButtonComponent(buttonEl)
+            .setButtonText("Switch")
+            .setCta()
+            .onClick(() => {
+                this.confirmed = true;
+                this.date.day = this.tempCurrentDays;
+                this.close();
+            });
+        new ButtonComponent(buttonEl).setButtonText("Cancel").onClick(() => {
+            this.close();
+        });
+    }
+    buildDateFields() {
+        this.dateFieldEl.empty();
+        if (
+            this.tempCurrentDays != undefined &&
+            this.date.month != undefined &&
+            this.tempCurrentDays >
+                this.calendar.static.months[this.date.month]?.length
+        ) {
+            this.tempCurrentDays =
+                this.calendar.static.months[this.date.month]?.length;
+        }
+        const dayEl = this.dateFieldEl.createDiv("fantasy-calendar-date-field");
+        dayEl.createEl("label", { text: "Day" });
+        const day = new TextComponent(dayEl)
+            .setPlaceholder("Day")
+            .setValue(`${this.tempCurrentDays}`)
+            .setDisabled(this.date.month == undefined)
+            .onChange((v) => {
+                if (
+                    Number(v) < 1 ||
+                    (Number(v) >
+                        this.calendar.static.months[this.date.month]?.length ??
+                        Infinity)
+                ) {
+                    new Notice(
+                        `The current day must be between 1 and ${
+                            this.calendar.static.months[this.date.month].length
+                        }`
+                    );
+                    this.tempCurrentDays = this.date.day;
+                    this.buildDateFields();
+                    return;
+                }
+                this.tempCurrentDays = Number(v);
+            });
+        day.inputEl.setAttr("type", "number");
+
+        const monthEl = this.dateFieldEl.createDiv(
+            "fantasy-calendar-date-field"
+        );
+        monthEl.createEl("label", { text: "Month" });
+        new DropdownComponent(monthEl)
+            .addOptions(
+                Object.fromEntries([
+                    ["select", "Select Month"],
+                    ...this.calendar.static.months.map((month) => [
+                        month.name,
+                        month.name
+                    ])
+                ])
+            )
+            .setValue(
+                this.date.month != undefined
+                    ? this.calendar.static.months[this.date.month].name
+                    : "select"
+            )
+            .onChange((v) => {
+                if (v === "select") this.date.month = null;
+                const index = this.calendar.static.months.find(
+                    (m) => m.name == v
+                );
+                this.date.month = this.calendar.static.months.indexOf(index);
+                this.buildDateFields();
+            });
+
+        const yearEl = this.dateFieldEl.createDiv(
+            "fantasy-calendar-date-field"
+        );
+        yearEl.createEl("label", { text: "Year" });
+        const year = new TextComponent(yearEl)
+            .setPlaceholder("Year")
+            .setValue(`${this.date.year}`)
+            .onChange((v) => {
+                this.date.year = Number(v);
+            });
+        year.inputEl.setAttr("type", "number");
+    }
+    onOpen() {
+        this.display();
+    }
+}
+
+class ViewEventModal extends Modal {
+    constructor(public event: Event, public plugin: FantasyCalendar) {
+        super(plugin.app);
+    }
+    async display() {
+        this.contentEl.empty();
+        this.contentEl.createEl("h4", { text: this.event.name });
+
+        await MarkdownRenderer.renderMarkdown(
+            this.event.description,
+            this.contentEl,
+            this.event.note,
+            null
+        );
+    }
+    async onOpen() {
+        await this.display();
+    }
 }

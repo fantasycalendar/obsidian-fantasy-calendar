@@ -1,11 +1,7 @@
 import { Events, Notice } from "obsidian";
-import type {
-    Calendar,
-    CurrentCalendarData,
-    Month,
-    Event,
-    ColorEvent
-} from "../@types";
+import type FantasyCalendar from "src/main";
+import { dateString } from "src/utils/functions";
+import type { Calendar, CurrentCalendarData, Month, Event } from "../@types";
 
 export class MonthHelper {
     days: DayHelper[] = [];
@@ -83,15 +79,10 @@ export class DayHelper {
     constructor(public month: MonthHelper, public number: number) {}
 }
 
-class YearHelper {
-    constructor(public year: Number) {}
-}
-
 export default class CalendarHelper extends Events {
     months: MonthHelper[];
-    constructor(public object: Calendar) {
+    constructor(public object: Calendar, public plugin: FantasyCalendar) {
         super();
-        window.calendar = this;
 
         this.months = this.data.months.map(
             (m, i) => new MonthHelper(m, i, this)
@@ -109,6 +100,13 @@ export default class CalendarHelper extends Events {
         month: null,
         day: null
     };
+
+    get currentDate() {
+        return dateString(
+            this.current,
+            this.months.map((m) => m.data)
+        );
+    }
 
     reset() {
         this.displayed = { ...this.current };

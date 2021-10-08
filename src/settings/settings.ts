@@ -1,12 +1,14 @@
 import {
     addIcon,
     ButtonComponent,
+    DropdownComponent,
     ExtraButtonComponent,
     Modal,
     Notice,
     PluginSettingTab,
     Setting,
-    TextAreaComponent
+    TextAreaComponent,
+    TextComponent
 } from "obsidian";
 import { DEFAULT_CALENDAR } from "../main";
 import type FantasyCalendar from "../main";
@@ -190,32 +192,23 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                 .addExtraButton((b) => {
                     b.setIcon("trash").onClick(async () => {
                         if (
-                            !(await confirmWithModal(
+                            await confirmWithModal(
                                 this.app,
                                 "Are you sure you want to delete this calendar?",
                                 {
                                     cta: "Cancel",
                                     secondary: "Delete"
                                 }
-                            ))
+                            )
                         )
                             return;
+                        this.plugin.data.calendars =
+                            this.plugin.data.calendars.filter(
+                                (c) => c.id != calendar.id
+                            );
+                        await this.plugin.saveCalendar();
 
-                        /* const modal = new ConfirmModal(
-                            this.plugin.app,
-                            "Are you sure you want to delete this calendar?"
-                        );
-                        modal.onClose = async () => {
-                            if (!modal.confirmed) return;
-                            this.plugin.data.calendars =
-                                this.plugin.data.calendars.filter(
-                                    (c) => c.id != calendar.id
-                                );
-                            await this.plugin.saveCalendar();
-
-                            this.showCalendars(element);
-                        };
-                        modal.open(); */
+                        this.showCalendars(element);
                     });
                 });
         }
@@ -235,6 +228,8 @@ class CreateCalendarModal extends Modal {
     preset: Calendar;
     categoryEl: HTMLDivElement;
     eventsUI: EventsUI;
+    infoDetailEl: HTMLDetailsElement;
+    dateFieldEl: HTMLDivElement;
     get static() {
         return this.calendar.static;
     }
@@ -303,17 +298,21 @@ class CreateCalendarModal extends Modal {
     }
     buildInfo() {
         this.infoEl.empty();
-        const element = this.infoEl.createEl("details", {
+        this.infoDetailEl = this.infoEl.createEl("details", {
             attr: { open: true }
         });
-        element.createEl("summary").createEl("h4", { text: "Basic Info" });
-        new Setting(element).setName("Calendar Name").addText((t) => {
+        this.infoDetailEl
+            .createEl("summary")
+            .createEl("h4", { text: "Basic Info" });
+        new Setting(this.infoDetailEl).setName("Calendar Name").addText((t) => {
             t.setValue(this.calendar.name).onChange(
                 (v) => (this.calendar.name = v)
             );
         });
 
-        const descriptionEl = element.createDiv("calendar-description");
+        const descriptionEl = this.infoDetailEl.createDiv(
+            "calendar-description"
+        );
         descriptionEl.createEl("label", { text: "Calendar Description" });
         new TextAreaComponent(descriptionEl)
             .setPlaceholder("Calendar Description")
@@ -321,7 +320,98 @@ class CreateCalendarModal extends Modal {
             .onChange((v) => {
                 this.calendar.description = v;
             });
+
+        this.dateFieldEl = this.infoDetailEl.createDiv(
+            "fantasy-calendar-date-fields"
+        );
+        this.buildDateFields();
     }
+    tempCurrentDays = this.calendar.current.day;
+    buildDateFields() {
+        this.dateFieldEl.empty();
+
+        if (
+            this.tempCurrentDays != undefined &&
+            this.calendar.current.month != undefined &&
+            this.tempCurrentDays >
+                this.calendar.static.months[this.calendar.current.month]?.length
+        ) {
+            this.tempCurrentDays =
+                this.calendar.static.months[
+                    this.calendar.current.month
+                ]?.length;
+        }
+        const dayEl = this.dateFieldEl.createDiv("fantasy-calendar-date-field");
+        dayEl.createEl("label", { text: "Day" });
+        const day = new TextComponent(dayEl)
+            .setPlaceholder("Day")
+            .setValue(`${this.tempCurrentDays}`)
+            .setDisabled(this.calendar.current.month == undefined)
+            .onChange((v) => {
+                if (
+                    Number(v) < 1 ||
+                    (Number(v) >
+                        this.calendar.static.months[this.calendar.current.month]
+                            ?.length ??
+                        Infinity)
+                ) {
+                    new Notice(
+                        `The current day must be between 1 and ${
+                            this.calendar.static.months[
+                                this.calendar.current.month
+                            ].length
+                        }`
+                    );
+                    this.tempCurrentDays = this.calendar.current.day;
+                    this.buildDateFields();
+                    return;
+                }
+                this.tempCurrentDays = Number(v);
+            });
+        day.inputEl.setAttr("type", "number");
+
+        const monthEl = this.dateFieldEl.createDiv(
+            "fantasy-calendar-date-field"
+        );
+        monthEl.createEl("label", { text: "Month" });
+        new DropdownComponent(monthEl)
+            .addOptions(
+                Object.fromEntries([
+                    ["select", "Select Month"],
+                    ...this.calendar.static.months.map((month) => [
+                        month.name,
+                        month.name
+                    ])
+                ])
+            )
+            .setValue(
+                this.calendar.current.month != undefined
+                    ? this.calendar.static.months[this.calendar.current.month]
+                          .name
+                    : "select"
+            )
+            .onChange((v) => {
+                if (v === "select") this.calendar.current.month = null;
+                const index = this.calendar.static.months.find(
+                    (m) => m.name == v
+                );
+                this.calendar.current.month =
+                    this.calendar.static.months.indexOf(index);
+            });
+
+        const yearEl = this.dateFieldEl.createDiv(
+            "fantasy-calendar-date-field"
+        );
+        yearEl.createEl("label", { text: "Year" });
+        const year = new TextComponent(yearEl)
+            .setPlaceholder("Year")
+            .setValue(`${this.calendar.current.year}`)
+            .onChange((v) => {
+                this.calendar.current.year = Number(v);
+            });
+        year.inputEl.setAttr("type", "number");
+    }
+
     buildWeekdays() {
         this.weekdayEl.empty();
         const weekday = new Weekdays({
@@ -373,6 +463,7 @@ class CreateCalendarModal extends Modal {
         months.$on("month-update", (e) => {
             this.calendar.static.months = e.detail;
 
+            this.buildDateFields();
             this.checkCanSave();
         });
     }
@@ -502,6 +593,7 @@ class CreateCalendarModal extends Modal {
                     }
                     return;
                 }
+                this.calendar.current.day = this.tempCurrentDays;
                 this.saved = true;
                 this.close();
             });

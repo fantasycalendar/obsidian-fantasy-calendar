@@ -1,13 +1,12 @@
 <script lang="ts">
-    import type { Calendar } from "src/@types";
-    import CalendarHelper, { DayHelper, MonthHelper } from "src/helper/index";
+    import type CalendarHelper from "src/helper";
+    import type { DayHelper, MonthHelper } from "src/helper/index";
 
     import MonthView from "./Month.svelte";
     import Nav from "./Nav.svelte";
 
-    export let data: Calendar;
     export let fullView: boolean = false;
-    $: calendar = new CalendarHelper(data);
+    export let calendar: CalendarHelper;
     let days: {
             previous: DayHelper[];
             current: DayHelper[];
@@ -38,9 +37,11 @@
     <Nav
         month={month.name}
         {year}
+        current={calendar.currentDate}
         on:next={() => calendar.goToNext()}
         on:previous={() => calendar.goToPrevious()}
         on:reset={() => calendar.reset()}
+        on:settings
     />
     <div class="weekdays">
         {#each weekdays as day}
@@ -53,6 +54,7 @@
         {fullView}
         on:day-click
         on:day-context-menu
+        on:event-click
     />
 </div>
 

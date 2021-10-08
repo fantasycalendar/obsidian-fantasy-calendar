@@ -11,11 +11,10 @@
     export let events: Event[] = [];
     export let months: Month[] = [];
 
-
     const dispatch = createEventDispatcher();
 
     const editEvent = (item: Event) => {
-        dispatch("new-event", item);
+        dispatch("new-item", item);
     };
     const deleteEvent = (item: Event) => {
         events = events.filter((event) => event.id !== item.id);
@@ -49,7 +48,7 @@
                 <EventUI
                     {event}
                     category={getCategory(event.category)}
-                    date={dateString(event, months)}
+                    date={dateString(event.date, months)}
                     on:edit={() => editEvent(event)}
                     on:delete={() => deleteEvent(event)}
                 />

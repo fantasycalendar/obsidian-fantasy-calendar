@@ -33,7 +33,7 @@
         {day.number}
     </span>
     {#if fullView}
-        <Flags events={day.events} {categories} />
+        <Flags events={day.events} {categories} on:event-click />
     {:else}
         <Dots events={day.events} {categories} />
     {/if}

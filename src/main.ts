@@ -6,6 +6,8 @@ import type { Calendar, FantasyCalendarData } from "./@types";
 
 import FantasyCalendarView, { VIEW_TYPE, FULL_VIEW } from "./view/view";
 
+import "./main.css";
+
 declare module "obsidian" {
     interface Workspace {
         on(name: "fantasy-calendars-updated", callback: () => any): EventRef;

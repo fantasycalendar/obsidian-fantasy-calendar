@@ -40,12 +40,12 @@ export class ConfirmModal extends Modal {
                 .setButtonText(this.buttons.cta)
                 .setCta()
                 .onClick(() => {
+                    this.confirmed = true;
                     this.close();
                 });
             new ButtonComponent(buttonEl)
                 .setButtonText(this.buttons.secondary)
                 .onClick(() => {
-                    this.confirmed = true;
                     this.close();
                 });
         });
