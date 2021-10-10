@@ -13,7 +13,5 @@
         "types": ["svelte", "node", "jest"],
         "lib": ["dom", "esnext", "scripthost", "es2015"]
     },
-    "include": [
-        "**/*.ts"
-    ]
+    "include": ["src/**/*", "tests/**/*"]
 }

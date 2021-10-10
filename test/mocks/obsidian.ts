@@ -7,6 +7,7 @@ export class App {
 
     /** @public */
     vault: Vault;
+    
     /** @public */
     metadataCache: MetadataCache;
 
@@ -18,5 +19,4 @@ export class App {
      * @public
      */
     lastEvent: UserEvent | null;
-
 }
