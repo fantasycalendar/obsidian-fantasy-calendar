@@ -7,7 +7,7 @@ import type {
     Week
 } from "../../@types";
 import distinct from "distinct-colors";
-import { nanoid } from "src/utils/functions";
+import { nanoid } from "../../utils/functions";
 
 import { decode } from "he";
 
