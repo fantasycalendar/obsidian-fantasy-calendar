@@ -9,12 +9,15 @@
     };
     export let columns: number;
     export let fullView: boolean = false;
+    export let weeks: number;
 </script>
 
 <div
     class="fantasy-month"
     class:full-view={fullView}
-    style="--calendar-columns: {columns};"
+    style="--calendar-columns: {columns}; --calendar-rows: {fullView
+        ? `${(1 / weeks) * 100}%`
+        : '1fr'}; "
 >
     {#each days.previous as day}
         <DayView {day} adjacent={true} {fullView} />
@@ -25,7 +28,9 @@
             adjacent={false}
             {fullView}
             on:day-click
-            on:day-context-menu on:event-click
+            on:day-context-menu
+            on:event-click
+            on:event-mouseover
         />
     {/each}
     {#each days.next as day}
@@ -37,6 +42,9 @@
     .fantasy-month {
         display: grid;
         grid-template-columns: repeat(var(--calendar-columns), 1fr);
+
+        grid-auto-rows: var(--calendar-rows);
+        gap: 2px;
     }
 
     .full-view {

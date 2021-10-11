@@ -42,14 +42,14 @@ export default class Import {
 
             if (!timespans) continue;
 
-            const month_spans = timespans.filter((t: any) => t.type == "month");
+            /*             const month_spans = timespans.filter((t: any) => t.type == "month");
 
-            if (!month_spans || !month_spans.length) continue;
+            if (!month_spans || !month_spans.length) continue; */
 
-            const months: Month[] = month_spans.map((m: any) => {
+            const months: Month[] = timespans.map((m: any) => {
                 return {
                     name: decode(m.name),
-                    type: "month",
+                    type: m.type,
                     length: m.length,
                     id: nanoid(6)
                 };
@@ -75,7 +75,29 @@ export default class Import {
             }
 
             const events: Event[] = [];
-            const categories: Map<string, string> = new Map();
+
+            const existingCategories: Map<string, EventCategory> = new Map();
+            if ("categories" in data) {
+                for (let category of data.categories) {
+                    const name = category.name;
+                    const id =
+                        name?.split(" ").join("-").toLowerCase() ?? nanoid(6);
+                    let color = category.event_settings.color;
+
+                    if (!(color in FantasyCalendarColorMap)) {
+                        color = color.split("-").join("");
+                        const canvas = createEl("canvas");
+                        const ctx = canvas.getContext("2d");
+                        ctx.fillStyle = color;
+                        color = ctx.fillStyle;
+                        canvas.detach();
+                    } else {
+                        color = FantasyCalendarColorMap[color];
+                    }
+                    existingCategories.set(id, { name, id, color });
+                }
+            }
+
             if (
                 data.events &&
                 Array.isArray(data.events) &&
@@ -132,13 +154,6 @@ export default class Import {
                         description = descriptionEl.textContent;
                     }
 
-                    if (
-                        event.event_category_id &&
-                        event.event_category_id.length &&
-                        !categories.has(event.event_category_id)
-                    ) {
-                        categories.set(event.event_category_id, nanoid(6));
-                    }
                     events.push({
                         name: event.name,
                         description: description,
@@ -146,26 +161,22 @@ export default class Import {
                         note: null,
                         date,
                         category:
-                            categories.get(event.event_category_id) ?? null
+                            existingCategories.get(event.event_category_id)
+                                ?.id ?? null
                     });
                 }
             }
 
-            const colors = distinct({ count: categories.size });
+            const colors = distinct({
+                count: existingCategories.size
+            });
 
-            const eventCatories: EventCategory[] = Array.from(categories).map(
-                ([name, id], i) => {
-                    return {
-                        name: name,
-                        color: colors[i].hex(),
-                        id: id
-                    };
-                }
-            );
-            console.log(
-                "🚀 ~ file: importer.ts ~ line 162 ~ eventCatories",
-                eventCatories
-            );
+            for (let id of existingCategories.keys()) {
+                const category = existingCategories.get(id);
+                if (category.color) continue;
+                category.color = colors.shift().hex();
+                existingCategories.set(id, category);
+            }
 
             const calendarData: Calendar = {
                 name,
@@ -174,7 +185,7 @@ export default class Import {
                 current: dynamicData,
                 events,
                 id: nanoid(6),
-                categories: eventCatories
+                categories: Array.from(existingCategories.values())
             };
 
             calendars.push(calendarData);
@@ -182,3 +193,21 @@ export default class Import {
         return calendars;
     }
 }
+
+const FantasyCalendarColorMap: Record<string, string> = {
+    "Dark-Solid": "#000000",
+    Red: "#9b2c2c",
+    Pink: "#880E4F",
+    Purple: "#4A148C",
+    "Deep-Purple": "#311B92",
+    Blue: "#0D47A1",
+    "Light-Blue": "#0288D1",
+    Cyan: "#006064",
+    Teal: "#004D40",
+    Green: "#2E7D32",
+    "Light-Green": "#7CB342",
+    Lime: "#9e9d24",
+    Yellow: "#FFEB3B",
+    Orange: "#FF9100",
+    "Blue-Grey": "#455A64"
+};

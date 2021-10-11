@@ -11,6 +11,10 @@
     padding: 18px 0 0 0;
 }
 
+.fantasy-calendar-create-calendar input[disabled] {
+    cursor: not-allowed;
+}
+
 .fantasy-calendar-settings .fantasy-calendars .existing-calendars > span {
     display: block;
     text-align: center;
@@ -105,8 +109,6 @@
 .fantasy-calendar-create-event .event-info textarea {
     resize: vertical;
 }
-
-
 
 /** Preset Calendar Modal */
 .fantasy-calendar-choose-preset .fantasy-calendar-preset-container {

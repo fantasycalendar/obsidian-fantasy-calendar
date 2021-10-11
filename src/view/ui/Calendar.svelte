@@ -1,11 +1,13 @@
 <script lang="ts">
     import type CalendarHelper from "src/helper";
     import type { DayHelper, MonthHelper } from "src/helper/index";
+    import DayView from "./DayView.svelte";
 
     import MonthView from "./Month.svelte";
     import Nav from "./Nav.svelte";
 
     export let fullView: boolean = false;
+    export let dayView: boolean = false;
     export let calendar: CalendarHelper;
     let days: {
             previous: DayHelper[];
@@ -13,14 +15,16 @@
             next: DayHelper[];
         },
         year: number,
-        month: MonthHelper;
-
+        month: MonthHelper,
+        weeks: number;
     $: weekdays = calendar.weekdays;
     $: {
         days = calendar.paddedDays;
         year = calendar.displayed.year;
         month = calendar.currentMonth;
+        weeks = calendar.weeksPerCurrentMonth;
         calendar.on("month-update", () => {
+            weeks = calendar.weeksPerCurrentMonth;
             days = calendar.paddedDays;
             year = calendar.displayed.year;
             month = calendar.currentMonth;
@@ -28,41 +32,55 @@
     }
 </script>
 
+<!-- {#if dayView && !fullView}
+    <DayView {calendar} on:back={() => (dayView = false)} />
+{:else} -->
 <div
     id="calendar-container"
     class="fantasy-calendar"
     class:full-view={fullView}
-    style="--calendar-columns: {calendar.weekdays.length};"
+    style="--calendar-columns: {calendar.weekdays
+        .length};--calendar-rows: {calendar.weeksPerCurrentMonth};"
 >
     <Nav
         month={month.name}
         {year}
-        current={calendar.currentDate}
+        current={calendar.displayedDate}
         on:next={() => calendar.goToNext()}
         on:previous={() => calendar.goToPrevious()}
         on:reset={() => calendar.reset()}
         on:settings
     />
-    <div class="weekdays">
-        {#each weekdays as day}
-            <span class="weekday fantasy-weekday">{day.name.slice(0, 3)}</span>
-        {/each}
-    </div>
+    {#if month.type == "month"}
+        <div class="weekdays">
+            {#each weekdays as day}
+                <span class="weekday fantasy-weekday"
+                    >{day.name.slice(0, 3)}</span
+                >
+            {/each}
+        </div>
+    {/if}
     <MonthView
         columns={weekdays.length}
+        {weeks}
         {days}
         {fullView}
         on:day-click
         on:day-context-menu
         on:event-click
+        on:event-mouseover
     />
 </div>
+{#if dayView && !fullView}
+    <hr />
+    <DayView {calendar} on:back={() => (dayView = false)} />
+{/if}
 
 <style>
     #calendar-container.fantasy-calendar.full-view {
         width: 100%;
         height: 100%;
-        margin: 0.5rem;
+        padding: 0.5rem;
 
         display: flex;
         flex-flow: column;
@@ -71,6 +89,7 @@
         display: grid;
         grid-template-columns: repeat(var(--calendar-columns), 1fr);
         grid-template-rows: auto;
+        gap: 2px;
     }
     .weekday {
         background-color: var(--color-background-heading);

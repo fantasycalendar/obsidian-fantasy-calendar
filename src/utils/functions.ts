@@ -27,6 +27,9 @@ export function dateString(date: CurrentCalendarData, months: Month[]) {
         return "";
     }
     const { day, month, year } = date;
+
+    if (!months[month]) return "Invalid Date";
+
     if (month != undefined && year != undefined) {
         return `${months[month].name} ${ordinal(day)}, ${year}`;
     }

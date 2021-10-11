@@ -2,14 +2,15 @@
     import Flag from "./Flag.svelte";
     import type { Event, EventCategory } from "src/@types";
 
-
     export let events: Event[] = [];
     export let categories: EventCategory[];
 
     const MAX_EVENTS = 5;
 
     const color = (event: Event) => {
-        return categories.find((c) => c.id == event.category)?.color;
+        return (
+            categories.find((c) => c.id == event.category)?.color ?? "#808080"
+        );
     };
 </script>
 
@@ -19,7 +20,8 @@
             <Flag
                 {event}
                 color={color(event)}
-                 on:event-click
+                on:event-click
+                on:event-mouseover
             />
         {/each}
     </div>

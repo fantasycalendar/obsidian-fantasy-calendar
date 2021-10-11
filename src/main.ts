@@ -38,7 +38,8 @@ export const DEFAULT_CALENDAR: Calendar = {
 export const DEFAULT_DATA: FantasyCalendarData = {
     calendars: [],
     currentCalendar: null,
-    defaultCalendar: null
+    defaultCalendar: null,
+    eventPreview: false
 };
 
 export default class FantasyCalendar extends Plugin {

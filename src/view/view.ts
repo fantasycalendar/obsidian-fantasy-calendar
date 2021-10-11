@@ -4,6 +4,7 @@ import {
     DropdownComponent,
     ItemView,
     MarkdownRenderer,
+    MarkdownView,
     Menu,
     Modal,
     Notice,
@@ -30,6 +31,7 @@ addIcon(
 
 export default class FantasyCalendarView extends ItemView {
     dropdownEl: HTMLDivElement;
+    helper: CalendarHelper;
     get full() {
         return this.options.full ?? false;
     }
@@ -80,7 +82,7 @@ export default class FantasyCalendarView extends ItemView {
             .setValue(this.calendar ? this.calendar.id : null);
     }
     updateCalendars() {
-        if (this.plugin.data.calendars.length == 1) {
+        if (this.plugin.data.calendars.length == 1 && !this.calendar) {
             this.setCurrentCalendar(this.plugin.data.calendars[0]);
             return;
         }
@@ -89,6 +91,9 @@ export default class FantasyCalendarView extends ItemView {
     setCurrentCalendar(calendar: Calendar) {
         this.dropdownEl?.detach();
         this.calendar = calendar;
+
+        this.helper = new CalendarHelper(this.calendar, this.plugin);
+
         this.plugin.data.currentCalendar = calendar;
         if (this._app) {
             this._app.$destroy();
@@ -96,7 +101,7 @@ export default class FantasyCalendarView extends ItemView {
         this._app = new CalendarUI({
             target: this.contentEl,
             props: {
-                calendar: new CalendarHelper(this.calendar, this.plugin),
+                calendar: this.helper,
                 fullView: this.full
             }
         });
@@ -118,6 +123,13 @@ export default class FantasyCalendarView extends ItemView {
 
                 menu.setNoIcon();
                 menu.addItem((item) => {
+                    item.setTitle("Open Day").onClick(() => {
+                        this.helper.displayed.day = day.number;
+
+                        this._app.$set({ dayView: true });
+                    });
+                });
+                menu.addItem((item) => {
                     item.setTitle("Set as Today").onClick(() => {
                         this.calendar.current = day.date;
 
@@ -134,7 +146,6 @@ export default class FantasyCalendarView extends ItemView {
         );
 
         this._app.$on("settings", (event: CustomEvent<MouseEvent>) => {
-            console.log("🚀 ~ file: view.ts ~ line 124 ~ event", event);
             const evt = event.detail;
             const menu = new Menu(this.app);
 
@@ -178,11 +189,43 @@ export default class FantasyCalendarView extends ItemView {
             menu.showAtMouseEvent(evt);
         });
 
-        this._app.$on("event-click", (event: CustomEvent<Event>) => {
-            console.log("🚀 ~ file: view.ts ~ line 178 ~ event", event);
-            const modal = new ViewEventModal(event.detail, this.plugin);
-            modal.open();
+        this._app.$on("event-click", (evt: CustomEvent<Event>) => {
+            const event = evt.detail;
+            if (event.note) {
+                let leaves: WorkspaceLeaf[] = [];
+                this.app.workspace.iterateAllLeaves((leaf) => {
+                    if (!(leaf.view instanceof MarkdownView)) return;
+                    if (leaf.view.file.basename === event.note) {
+                        leaves.push(leaf);
+                    }
+                });
+                if (leaves.length) {
+                    this.app.workspace.setActiveLeaf(leaves[0]);
+                } else {
+                    this.app.workspace.openLinkText(event.note, "", this.full);
+                }
+            } else {
+                const modal = new ViewEventModal(evt.detail, this.plugin);
+                modal.open();
+            }
         });
+
+        this._app.$on(
+            "event-mouseover",
+            (evt: CustomEvent<{ target: HTMLElement; event: Event }>) => {
+                if (!this.plugin.data.eventPreview) return;
+                const { target, event } = evt.detail;
+                if (event.note) {
+                    this.app.workspace.trigger(
+                        "link-hover",
+                        this, //hover popover, but don't need
+                        target, //targetEl
+                        event.note, //linkText
+                        "" //source
+                    );
+                }
+            }
+        );
     }
     createEventForDay(day: DayHelper) {
         const modal = new CreateEventModal(
@@ -195,6 +238,8 @@ export default class FantasyCalendarView extends ItemView {
         modal.onClose = () => {
             if (!modal.saved) return;
             this.calendar.events.push(modal.event);
+
+            this.plugin.saveCalendar();
 
             this._app.$set({
                 calendar: new CalendarHelper(this.calendar, this.plugin)

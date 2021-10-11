@@ -21,6 +21,10 @@ export class MonthHelper {
         return this.days[this.days.length - 1].weekday;
     }
 
+    get type() {
+        return this.data.type;
+    }
+
     constructor(
         public data: Month,
         public number: number,
@@ -62,6 +66,7 @@ export class DayHelper {
     }
     get weekday() {
         const days = this.month.daysBefore + this.number - 1;
+
         const firstOfYear = this.calendar.firstDayOfYear();
 
         return wrap(
@@ -108,6 +113,13 @@ export default class CalendarHelper extends Events {
         );
     }
 
+    get displayedDate() {
+        return dateString(
+            this.displayed,
+            this.months.map((m) => m.data)
+        );
+    }
+
     reset() {
         this.displayed = { ...this.current };
         this.trigger("month-update");
@@ -118,6 +130,25 @@ export default class CalendarHelper extends Events {
 
         this.trigger("month-update");
     }
+
+    goToNextDay() {
+        this.displayed.day += 1;
+        const currentMonth = this.months[this.displayed.month];
+        if (this.displayed.day >= currentMonth.days.length) {
+            this.setCurrentMonth(this.nextMonthIndex);
+            this.displayed.day = 1;
+        }
+        this.trigger("day-update");
+    }
+    goToPreviousDay() {
+        this.displayed.day -= 1;
+        if (this.displayed.day < 1) {
+            this.setCurrentMonth(this.prevMonthIndex);
+            this.displayed.day = this.currentMonth.days.length;
+        }
+        this.trigger("day-update");
+    }
+
     get nextMonthIndex() {
         return wrap(this.displayed.month + 1, this.months.length);
     }
@@ -169,7 +200,10 @@ export default class CalendarHelper extends Events {
         }
 
         /** Get Days of Next Month */
-        if (this.currentMonth.lastWeekday < this.weekdays.length) {
+        if (
+            this.currentMonth.lastWeekday < this.weekdays.length - 1 &&
+            this.currentMonth.type == "month"
+        ) {
             next = this.nextMonth.days.slice(
                 0,
                 this.weekdays.length - this.currentMonth.lastWeekday - 1
@@ -203,13 +237,16 @@ export default class CalendarHelper extends Events {
      * @memberof Calendar
      */
     get daysPerYear() {
-        return this.months.reduce((a, b) => a + b.days.length, 0);
+        return this.months
+            .filter((m) => m.type === "month")
+            .reduce((a, b) => a + b.days.length, 0);
     }
     daysBeforeMonth(month: MonthHelper) {
         if (this.months.indexOf(month) == 0) {
             return 0;
         }
         return this.months
+            .filter((m) => m.type == "month")
             .slice(0, month.number)
             .reduce((a, b) => a + b.days.length, 0);
     }

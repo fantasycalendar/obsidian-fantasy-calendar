@@ -33,7 +33,12 @@
         {day.number}
     </span>
     {#if fullView}
-        <Flags events={day.events} {categories} on:event-click />
+        <Flags
+            events={day.events}
+            {categories}
+            on:event-click
+            on:event-mouseover
+        />
     {:else}
         <Dots events={day.events} {categories} />
     {/if}
@@ -41,7 +46,7 @@
 
 <style>
     .day {
-        background-color: var(--color-background-day);
+        background-color: transparent;
         border-radius: 4px;
         color: var(--color-text-day);
         cursor: pointer;
@@ -52,6 +57,9 @@
         text-align: center;
         vertical-align: baseline;
         overflow: hidden;
+    }
+    .active {
+        background-color: var(--background-secondary);
     }
     .adjacent-month {
         opacity: 0.25;

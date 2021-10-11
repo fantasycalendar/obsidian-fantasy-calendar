@@ -128,6 +128,18 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                     this.plugin.saveSettings();
                 });
             });
+
+        new Setting(this.infoEl)
+            .setName("Display Event Previews")
+            .setDesc(
+                "Use the core Note Preview plugin to display event notes when hovered."
+            )
+            .addToggle((t) => {
+                t.setValue(this.data.eventPreview).onChange((v) => {
+                    this.data.eventPreview = v;
+                    this.plugin.saveSettings();
+                });
+            });
     }
     buildCalendarUI() {
         this.calendarUI.empty();
@@ -144,7 +156,6 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                         modal.onClose = async () => {
                             if (!modal.saved) return;
                             const calendar = { ...modal.calendar };
-                            ;
                             this.data.calendars.push({ ...calendar });
                             if (!this.data.defaultCalendar) {
                                 this.data.defaultCalendar = calendar;
@@ -235,6 +246,7 @@ class CreateCalendarModal extends Modal {
     eventsUI: EventsUI;
     infoDetailEl: HTMLDetailsElement;
     dateFieldEl: HTMLDivElement;
+    uiEl: HTMLDivElement;
     get static() {
         return this.calendar.static;
     }
@@ -284,22 +296,21 @@ class CreateCalendarModal extends Modal {
                     });
             });
 
-        this.infoEl = this.contentEl.createDiv("calendar-info");
-        this.buildInfo();
-
-        this.weekdayEl = this.contentEl.createDiv();
-        this.buildWeekdays();
-        this.monthEl = this.contentEl.createDiv("fantasy-calendar-container");
-        this.buildMonths();
-        this.eventEl = this.contentEl.createDiv("fantasy-calendar-container");
-        this.buildEvents();
-        this.categoryEl = this.contentEl.createDiv(
-            "fantasy-calendar-container"
-        );
-        this.buildCategories();
+        this.uiEl = this.contentEl.createDiv("fantasy-calendar-ui");
 
         this.buttonsEl = this.contentEl.createDiv("fantasy-context-buttons");
         this.buildButtons();
+        this.infoEl = this.uiEl.createDiv("calendar-info");
+        this.buildInfo();
+
+        this.weekdayEl = this.uiEl.createDiv();
+        this.buildWeekdays();
+        this.monthEl = this.uiEl.createDiv("fantasy-calendar-container");
+        this.buildMonths();
+        this.eventEl = this.uiEl.createDiv("fantasy-calendar-container");
+        this.buildEvents();
+        this.categoryEl = this.uiEl.createDiv("fantasy-calendar-container");
+        this.buildCategories();
     }
     buildInfo() {
         this.infoEl.empty();

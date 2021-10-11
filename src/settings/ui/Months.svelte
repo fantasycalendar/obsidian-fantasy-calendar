@@ -5,12 +5,15 @@
     import {
         ButtonComponent,
         debounce,
+        DropdownComponent,
         ExtraButtonComponent,
         Notice,
         setIcon,
         TextComponent
     } from "obsidian";
     import type { Month } from "src/@types";
+
+    import MonthInstance from "./Month.svelte";
 
     import { nanoid } from "src/utils/functions";
     import Detail from "./Detail.svelte";
@@ -29,50 +32,6 @@
 
     const grip = (node: HTMLElement) => {
         setIcon(node, "fantasy-calendar-grip");
-    };
-
-    const trash = (node: HTMLElement, item: Month) => {
-        new ExtraButtonComponent(node)
-            .setIcon("trash")
-            .onClick(
-                () => (months = months.filter((day) => day.id !== item.id))
-            );
-    };
-
-    const name = (node: HTMLElement, item: Month) => {
-        const comp = new TextComponent(node)
-            .setValue(item.name)
-            .setPlaceholder("Name")
-            .onChange((v) => {
-                item.name = v;
-                dispatch("month-update", months);
-            });
-        comp.inputEl.setAttr("style", "width: 100%;");
-    };
-
-    const length = (node: HTMLElement, item: Month) => {
-        const comp = new TextComponent(node)
-            .setValue(`${item.length}`)
-            .setPlaceholder("Length")
-            .onChange(
-                debounce(
-                    (v) => {
-                        if (isNaN(Number(v)) || Number(v) < 0) {
-                            new Notice(
-                                "Month length must be a positive number."
-                            );
-                            comp.inputEl.value = null;
-                            return;
-                        }
-                        item.length = Number(v);
-                        dispatch("month-update", months);
-                    },
-                    500,
-                    true
-                )
-            );
-        comp.inputEl.setAttr("style", "width: 100%;");
-        comp.inputEl.setAttrs({ type: "number", min: "0" });
     };
 
     function startDrag(e: Event) {
@@ -109,9 +68,6 @@
     const dispatch = createEventDispatcher();
 
     export let months: Month[] = [];
-    $: {
-        dispatch("month-update", months);
-    }
 </script>
 
 <Detail label="Months" on:new-item={addNew}>
@@ -126,7 +82,7 @@
             on:consider={handleConsider}
             on:finalize={handleFinalize}
         >
-            {#each months as item (item.id)}
+            {#each months as month (month.id)}
                 <div animate:flip={{ duration: flipDurationMs }} class="month">
                     <div
                         class="icon"
@@ -134,11 +90,7 @@
                         on:mousedown={startDrag}
                         on:touchstart={startDrag}
                     />
-
-                    <div use:name={item} />
-                    <div use:length={item} />
-
-                    <div class="icon" use:trash={item} />
+                    <MonthInstance {month} on:mousedown={startDrag} />
                 </div>
             {/each}
         </div>
@@ -147,17 +99,9 @@
 
 <style>
     .month {
-        display: grid;
-        grid-template-columns: auto 1fr 1fr auto;
+        display: flex;
         align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-    }
-
-    .month .icon {
-        align-items: center;
-    }
-    .month {
         margin-top: 0.5rem;
+        gap: 1rem;
     }
 </style>

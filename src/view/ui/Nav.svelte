@@ -55,6 +55,10 @@
 </div>
 
 <style>
+    #calendar-container .nav {
+        padding: 10px 5px;
+        margin: 0;
+    }
     .fantasy-nav {
         display: flex;
         align-items: center;

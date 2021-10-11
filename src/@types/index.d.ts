@@ -1,5 +1,5 @@
 import type { Recurring } from "src/settings/settings";
-import type Calendar__SvelteComponent_ from "src/view/ui/Calendar.svelte";
+import type Calendar__SvelteComponent_ from "src/view/day/Calendar.svelte";
 
 export interface Calendar {
     id: string;
@@ -15,6 +15,7 @@ export interface FantasyCalendarData {
     calendars: Calendar[];
     currentCalendar: Calendar;
     defaultCalendar: Calendar;
+    eventPreview: boolean;
 }
 
 export interface TimeSpan {
@@ -27,6 +28,10 @@ export interface Day extends TimeSpan {}
 export type Week = Day[];
 export interface Month extends TimeSpan {
     length: number;
+}
+export interface IntercalaryMonth extends Month {
+    length: 1;
+    type: "intercalary";
 }
 
 export interface LeapDay extends Day {

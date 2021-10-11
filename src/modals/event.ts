@@ -197,8 +197,6 @@ export class CreateEventModal extends Modal {
                 })
             );
 
-            console.log(options, this.event.category);
-
             d.addOptions(options)
                 .setValue(this.event.category)
                 .onChange((v) => (this.event.category = v));
@@ -224,7 +222,7 @@ export class CreateEventModal extends Modal {
         this.event.name = note;
         const cache = this.app.metadataCache.getFileCache(file);
         const content = await this.app.vault.cachedRead(file);
-        this.event.description = content.replace(/^---[\s\S]+---\n/, "");
+        this.event.description = content.replace(/^---[\s\S]+?---\n/, "");
 
         const { frontmatter } = cache;
         if (frontmatter) {
@@ -260,11 +258,9 @@ export class CreateEventModal extends Modal {
                 }
                 this.event.category = this.calendar.categories.find(
                     (c) => c.name === frontmatter["fc-category"]
-                ).id;
+                )?.id;
             }
         }
-
-        console.log(this.event);
 
         await this.display();
     }
