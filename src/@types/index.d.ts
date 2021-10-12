@@ -68,6 +68,7 @@ export interface LeapDay extends Day {
     interval: LeapDayCondition[];
     timespan: number;
     intercalary: boolean;
+    offset: number;
 }
 
 export interface Season {

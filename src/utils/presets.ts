@@ -149,6 +149,7 @@ export const PRESET_CALENDARS: Calendar[] = [
                             interval: 4
                         }
                     ],
+                    offset: 0,
                     timespan: 1,
                     intercalary: false,
                     id: "ID_b91ad86a887a"
@@ -963,6 +964,7 @@ export const PRESET_CALENDARS: Calendar[] = [
                             interval: 8
                         }
                     ],
+                    offset: 0,
                     timespan: 1,
                     intercalary: false,
                     id: "ID_88c8da3b8b2b"
@@ -2897,6 +2899,7 @@ export const PRESET_CALENDARS: Calendar[] = [
                             interval: 4
                         }
                     ],
+                    offset: 0,
                     timespan: 1,
                     intercalary: false,
                     id: "ID_6a28dbb81a48"
@@ -3720,6 +3723,7 @@ export const PRESET_CALENDARS: Calendar[] = [
                             interval: 4
                         }
                     ],
+                    offset: 0,
                     timespan: 9,
                     intercalary: false,
                     id: "ID_5b08faa88ada"

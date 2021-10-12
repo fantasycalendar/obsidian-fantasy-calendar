@@ -90,6 +90,7 @@ export default class Import {
                         interval: intervals,
                         timespan: leap.timespan ?? 0,
                         intercalary: leap.intercalary ?? false,
+                        offset: leap.offset ?? 0,
                         id: nanoid(6)
                     });
                 }

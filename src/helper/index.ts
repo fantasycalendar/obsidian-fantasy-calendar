@@ -1,10 +1,17 @@
 import { Events, Notice } from "obsidian";
 import type FantasyCalendar from "src/main";
 import { dateString } from "src/utils/functions";
-import type { Calendar, CurrentCalendarData, Month, Event } from "../@types";
+import type {
+    Calendar,
+    CurrentCalendarData,
+    Month,
+    Event,
+    LeapDay
+} from "../@types";
 
 export class MonthHelper {
     days: DayHelper[] = [];
+    leapDays: LeapDay[];
     get name() {
         return this.data.name;
     }
@@ -28,11 +35,13 @@ export class MonthHelper {
     constructor(
         public data: Month,
         public number: number,
+        public year: number,
         public calendar: CalendarHelper
     ) {
-        this.days = [...new Array(data.length).keys()].map(
-            (k) => new DayHelper(this, k + 1)
-        );
+        this.leapDays = this.calendar.leapDaysForMonth(this);
+        this.days = [
+            ...new Array(data.length + this.leapDays.length).keys()
+        ].map((k) => new DayHelper(this, k + 1));
     }
 }
 
@@ -88,11 +97,10 @@ export default class CalendarHelper extends Events {
     months: MonthHelper[];
     constructor(public object: Calendar, public plugin: FantasyCalendar) {
         super();
-
-        this.months = this.data.months.map(
-            (m, i) => new MonthHelper(m, i, this)
-        );
         this.displayed = { ...this.current };
+        this.months = this.data.months.map(
+            (m, i) => new MonthHelper(m, i, this.displayed.year, this)
+        );
     }
     get data() {
         return this.object.static;
@@ -100,6 +108,11 @@ export default class CalendarHelper extends Events {
     get current() {
         return this.object.current;
     }
+
+    get leapdays() {
+        return this.data.leapDays;
+    }
+
     displayed: CurrentCalendarData = {
         year: null,
         month: null,
@@ -186,9 +199,15 @@ export default class CalendarHelper extends Events {
     }
     goToNext() {
         if (this.nextMonthIndex < this.displayed.month) {
-            this.displayed.year += 1;
+            this.goToNextYear();
         }
         this.setCurrentMonth(this.nextMonthIndex);
+    }
+    goToNextYear() {
+        this.displayed.year += 1;
+        this.months = this.data.months.map(
+            (m, i) => new MonthHelper(m, i, this.displayed.year, this)
+        );
     }
     get prevMonthIndex() {
         return wrap(this.displayed.month - 1, this.months.length);
@@ -202,11 +221,16 @@ export default class CalendarHelper extends Events {
                 new Notice("This is the earliest year.");
                 return;
             }
-            this.displayed.year -= 1;
+            this.goToPreviousYear();
         }
         this.setCurrentMonth(this.prevMonthIndex);
     }
-
+    goToPreviousYear() {
+        this.displayed.year -= 1;
+        this.months = this.data.months.map(
+            (m, i) => new MonthHelper(m, i, this.displayed.year, this)
+        );
+    }
     get weekdays() {
         return this.data.weekdays;
     }
@@ -216,9 +240,36 @@ export default class CalendarHelper extends Events {
     get daysOfCurrentMonth() {
         return this.currentMonth.days;
     }
+
+    leapDaysForMonth(month: MonthHelper) {
+        return this.leapdays
+            .filter((l) => l.timespan == month.number)
+            .filter((l) => {
+                return l.interval
+                    .sort((a, b) => a.interval - b.interval)
+                    .some(({ interval, exclusive }, index, array) => {
+                        if (exclusive && index == 0) {
+                            return this.displayed.year % interval != 0;
+                        }
+
+                        if (exclusive) return;
+
+                        if (array[index + 1] && array[index + 1].exclusive) {
+                            return (
+                                this.displayed.year % interval == 0 &&
+                                this.displayed.year %
+                                    array[index + 1].interval !=
+                                    0
+                            );
+                        }
+                        return this.displayed.year % interval == 0;
+                    });
+            });
+    }
     get paddedDays() {
         let previous: DayHelper[] = [];
         let current = this.daysOfCurrentMonth;
+
         let next: DayHelper[] = [];
 
         /** Get Days of Previous Month */
