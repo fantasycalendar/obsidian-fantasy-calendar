@@ -6,7 +6,7 @@
     export let categories: EventCategory[];
     export let dayView: boolean = false;
 
-    const MAX_EVENTS = 5;
+    const MAX_EVENTS = dayView ? Infinity : 5;
 
     const color = (event: Event) => {
         return (
@@ -24,6 +24,7 @@
                 {dayView}
                 on:event-click
                 on:event-mouseover
+                on:event-context
             />
         {/each}
     </div>

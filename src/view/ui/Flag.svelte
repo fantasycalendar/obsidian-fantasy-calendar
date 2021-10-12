@@ -8,7 +8,7 @@
     export let event: Event;
     export let color: string;
     export let dayView: boolean = false;
-    console.log("🚀 ~ file: Flag.svelte ~ line 11 ~ dayView", dayView);
+
     const note = (node: HTMLElement) => {
         setIcon(node, "note-glyph");
     };
@@ -22,6 +22,7 @@
     on:mouseover={(evt) =>
         dispatch("event-mouseover", { target: evt.target, event })}
     on:focus={() => {}}
+    on:contextmenu={(evt) => dispatch("event-context", { evt: evt, event })}
 >
     <span class:clamp={!dayView} class:day-view={dayView}> {event.name}</span>
     {#if event.note}
@@ -31,7 +32,10 @@
 
 <style>
     .flag {
+        cursor: pointer;
+
         display: flex;
+        justify-content: space-between;
         align-items: flex-start;
         padding-left: 0.125rem;
         text-align: left;

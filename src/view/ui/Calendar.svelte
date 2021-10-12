@@ -77,7 +77,13 @@
 </div>
 {#if dayView && !fullView}
     <hr />
-    <DayView {calendar} on:close={() => (dayView = false)} />
+    <DayView
+        {calendar}
+        on:close={() => (dayView = false)}
+        on:event-click
+        on:event-mouseover
+                on:event-context
+    />
 {/if}
 
 <style>

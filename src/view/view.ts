@@ -23,6 +23,7 @@ export const VIEW_TYPE = "FANTASY_CALENDAR";
 export const FULL_VIEW = "FANTASY_CALENDAR_FULL_VIEW";
 
 import CalendarUI from "./ui/Calendar.svelte";
+import { confirmWithModal } from "src/modals/confirm";
 
 addIcon(
     VIEW_TYPE,
@@ -104,6 +105,8 @@ export default class FantasyCalendarView extends ItemView {
             this._app.$set({
                 calendar: this.helper
             });
+
+            this.helper.trigger("day-update");
         };
 
         modal.open();
@@ -258,6 +261,83 @@ export default class FantasyCalendarView extends ItemView {
                         "" //source
                     );
                 }
+            }
+        );
+        this._app.$on(
+            "event-context",
+            (custom: CustomEvent<{ evt: MouseEvent; event: Event }>) => {
+                const { evt, event } = custom.detail;
+
+                const menu = new Menu(this.app);
+
+                menu.setNoIcon();
+                menu.addItem((item) => {
+                    item.setTitle("Edit Event").onClick(() => {
+                        const modal = new CreateEventModal(
+                            this.app,
+                            this.calendar,
+                            event
+                        );
+
+                        modal.onClose = () => {
+                            if (!modal.saved) return;
+
+                            const existing = this.calendar.events.find(
+                                (e) => e.id == event.id
+                            );
+
+                            this.calendar.events.splice(
+                                this.calendar.events.indexOf(existing),
+                                1,
+                                modal.event
+                            );
+
+                            this.plugin.saveSettings();
+
+                            this._app.$set({
+                                calendar: this.helper
+                            });
+
+                            this.helper.trigger("day-update");
+                        };
+
+                        modal.open();
+                    });
+                });
+
+                menu.addItem((item) => {
+                    item.setTitle("Delete Event").onClick(async () => {
+                        if (
+                            await confirmWithModal(
+                                this.app,
+                                "Are you sure you wish to delete this event?",
+                                {
+                                    cta: "Delete",
+                                    secondary: "Cancel"
+                                }
+                            )
+                        ) {
+                            const existing = this.calendar.events.find(
+                                (e) => e.id == event.id
+                            );
+
+                            this.calendar.events.splice(
+                                this.calendar.events.indexOf(existing),
+                                1
+                            );
+
+                            this.plugin.saveSettings();
+
+                            this._app.$set({
+                                calendar: this.helper
+                            });
+
+                            this.helper.trigger("day-update");
+                        }
+                    });
+                });
+
+                menu.showAtMouseEvent(evt);
             }
         );
     }

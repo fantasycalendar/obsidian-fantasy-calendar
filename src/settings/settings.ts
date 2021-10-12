@@ -268,10 +268,6 @@ class CreateCalendarModal extends Modal {
         super(plugin.app);
         this.calendar.id = nanoid(6);
         if (existing) {
-            console.log(
-                "🚀 ~ file: settings.ts ~ line 271 ~ existing",
-                existing.current
-            );
             this.editing = true;
             this.calendar = { ...existing };
         }
@@ -299,10 +295,6 @@ class CreateCalendarModal extends Modal {
                             if (!modal.saved) return;
 
                             this.calendar = { ...modal.preset };
-                            console.log(
-                                "🚀 ~ file: settings.ts ~ line 302 ~ this.calendar ",
-                                this.calendar.current
-                            );
                             this.display();
                         };
                         modal.open();
@@ -374,7 +366,6 @@ class CreateCalendarModal extends Modal {
                     this.calendar.current.month
                 ]?.length;
         }
-        console.log(this.tempCurrentDays, this.calendar.current.day);
         const dayEl = this.dateFieldEl.createDiv("fantasy-calendar-date-field");
         dayEl.createEl("label", { text: "Day" });
         const day = new TextComponent(dayEl)

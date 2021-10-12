@@ -62,7 +62,14 @@
             on:click={(evt) => calendar.goToNextDay()}
         />
     </div>
-    <Flags {events} {categories} dayView={true} />
+    <Flags
+        {events}
+        {categories}
+        dayView={true}
+        on:event-click
+        on:event-mouseover
+        on:event-context
+    />
 </div>
 
 <style>

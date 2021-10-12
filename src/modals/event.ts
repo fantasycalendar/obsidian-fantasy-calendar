@@ -221,8 +221,6 @@ export class CreateEventModal extends Modal {
         }
         this.event.name = note;
         const cache = this.app.metadataCache.getFileCache(file);
-        const content = await this.app.vault.cachedRead(file);
-        this.event.description = content.replace(/^---[\s\S]+?---\n/, "");
 
         const { frontmatter } = cache;
         if (frontmatter) {

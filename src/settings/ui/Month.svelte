@@ -1,12 +1,5 @@
 <script lang="ts">
-    import {
-        debounce,
-        DropdownComponent,
-        ExtraButtonComponent,
-        Notice,
-        setIcon,
-        TextComponent
-    } from "obsidian";
+    import { ExtraButtonComponent } from "obsidian";
     import type { Month } from "src/@types";
     import { createEventDispatcher } from "svelte";
 
@@ -23,65 +16,6 @@
             dispatch("month-delete");
         });
     };
-
-    /*     const name = (node: HTMLElement) => {
-        const comp = new TextComponent(node)
-            .setValue(month.name)
-            .setPlaceholder("Name")
-            .onChange((v) => {
-                month.name = v;
-                dispatch("month-update");
-            });
-        comp.inputEl.setAttr("style", "width: 100%;");
-    }; */
-
-    /*     const length = (node: HTMLElement) => {
-        const comp = new TextComponent(node)
-            .setValue(`${month.length}`)
-            .setPlaceholder("Length")
-            .setDisabled(month.type == "intercalary")
-            .onChange(
-                debounce(
-                    (v) => {
-                        if (isNaN(Number(v)) || Number(v) < 0) {
-                            new Notice(
-                                "Month length must be a positive number."
-                            );
-                            comp.inputEl.value = null;
-                            return;
-                        }
-                        month.length = Number(v);
-                        dispatch("month-update");
-                    },
-                    500,
-                    true
-                )
-            );
-        comp.inputEl.setAttr("style", "width: 100%;");
-        comp.inputEl.setAttrs({ type: "number", min: "0" });
-
-        if (month.type == "intercalary") {
-            console.log("🚀 ~ file: Months.svelte ~ line 79 ~ month", month);
-            comp.inputEl.setAttr(
-                "aria-label",
-                "Intercalary Months can only be 1 day long."
-            );
-        }
-    }; */
-
-    /*     const type = (node: HTMLElement) => {
-        new DropdownComponent(node)
-            .addOption("month", "Month")
-            .addOption("intercalary", "Intercalary")
-            .setValue(month.type)
-            .onChange((v) => {
-                month.type = v;
-                if (v == "intercalary") {
-                    month.length = 1;
-                }
-                dispatch("month-update");
-            });
-    }; */
 
     $: {
         month.name = name;
