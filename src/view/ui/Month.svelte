@@ -30,6 +30,7 @@
             {fullView}
             {dayView}
             on:day-click
+            on:day-doubleclick
             on:day-context-menu
             on:event-click
             on:event-mouseover
@@ -51,5 +52,6 @@
 
     .full-view {
         height: 100%;
+        margin-bottom: 0.5rem;
     }
 </style>

@@ -1,4 +1,6 @@
 <script lang="ts">
+    import type { Week } from "src/@types";
+
     import type CalendarHelper from "src/helper";
     import type { DayHelper, MonthHelper } from "src/helper/index";
     import DayView from "./DayView.svelte";
@@ -16,25 +18,25 @@
         },
         year: number,
         month: MonthHelper,
-        weeks: number;
-    $: weekdays = calendar.weekdays;
+        weeks: number,
+        weekdays: Week;
     $: {
-        days = calendar.paddedDays;
-        year = calendar.displayed.year;
-        month = calendar.currentMonth;
-        weeks = calendar.weeksPerCurrentMonth;
-        calendar.on("month-update", () => {
-            weeks = calendar.weeksPerCurrentMonth;
+        if (calendar) {
+            weekdays = calendar.weekdays;
             days = calendar.paddedDays;
             year = calendar.displayed.year;
             month = calendar.currentMonth;
-        });
+            weeks = calendar.weeksPerCurrentMonth;
+            calendar.on("month-update", () => {
+                weeks = calendar.weeksPerCurrentMonth;
+                days = calendar.paddedDays;
+                year = calendar.displayed.year;
+                month = calendar.currentMonth;
+            });
+        }
     }
 </script>
 
-<!-- {#if dayView && !fullView}
-    <DayView {calendar} on:back={() => (dayView = false)} />
-{:else} -->
 <div
     id="calendar-container"
     class="fantasy-calendar"
@@ -67,6 +69,7 @@
         {fullView}
         {dayView}
         on:day-click
+        on:day-doubleclick
         on:day-context-menu
         on:event-click
         on:event-mouseover

@@ -7,6 +7,8 @@
 
     export let event: Event;
     export let color: string;
+    export let dayView: boolean = false;
+    console.log("🚀 ~ file: Flag.svelte ~ line 11 ~ dayView", dayView);
     const note = (node: HTMLElement) => {
         setIcon(node, "note-glyph");
     };
@@ -14,14 +16,14 @@
 
 <div
     class="flag"
-    aria-label={event.name}
+    aria-label={!dayView ? event.name : null}
     style="--hex-alpha: {color}40; --color:{color}"
     on:click={() => dispatch("event-click", event)}
     on:mouseover={(evt) =>
         dispatch("event-mouseover", { target: evt.target, event })}
     on:focus={() => {}}
 >
-    <span class="clamp"> {event.name}</span>
+    <span class:clamp={!dayView} class:day-view={dayView}> {event.name}</span>
     {#if event.note}
         <div class="note" use:note />
     {/if}

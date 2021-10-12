@@ -38,9 +38,7 @@ export default class FantasyCalendarView extends ItemView {
     dropdownEl: HTMLDivElement;
     helper: CalendarHelper;
     noCalendarEl: HTMLDivElement;
-    get full() {
-        return this.options.full ?? false;
-    }
+    full = false;
     calendar: Calendar;
     /* calendarDropdownEl: HTMLDivElement; */
     protected _app: CalendarUI;
@@ -50,19 +48,6 @@ export default class FantasyCalendarView extends ItemView {
         public options: { calendar?: Calendar; full?: boolean } = {}
     ) {
         super(leaf);
-
-        if (this.plugin.currentCalendar) {
-            this.setCurrentCalendar(this.plugin.currentCalendar);
-        } else if (this.plugin.defaultCalendar) {
-            this.setCurrentCalendar(this.plugin.defaultCalendar);
-        } else {
-            this.noCalendarEl = this.contentEl.createDiv("fantasy-no-calendar");
-            this.noCalendarEl.createSpan({
-                text: "No calendars created! Create a calendar to see it here."
-            });
-        }
-
-        this.updateCalendars();
         this.registerEvent(
             this.plugin.app.workspace.on("fantasy-calendars-updated", () => {
                 this.updateCalendars();
@@ -70,9 +55,25 @@ export default class FantasyCalendarView extends ItemView {
         );
     }
     updateCalendars() {
-        if (this.plugin.data.calendars.length == 1 && !this.calendar) {
+        if (!this.plugin.data.calendars.length) {
+            this.contentEl.empty();
+            this.noCalendarEl = this.contentEl.createDiv("fantasy-no-calendar");
+            this.noCalendarEl.createSpan({
+                text: "No calendars created! Create a calendar to see it here."
+            });
+        } else if (
+            this.calendar &&
+            this.plugin.data.calendars.find((c) => c.id == this.calendar.id)
+        ) {
+            this.setCurrentCalendar(
+                this.plugin.data.calendars.find((c) => c.id == this.calendar.id)
+            );
+        } else if (this.plugin.currentCalendar) {
+            this.setCurrentCalendar(this.plugin.currentCalendar);
+        } else if (this.plugin.defaultCalendar) {
+            this.setCurrentCalendar(this.plugin.defaultCalendar);
+        } else if (this.plugin.data.calendars.length == 1 && !this.calendar) {
             this.setCurrentCalendar(this.plugin.data.calendars[0]);
-            return;
         }
     }
 
@@ -83,9 +84,36 @@ export default class FantasyCalendarView extends ItemView {
         this.helper = new CalendarHelper(this.calendar, this.plugin);
 
         this.plugin.data.currentCalendar = calendar.id;
-        if (this._app) {
-            this._app.$destroy();
-        }
+
+        this.build();
+    }
+    createEventForDay(day: DayHelper) {
+        const modal = new CreateEventModal(
+            this.app,
+            this.calendar,
+            null,
+            day.date
+        );
+
+        modal.onClose = () => {
+            if (!modal.saved) return;
+            this.calendar.events.push(modal.event);
+
+            this.plugin.saveSettings();
+
+            this._app.$set({
+                calendar: this.helper
+            });
+        };
+
+        modal.open();
+    }
+
+    async onOpen() {
+        this.updateCalendars();
+    }
+    build() {
+        this.contentEl.empty();
         this._app = new CalendarUI({
             target: this.contentEl,
             props: {
@@ -96,10 +124,21 @@ export default class FantasyCalendarView extends ItemView {
         this._app.$on("day-click", (event: CustomEvent<DayHelper>) => {
             const day = event.detail;
 
-            if (day.events.length) {
-            } else {
-                this.createEventForDay(day);
-            }
+            if (day.events.length) return;
+            this.createEventForDay(day);
+        });
+
+        this._app.$on("day-doubleclick", (event: CustomEvent<DayHelper>) => {
+            const day = event.detail;
+            if (!day.events.length) return;
+
+            this.helper.viewing.day = day.number;
+            this.helper.viewing.month = this.helper.displayed.month;
+            this.helper.viewing.year = this.helper.displayed.year;
+
+            this.helper.trigger("day-update");
+
+            this._app.$set({ dayView: true });
         });
 
         this._app.$on(
@@ -116,6 +155,7 @@ export default class FantasyCalendarView extends ItemView {
                         this.helper.viewing.month = this.helper.displayed.month;
                         this.helper.viewing.year = this.helper.displayed.year;
 
+                        this.helper.trigger("day-update");
                         this._app.$set({ dayView: true });
                     });
                 });
@@ -221,29 +261,6 @@ export default class FantasyCalendarView extends ItemView {
             }
         );
     }
-    createEventForDay(day: DayHelper) {
-        const modal = new CreateEventModal(
-            this.app,
-            this.calendar,
-            null,
-            day.date
-        );
-
-        modal.onClose = () => {
-            if (!modal.saved) return;
-            this.calendar.events.push(modal.event);
-
-            this.plugin.saveCalendar();
-
-            this._app.$set({
-                calendar: new CalendarHelper(this.calendar, this.plugin)
-            });
-        };
-
-        modal.open();
-    }
-
-    async onOpen() {}
 
     async onClose() {}
     getViewType() {
@@ -257,6 +274,10 @@ export default class FantasyCalendarView extends ItemView {
     }
 
     async onunload() {}
+}
+
+export class FullCalendarView extends FantasyCalendarView {
+    full = true;
 }
 
 class SwitchModal extends Modal {

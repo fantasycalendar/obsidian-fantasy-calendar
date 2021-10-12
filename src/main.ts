@@ -4,7 +4,11 @@ import FantasyCalendarSettings from "./settings/settings";
 
 import type { Calendar, FantasyCalendarData } from "./@types";
 
-import FantasyCalendarView, { VIEW_TYPE, FULL_VIEW } from "./view/view";
+import FantasyCalendarView, {
+    VIEW_TYPE,
+    FULL_VIEW,
+    FullCalendarView
+} from "./view/view";
 
 import "./main.css";
 
@@ -82,7 +86,7 @@ export default class FantasyCalendar extends Plugin {
             VIEW_TYPE,
             (leaf: WorkspaceLeaf) => new FantasyCalendarView(this, leaf)
         );
-        this.app.workspace.onLayoutReady(() => this.addCalendarView());
+        this.app.workspace.onLayoutReady(() => this.addCalendarView(true));
         this.addRibbonIcon(VIEW_TYPE, "Open Big Fantasy Calendar", (evt) => {
             this.app.workspace
                 .getLeaf(evt.getModifierState(MODIFIER_KEY))
@@ -90,7 +94,7 @@ export default class FantasyCalendar extends Plugin {
         });
 
         this.registerView(FULL_VIEW, (leaf: WorkspaceLeaf) => {
-            return new FantasyCalendarView(this, leaf, { full: true });
+            return new FullCalendarView(this, leaf, { full: true });
         });
 
         this.addCommand({
@@ -120,13 +124,17 @@ export default class FantasyCalendar extends Plugin {
             .forEach((leaf) => leaf.detach());
     }
 
-    async addCalendarView() {
+    async addCalendarView(startup: boolean = false) {
+        if (startup && this.app.workspace.getLeavesOfType(VIEW_TYPE).length)
+            return;
         await this.app.workspace.getRightLeaf(false).setViewState({
             type: VIEW_TYPE
         });
         if (this.view) this.app.workspace.revealLeaf(this.view.leaf);
     }
-    async addFullCalendarView() {
+    async addFullCalendarView(startup: boolean = false) {
+        if (startup && this.app.workspace.getLeavesOfType(FULL_VIEW).length)
+            return;
         this.app.workspace.getLeaf(false).setViewState({ type: FULL_VIEW });
         if (this.full) this.app.workspace.revealLeaf(this.full.leaf);
     }

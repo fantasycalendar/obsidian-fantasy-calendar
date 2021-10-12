@@ -4,6 +4,7 @@
 
     export let events: Event[] = [];
     export let categories: EventCategory[];
+    export let dayView: boolean = false;
 
     const MAX_EVENTS = 5;
 
@@ -20,6 +21,7 @@
             <Flag
                 {event}
                 color={color(event)}
+                {dayView}
                 on:event-click
                 on:event-mouseover
             />

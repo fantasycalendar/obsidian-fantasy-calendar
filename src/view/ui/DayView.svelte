@@ -62,7 +62,7 @@
             on:click={(evt) => calendar.goToNextDay()}
         />
     </div>
-    <Flags {events} {categories} />
+    <Flags {events} {categories} dayView={true} />
 </div>
 
 <style>
@@ -88,5 +88,9 @@
     }
     h3 {
         margin: 0;
+    }
+
+    .day-view :global(.flag-container > .flag) {
+        padding-left: 0.5rem;
     }
 </style>

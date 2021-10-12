@@ -13,10 +13,6 @@
 
     $: categories = day.calendar.object.categories;
 
-    const contextMenu = (evt: MouseEvent) => {
-        dispatch("day-context-menu", { day, evt });
-    };
-
     export let dayView: boolean = false;
     let today = day.isCurrentDay;
     let displaying = day.isDisplaying;
@@ -43,7 +39,8 @@
         ? `${day.events.length} event${day.events.length == 1 ? "" : "s"}`
         : undefined}
     on:click={() => dispatch("day-click", day)}
-    on:contextmenu={contextMenu}
+    on:dblclick={() => dispatch("day-doubleclick", day)}
+    on:contextmenu={(evt) => dispatch("day-context-menu", { day, evt })}
 >
     <span>
         {day.number}
