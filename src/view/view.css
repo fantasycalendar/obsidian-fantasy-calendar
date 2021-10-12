@@ -20,3 +20,11 @@
 .fantasy-calendar-view-event {
     max-width: 75vw;
 }
+
+.fantasy-no-calendar {
+    color: var(--text-muted);
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    padding: 0.5rem;
+}

@@ -117,18 +117,15 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                 for (let calendar of this.data.calendars) {
                     d.addOption(calendar.id, calendar.name);
                 }
-                d.setValue(this.plugin.data.defaultCalendar?.id);
+                d.setValue(this.plugin.data.defaultCalendar);
                 d.onChange((v) => {
                     if (v === "none") {
                         this.plugin.data.defaultCalendar = null;
                         this.plugin.saveSettings();
                         return;
                     }
-                    const calendar = this.plugin.data.calendars.find(
-                        (c) => c.id == v
-                    );
 
-                    this.plugin.data.defaultCalendar = calendar;
+                    this.plugin.data.defaultCalendar = v;
                     this.plugin.saveSettings();
                 });
             });
@@ -162,7 +159,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                             const calendar = { ...modal.calendar };
                             this.data.calendars.push({ ...calendar });
                             if (!this.data.defaultCalendar) {
-                                this.data.defaultCalendar = calendar;
+                                this.data.defaultCalendar = calendar.id;
                             }
                             await this.plugin.saveCalendar();
 
@@ -227,6 +224,10 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                                 (c) => c.id != calendar.id
                             );
                         await this.plugin.saveCalendar();
+                        if (this.data.defaultCalendar == calendar.id) {
+                            this.data.defaultCalendar =
+                                this.data.calendars[0]?.id ?? null;
+                        }
 
                         this.showCalendars(element);
                     });

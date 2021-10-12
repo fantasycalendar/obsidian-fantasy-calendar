@@ -13,8 +13,8 @@ export interface Calendar {
 
 export interface FantasyCalendarData {
     calendars: Calendar[];
-    currentCalendar: Calendar;
-    defaultCalendar: Calendar;
+    currentCalendar: string;
+    defaultCalendar: string;
     eventPreview: boolean;
 }
 

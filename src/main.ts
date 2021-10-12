@@ -48,6 +48,18 @@ export const DEFAULT_DATA: FantasyCalendarData = {
 
 export default class FantasyCalendar extends Plugin {
     data: FantasyCalendarData;
+    get currentCalendar() {
+        return this.data.calendars.find(
+            (c) => c.id == this.data.currentCalendar
+        );
+    }
+    get defaultCalendar() {
+        return (
+            this.data.calendars.find(
+                (c) => c.id == this.data.defaultCalendar
+            ) ?? this.data.calendars[0]
+        );
+    }
     get view() {
         const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE);
         const leaf = leaves.length ? leaves[0] : null;
@@ -124,7 +136,7 @@ export default class FantasyCalendar extends Plugin {
             ...(await this.loadData())
         };
         if (!this.data.defaultCalendar && this.data.calendars.length) {
-            this.data.defaultCalendar = this.data.calendars[0];
+            this.data.defaultCalendar = this.data.calendars[0].id;
         }
     }
 
