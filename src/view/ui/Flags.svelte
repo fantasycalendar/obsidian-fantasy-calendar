@@ -36,12 +36,11 @@
     .flag-container {
         display: flex;
         flex-flow: column nowrap;
-        gap: 0.125rem;
+        gap: 0.25rem;
     }
 
     .overflow {
         color: var(--text-muted);
-
         display: flex;
         justify-content: flex-end;
         width: 100%;

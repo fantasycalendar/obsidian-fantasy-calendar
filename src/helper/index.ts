@@ -48,14 +48,7 @@ export class DayHelper {
         };
     }
     get events(): Event[] {
-        return this.calendar.object.events.filter((e) => {
-            return (
-                e.date.day == this.date.day &&
-                (e.date.month === undefined ||
-                    e.date.month == this.date.month) &&
-                (e.date.year === undefined || e.date.year == this.date.year)
-            );
-        });
+        return this.calendar.getEventsOnDate(this.date);
     }
     get longDate() {
         return {
@@ -79,6 +72,13 @@ export class DayHelper {
             this.number == this.calendar.current.day &&
             this.calendar.displayed.month == this.calendar.current.month &&
             this.calendar.displayed.year == this.calendar.current.year
+        );
+    }
+    get isDisplaying() {
+        return (
+            this.number == this.calendar.viewing.day &&
+            this.calendar.displayed.year == this.calendar.viewing.year &&
+            this.calendar.displayed.month == this.calendar.viewing.month
         );
     }
     constructor(public month: MonthHelper, public number: number) {}
@@ -106,6 +106,22 @@ export default class CalendarHelper extends Events {
         day: null
     };
 
+    viewing: CurrentCalendarData = {
+        year: null,
+        month: null,
+        day: null
+    };
+
+    getEventsOnDate(date: CurrentCalendarData) {
+        return this.object.events.filter((e) => {
+            return (
+                e.date.day == date.day &&
+                (e.date.month === undefined || e.date.month == date.month) &&
+                (e.date.year === undefined || e.date.year == date.year)
+            );
+        });
+    }
+
     get currentDate() {
         return dateString(
             this.current,
@@ -119,32 +135,45 @@ export default class CalendarHelper extends Events {
             this.months.map((m) => m.data)
         );
     }
+    get viewedDate() {
+        return dateString(
+            this.viewing,
+            this.months.map((m) => m.data)
+        );
+    }
 
     reset() {
         this.displayed = { ...this.current };
+
         this.trigger("month-update");
+        this.trigger("day-update");
     }
 
     setCurrentMonth(n: number) {
         this.displayed.month = n;
 
         this.trigger("month-update");
+        this.trigger("day-update");
     }
 
     goToNextDay() {
-        this.displayed.day += 1;
+        this.viewing.day += 1;
         const currentMonth = this.months[this.displayed.month];
-        if (this.displayed.day >= currentMonth.days.length) {
-            this.setCurrentMonth(this.nextMonthIndex);
-            this.displayed.day = 1;
+        if (this.viewing.day > currentMonth.days.length) {
+            this.goToNext();
+            this.viewing.month = this.displayed.month;
+            this.viewing.year = this.displayed.year;
+            this.viewing.day = 1;
         }
         this.trigger("day-update");
     }
     goToPreviousDay() {
-        this.displayed.day -= 1;
-        if (this.displayed.day < 1) {
-            this.setCurrentMonth(this.prevMonthIndex);
-            this.displayed.day = this.currentMonth.days.length;
+        this.viewing.day -= 1;
+        if (this.viewing.day < 1) {
+            this.goToPrevious();
+            this.viewing.month = this.displayed.month;
+            this.viewing.year = this.displayed.year;
+            this.viewing.day = this.currentMonth.days.length;
         }
         this.trigger("day-update");
     }

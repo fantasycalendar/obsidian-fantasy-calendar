@@ -65,6 +65,7 @@
         {weeks}
         {days}
         {fullView}
+        {dayView}
         on:day-click
         on:day-context-menu
         on:event-click
@@ -73,7 +74,7 @@
 </div>
 {#if dayView && !fullView}
     <hr />
-    <DayView {calendar} on:back={() => (dayView = false)} />
+    <DayView {calendar} on:close={() => (dayView = false)} />
 {/if}
 
 <style>
@@ -99,5 +100,8 @@
         padding: 4px;
         text-transform: uppercase;
         text-align: center;
+    }
+    hr {
+        margin: 1rem 0;
     }
 </style>

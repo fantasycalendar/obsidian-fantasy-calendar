@@ -4,6 +4,7 @@
 
     import { createEventDispatcher } from "svelte";
     import Flags from "./Flags.svelte";
+    import Calendar from "./Calendar.svelte";
 
     const dispatch = createEventDispatcher();
 
@@ -16,12 +17,28 @@
     const contextMenu = (evt: MouseEvent) => {
         dispatch("day-context-menu", { day, evt });
     };
+
+    export let dayView: boolean = false;
+    let today = day.isCurrentDay;
+    let displaying = day.isDisplaying;
+
+    $: {
+        if (dayView) {
+            displaying = day.isDisplaying;
+        }
+    }
+
+    day.calendar.on("day-update", () => {
+        today = day.isCurrentDay;
+        displaying = day.isDisplaying;
+    });
 </script>
 
 <div
     class:day={true}
     class:fantasy-day={true}
-    class:active={day.isCurrentDay && !adjacent}
+    class:active={today && !adjacent}
+    class:viewing={dayView && displaying}
     class={adjacent ? "adjacent-month fantasy-adjacent-month" : ""}
     aria-label={day.events.length
         ? `${day.events.length} event${day.events.length == 1 ? "" : "s"}`
@@ -47,12 +64,13 @@
 <style>
     .day {
         background-color: transparent;
+        border: 2px solid transparent;
         border-radius: 4px;
         color: var(--color-text-day);
         cursor: pointer;
         font-size: 0.8em;
         height: 100%;
-        padding: 4px;
+        padding: 2px;
         position: relative;
         text-align: center;
         vertical-align: baseline;
@@ -61,6 +79,11 @@
     .active {
         background-color: var(--background-secondary);
     }
+
+    .viewing {
+        border: 2px solid var(--background-modifier-border);
+    }
+
     .adjacent-month {
         opacity: 0.25;
     }

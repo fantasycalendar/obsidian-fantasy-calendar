@@ -3,18 +3,32 @@
     import type CalendarHelper from "src/helper";
 
     import { createEventDispatcher } from "svelte";
+    import Flags from "./Flags.svelte";
 
     export let calendar: CalendarHelper;
-    let currentDate = calendar.displayedDate;
+
+    let currentDate = calendar.viewedDate;
+    let events = calendar.getEventsOnDate(calendar.viewing);
+    let categories = calendar.object.categories;
 
     calendar.on("day-update", () => {
-        currentDate = calendar.displayedDate;
+        currentDate = calendar.viewedDate;
+        events = calendar.getEventsOnDate(calendar.viewing);
     });
 
     const dispatch = createEventDispatcher();
 
     const close = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("cross").setTooltip("Close");
+    };
+    const reveal = (node: HTMLElement) => {
+        new ExtraButtonComponent(node)
+            .setIcon("fantasy-calendar-reveal")
+            .setTooltip("Show on Calendar")
+            .onClick(() => {
+                calendar.displayed.year = calendar.viewing.year;
+                calendar.setCurrentMonth(calendar.viewing.month);
+            });
     };
     const left = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("left-arrow");
@@ -25,10 +39,11 @@
 </script>
 
 <div class="day-view">
-    <div class="back">
+    <div class="nav">
+        <div use:reveal on:click={() => dispatch("reveal")} />
         <div use:close on:click={() => dispatch("close")} />
     </div>
-    <div class="nav">
+    <div class="date">
         <div
             class="arrow calendar-clickable"
             use:left
@@ -47,16 +62,19 @@
             on:click={(evt) => calendar.goToNextDay()}
         />
     </div>
+    <Flags {events} {categories} />
 </div>
 
 <style>
-    .back {
+    .day-view {
+        padding: 5px 15px;
         display: flex;
-        justify-content: flex-end;
-        align-items: center;
+        flex-flow: column nowrap;
+        gap: 0.5rem;
     }
 
-    .nav {
+    .nav,
+    .date {
         display: flex;
         justify-content: space-between;
         align-items: center;

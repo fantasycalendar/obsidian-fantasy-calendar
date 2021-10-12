@@ -21,10 +21,10 @@
         dispatch("event-mouseover", { target: evt.target, event })}
     on:focus={() => {}}
 >
+    <span class="clamp"> {event.name}</span>
     {#if event.note}
         <div class="note" use:note />
     {/if}
-    <span> {event.name}</span>
 </div>
 
 <style>
@@ -33,16 +33,23 @@
         align-items: flex-start;
         padding-left: 0.125rem;
         text-align: left;
-        overflow: hidden;
-        /* white-space: nowrap; */
-        text-overflow: ellipsis;
         width: 100%;
 
         background-color: var(--hex-alpha);
         border-left: 2px solid var(--color);
     }
+
+    .clamp {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        word-break: keep-all;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
     .note {
         display: flex;
-        margin-top: 0.2em;
+        align-self: center;
     }
 </style>
