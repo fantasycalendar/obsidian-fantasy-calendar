@@ -34,10 +34,40 @@ export interface IntercalaryMonth extends Month {
     type: "intercalary";
 }
 
+interface LeapDayCondition {
+    ignore: boolean; //ignore offset
+    exclusive: boolean; //causes failure if true
+    interval: number; //how many years between checking
+}
+
+/**
+Example Condition
+  
+400,!100,4 - Every 4 years, unless it is divisible by 100, but again if it is divisible by 400.
+
+[
+    {
+        ignore: false,
+        exclusive: false,
+        interval: 400
+    },
+    {
+        ignore: false,
+        exclusive: true,
+        interval: 100
+    },
+    {
+        ignore: false,
+        exclusive: false,
+        interval: 4
+    }
+]
+
+ */
 export interface LeapDay extends Day {
-    interval: number;
-    after: number;
-    month: Month;
+    interval: LeapDayCondition[];
+    timespan: number;
+    intercalary: boolean;
 }
 
 export interface Season {
@@ -51,8 +81,9 @@ export interface Moon {
     name: string;
     cycle: number;
     offset: number;
-    face: string;
-    shadow: string;
+    faceColor: string;
+    shadowColor: string;
+    id: string;
 }
 
 export interface Event {
@@ -66,6 +97,13 @@ export interface Event {
     id: string;
     note: string;
     category: string;
+}
+
+export interface Era {
+    name: string;
+    format: string;
+    description: string;
+    start: CurrentCalendarData;
 }
 
 export interface ColorEvent extends Event {
@@ -83,9 +121,9 @@ export interface StaticCalendarData {
     overflow: boolean;
     weekdays: Week;
     months: Month[];
-    /*     leapDays: LeapDay[];
+    leapDays: LeapDay[];
     moons: Moon[];
-    seasons: Season[]; */
+    eras: Era[];
 }
 
 export interface CurrentCalendarData {

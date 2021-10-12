@@ -68,6 +68,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                 type: "file",
                 name: "merge",
                 accept: ".json",
+                multiple: true,
                 style: "display: none;"
             }
         });
@@ -76,8 +77,11 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
 
             if (!files.length) return;
             try {
-                const data = await files[0].text();
-                const calendars = Importer.import([JSON.parse(data)]);
+                const data = [];
+                for (let file of Array.from(files)) {
+                    data.push(JSON.parse(await file.text()));
+                }
+                const calendars = Importer.import(data);
                 this.plugin.data.calendars.push(...calendars);
                 await this.plugin.saveSettings();
                 this.buildCalendarUI();
@@ -93,7 +97,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
             input.value = null;
         };
         importSetting.addButton((b) => {
-            b.setButtonText("Choose File");
+            b.setButtonText("Choose Files");
             b.buttonEl.addClass("calendar-file-upload");
             b.buttonEl.appendChild(input);
             b.onClick(() => input.click());
@@ -208,14 +212,14 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                 .addExtraButton((b) => {
                     b.setIcon("trash").onClick(async () => {
                         if (
-                            await confirmWithModal(
+                            !(await confirmWithModal(
                                 this.app,
                                 "Are you sure you want to delete this calendar?",
                                 {
-                                    cta: "Cancel",
-                                    secondary: "Delete"
+                                    cta: "Delete",
+                                    secondary: "Cancel"
                                 }
-                            )
+                            ))
                         )
                             return;
                         this.plugin.data.calendars =

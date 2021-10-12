@@ -4,7 +4,6 @@
 
     import { createEventDispatcher } from "svelte";
     import Flags from "./Flags.svelte";
-    import Calendar from "./Calendar.svelte";
 
     const dispatch = createEventDispatcher();
 

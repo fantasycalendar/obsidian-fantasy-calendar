@@ -116,8 +116,8 @@ export default class CalendarHelper extends Events {
         return this.object.events.filter((e) => {
             return (
                 e.date.day == date.day &&
-                (e.date.month === undefined || e.date.month == date.month) &&
-                (e.date.year === undefined || e.date.year == date.year)
+                (e.date.month == undefined || e.date.month == date.month) &&
+                (e.date.year == undefined || e.date.year == date.year)
             );
         });
     }

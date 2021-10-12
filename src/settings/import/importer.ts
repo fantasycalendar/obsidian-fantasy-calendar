@@ -1,8 +1,11 @@
 import type {
     Calendar,
+    Era,
     Event,
     EventCategory,
+    LeapDay,
     Month,
+    Moon,
     StaticCalendarData,
     Week
 } from "../../@types";
@@ -55,11 +58,81 @@ export default class Import {
                 };
             });
 
+            const avgLength = months.reduce((a, b) => {
+                if (b.type == "month") {
+                    return a + b.length;
+                }
+                return a;
+            }, 0);
+
+            const leapDays: LeapDay[] = [];
+
+            if ("leap_days" in year_data) {
+                for (let leap of year_data["leap_days"]) {
+                    //build interval
+                    const interval: string[] = leap.interval.split(",") ?? [
+                        "1"
+                    ];
+                    const intervals = interval.map((i) => {
+                        const ignore = /\+/.test(i);
+                        const exclusive = /\!/.test(i);
+                        const interval = i.match(/(\d+)/).first();
+
+                        return {
+                            ignore,
+                            exclusive,
+                            interval: Number(interval)
+                        };
+                    });
+                    leapDays.push({
+                        name: leap.name ?? `Leap Day ${leapDays.length + 1}`,
+                        type: "leapday",
+                        interval: intervals,
+                        timespan: leap.timespan ?? 0,
+                        intercalary: leap.intercalary ?? false,
+                        id: nanoid(6)
+                    });
+                }
+            }
+            const moons: Moon[] = [];
+
+            if ("moons" in static_data) {
+                for (let moon of static_data["moons"]) {
+                    moons.push({
+                        name: moon.name ?? `Moon ${moons.length + 1}`,
+                        cycle: Number(moon.cycle) ?? avgLength,
+                        offset: moon.shift ?? 0,
+                        faceColor: moon.color ?? "#ffffff",
+                        shadowColor: moon.shadow_color ?? "#000000",
+                        id: nanoid(6)
+                    });
+                }
+            }
+
+            const eras: Era[] = [];
+            if ("eras" in static_data) {
+                for (let era of static_data["eras"]) {
+                    eras.push({
+                        name: era.name ?? `Era ${eras.length + 1}`,
+                        description: era.description,
+                        format:
+                            era.formatting ?? "Year {{year}} - {{era_name}}",
+                        start: {
+                            year: era.date?.year ?? 1,
+                            month: era.date?.timespan ?? 0,
+                            day: era.date?.day ?? 0
+                        }
+                    });
+                }
+            }
             const staticData: StaticCalendarData = {
                 firstWeekDay,
                 overflow,
                 weekdays,
-                months
+                months,
+                moons,
+                leapDays,
+                eras
             };
 
             const dynamicData = {
@@ -113,7 +186,8 @@ export default class Import {
                     if (
                         event.data &&
                         event.data.date &&
-                        Array.isArray(event.data?.date)
+                        Array.isArray(event.data?.date) &&
+                        event.data.date.length
                     ) {
                         date.day = event.data.date[2];
                         date.month = event.data.date[1];

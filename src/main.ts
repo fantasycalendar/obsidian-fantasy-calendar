@@ -24,7 +24,11 @@ export const DEFAULT_CALENDAR: Calendar = {
         firstWeekDay: null,
         overflow: true,
         weekdays: [],
-        months: []
+        months: [],
+
+        moons: [],
+        leapDays: [],
+        eras: []
     },
     current: {
         year: null,
