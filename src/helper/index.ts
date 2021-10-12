@@ -11,9 +11,12 @@ import type {
 
 export class MonthHelper {
     days: DayHelper[] = [];
-    leapDays: LeapDay[];
+    leapDays: LeapDay[] = [];
     get name() {
         return this.data.name;
+    }
+    get length() {
+        return this.days.length;
     }
 
     get daysBefore() {
@@ -68,6 +71,7 @@ export class DayHelper {
     }
     get weekday() {
         const days = this.month.daysBefore + this.number - 1;
+        console.log("🚀 ~ file: index.ts ~ line 71 ~ days", days, this.number);
 
         const firstOfYear = this.calendar.firstDayOfYear();
 
@@ -97,6 +101,9 @@ export default class CalendarHelper extends Events {
     months: MonthHelper[];
     constructor(public object: Calendar, public plugin: FantasyCalendar) {
         super();
+
+        window.calendar = this;
+
         this.displayed = { ...this.current };
         this.months = this.data.months.map(
             (m, i) => new MonthHelper(m, i, this.displayed.year, this)
@@ -241,6 +248,28 @@ export default class CalendarHelper extends Events {
         return this.currentMonth.days;
     }
 
+    leapDaysForYear(year: number) {
+        return this.leapdays.filter((l) => {
+            return l.interval
+                .sort((a, b) => a.interval - b.interval)
+                .some(({ interval, exclusive }, index, array) => {
+                    if (exclusive && index == 0) {
+                        return year % interval != 0;
+                    }
+
+                    if (exclusive) return;
+
+                    if (array[index + 1] && array[index + 1].exclusive) {
+                        return (
+                            year % interval == 0 &&
+                            year % array[index + 1].interval != 0
+                        );
+                    }
+                    return year % interval == 0;
+                });
+        });
+    }
+
     leapDaysForMonth(month: MonthHelper) {
         return this.leapdays
             .filter((l) => l.timespan == month.number)
@@ -269,7 +298,6 @@ export default class CalendarHelper extends Events {
     get paddedDays() {
         let previous: DayHelper[] = [];
         let current = this.daysOfCurrentMonth;
-
         let next: DayHelper[] = [];
 
         /** Get Days of Previous Month */
@@ -317,18 +345,23 @@ export default class CalendarHelper extends Events {
      * @memberof Calendar
      */
     get daysPerYear() {
-        return this.months
+        return this.data.months
             .filter((m) => m.type === "month")
-            .reduce((a, b) => a + b.days.length, 0);
+            .reduce((a, b) => a + b.length, 0);
     }
     daysBeforeMonth(month: MonthHelper) {
         if (this.months.indexOf(month) == 0) {
             return 0;
         }
-        return this.months
-            .filter((m) => m.type == "month")
-            .slice(0, month.number)
-            .reduce((a, b) => a + b.days.length, 0);
+        const months = this.months.filter((m) => m.type == "month");
+        console.log(
+            months
+                .slice(0, months.indexOf(month))
+                .reduce((a, b) => a + b.length, 0)
+        );
+        return months
+            .slice(0, months.indexOf(month))
+            .reduce((a, b) => a + b.length, 0);
     }
 
     get firstWeekday() {
@@ -337,10 +370,16 @@ export default class CalendarHelper extends Events {
     firstDayOfYear() {
         if (this.displayed.year == 1) return this.firstWeekday;
 
+        const leapdays = [...Array(this.displayed.year - 1).keys()]
+            .map((k) => this.leapDaysForYear(k + 1))
+            .reduce((a, b) => a + b.length, 0);
+
+        //note: added 1 here to fix gregorian offset??
         return wrap(
-            ((Math.abs(this.displayed.year - 1) * this.daysPerYear) %
+            ((Math.abs(this.displayed.year) * this.daysPerYear + leapdays) % //have to calculate total leap days here?
                 this.data.weekdays.length) +
-                this.firstWeekday,
+                this.firstWeekday +
+                this.data.offset,
             this.data.weekdays.length
         );
     }

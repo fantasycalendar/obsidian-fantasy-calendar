@@ -125,6 +125,7 @@ export interface StaticCalendarData {
     leapDays: LeapDay[];
     moons: Moon[];
     eras: Era[];
+    offset?: number;
 }
 
 export interface CurrentCalendarData {
