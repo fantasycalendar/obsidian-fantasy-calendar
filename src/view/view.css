@@ -17,7 +17,7 @@
     padding-bottom: 0.75rem;
 }
 
-.fantasy-calendar-view-event {
+.fantasy-calendar-view-event .modal-content {
     max-width: 75vw;
 }
 
