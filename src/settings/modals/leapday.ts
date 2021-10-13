@@ -202,10 +202,7 @@ class IntervalModal extends Modal {
         condition?: LeapDayCondition
     ) {
         super(app);
-        console.log(
-            "🚀 ~ file: leapday.ts ~ line 204 ~ canBeExclusive",
-            canBeExclusive
-        );
+
         if (condition) {
             this.condition = { ...condition };
             this.editing = true;
