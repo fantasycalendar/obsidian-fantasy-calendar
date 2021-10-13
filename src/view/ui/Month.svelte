@@ -9,7 +9,6 @@
     };
     export let columns: number;
     export let fullView: boolean = false;
-    export let dayView: boolean = false;
     export let weeks: number;
 </script>
 
@@ -28,7 +27,6 @@
             {day}
             adjacent={false}
             {fullView}
-            {dayView}
             on:day-click
             on:day-doubleclick
             on:day-context-menu

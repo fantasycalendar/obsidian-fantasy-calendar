@@ -123,7 +123,7 @@ export const PRESET_CALENDARS: Calendar[] = [
                 {
                     name: "Moon",
                     cycle: 29.530588853,
-                    offset: 10.24953,
+                    offset: 9.24953,
                     faceColor: "#ffffff",
                     shadowColor: "#000000",
                     id: "ID_a9ab186b1819"

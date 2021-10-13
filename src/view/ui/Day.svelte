@@ -1,9 +1,11 @@
 <script lang="ts">
     import type { DayHelper } from "src/helper";
     import Dots from "./Dots.svelte";
+    import Moon from "./Moon.svelte";
 
-    import { createEventDispatcher } from "svelte";
+    import { createEventDispatcher, getContext } from "svelte";
     import Flags from "./Flags.svelte";
+    import type { Writable } from "svelte/store";
 
     const dispatch = createEventDispatcher();
 
@@ -11,9 +13,16 @@
     export let adjacent: boolean;
     export let fullView: boolean;
 
+    $: moons = day.moons;
     $: categories = day.calendar.object.categories;
 
-    export let dayView: boolean = false;
+    let dayView: boolean;
+    const dayViewStore = getContext<Writable<boolean>>("dayView");
+    dayViewStore.subscribe((v) => (dayView = v));
+    let displayMoons: boolean;
+    const moonStore = getContext<Writable<boolean>>("displayMoons");
+    moonStore.subscribe((v) => (displayMoons = v));
+
     let today = day.isCurrentDay;
     let displaying = day.isDisplaying;
 
@@ -35,7 +44,7 @@
     class:active={today && !adjacent}
     class:viewing={dayView && displaying}
     class={adjacent ? "adjacent-month fantasy-adjacent-month" : ""}
-    aria-label={day.events.length
+    aria-label={!fullView && day.events.length
         ? `${day.events.length} event${day.events.length == 1 ? "" : "s"}`
         : undefined}
     on:click={() => dispatch("day-click", day)}
@@ -46,6 +55,13 @@
         {day.number}
     </span>
     {#if fullView}
+        {#if displayMoons && moons && moons.length}
+            <div class="moon-container">
+                {#each moons as [moon, phase]}
+                    <Moon {moon} {phase} />
+                {/each}
+            </div>
+        {/if}
         <Flags
             events={day.events}
             {categories}

@@ -40,6 +40,7 @@ export default class FantasyCalendarView extends ItemView {
     helper: CalendarHelper;
     noCalendarEl: HTMLDivElement;
     full = false;
+    moons = true;
     calendar: Calendar;
     /* calendarDropdownEl: HTMLDivElement; */
     protected _app: CalendarUI;
@@ -121,7 +122,8 @@ export default class FantasyCalendarView extends ItemView {
             target: this.contentEl,
             props: {
                 calendar: this.helper,
-                fullView: this.full
+                fullView: this.full,
+                moons: this.moons
             }
         });
         this._app.$on("day-click", (event: CustomEvent<DayHelper>) => {
@@ -187,6 +189,14 @@ export default class FantasyCalendarView extends ItemView {
             const menu = new Menu(this.app);
 
             menu.setNoIcon();
+            menu.addItem((item) => {
+                item.setTitle(
+                    this.moons ? "Hide Moons" : "Display Moons"
+                ).onClick(() => {
+                    this.moons = !this.moons;
+                    this._app.$set({ moons: this.moons });
+                });
+            });
             menu.addItem((item) => {
                 item.setTitle("Change Current Day");
 

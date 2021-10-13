@@ -23,10 +23,6 @@ export class MonthHelper {
 
     /** Days before this month in the year.  */
     get daysBefore() {
-        console.log(
-            "🚀 ~ file: index.ts ~ line 27 ~ this.calendar",
-            this.calendar
-        );
         return this.calendar.daysBeforeMonth(this);
     }
 
@@ -48,7 +44,6 @@ export class MonthHelper {
         public year: number,
         public calendar: CalendarHelper
     ) {
-        console.log("🚀 ~ file: index.ts ~ line 47 ~ year", year);
         this.leapDays = this.calendar.leapDaysForMonth(this);
         this.days = [
             ...new Array(data.length + this.leapDays.length).keys()
@@ -79,7 +74,6 @@ export class DayHelper {
     }
     /** Days before this day in the year. */
     get daysBefore() {
-        console.log("🚀 ~ file: index.ts ~ line 79 ~ this.month", this.month);
         return this.month.daysBefore + this.number - 1;
     }
     get weekday() {
@@ -104,6 +98,11 @@ export class DayHelper {
             this.calendar.displayed.month == this.calendar.viewing.month
         );
     }
+
+    get moons() {
+        return this.calendar.getMoonsForDate(this.date);
+    }
+
     constructor(public month: MonthHelper, public number: number) {}
 }
 

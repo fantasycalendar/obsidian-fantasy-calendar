@@ -3,6 +3,8 @@
 
     import type CalendarHelper from "src/helper";
     import type { DayHelper, MonthHelper } from "src/helper/index";
+    import { setContext } from "svelte";
+    import { writable } from "svelte/store";
     import DayView from "./DayView.svelte";
 
     import MonthView from "./Month.svelte";
@@ -11,6 +13,18 @@
     export let fullView: boolean = false;
     export let dayView: boolean = false;
     export let calendar: CalendarHelper;
+    export let moons: boolean;
+
+    const dayViewStore = writable(dayView);
+    const moonStore = writable(moons);
+
+    $: dayViewStore.set(dayView);
+    $: moonStore.set(moons);
+    
+
+    setContext("dayView", dayViewStore);
+    setContext("displayMoons", moonStore);
+
     let days: {
             previous: DayHelper[];
             current: DayHelper[];
@@ -67,7 +81,6 @@
         {weeks}
         {days}
         {fullView}
-        {dayView}
         on:day-click
         on:day-doubleclick
         on:day-context-menu
@@ -82,7 +95,7 @@
         on:close={() => (dayView = false)}
         on:event-click
         on:event-mouseover
-                on:event-context
+        on:event-context
     />
 {/if}
 

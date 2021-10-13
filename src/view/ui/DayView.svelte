@@ -2,7 +2,8 @@
     import { ExtraButtonComponent } from "obsidian";
     import type CalendarHelper from "src/helper";
 
-    import { createEventDispatcher } from "svelte";
+    import { createEventDispatcher, getContext } from "svelte";
+    import type { Writable } from "svelte/store";
     import Flags from "./Flags.svelte";
     import Moon from "./Moon.svelte";
 
@@ -13,8 +14,11 @@
     let moons = calendar.getMoonsForDate(calendar.viewing);
     let categories = calendar.object.categories;
 
+    let displayMoons: boolean;
+    const moonStore = getContext<Writable<boolean>>("displayMoons");
+    moonStore.subscribe((v) => (displayMoons = v));
+
     calendar.on("day-update", () => {
-        console.log("🚀 ~ file: DayView.svelte ~ line 21 ~ day-update");
         currentDate = calendar.viewedDate;
         events = calendar.getEventsOnDate(calendar.viewing);
         moons = calendar.getMoonsForDate(calendar.viewing);
@@ -63,10 +67,10 @@
             class="arrow right calendar-clickable"
             use:right
             aria-label="Next"
-            on:click={(evt) => calendar.goToNextDay()}
+            on:click={() => calendar.goToNextDay()}
         />
     </div>
-    {#if moons && moons.length}
+    {#if displayMoons && moons && moons.length}
         <div class="moon-container">
             {#each moons as [moon, phase]}
                 <Moon {moon} {phase} />
