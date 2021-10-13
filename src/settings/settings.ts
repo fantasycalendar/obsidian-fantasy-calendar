@@ -22,15 +22,15 @@ import Categories from "./ui/Categories.svelte";
 
 import "./settings.css";
 import { nanoid } from "src/utils/functions";
-import type { Calendar, Event, EventCategory, Moon } from "src/@types";
+import type { Calendar, Event, EventCategory, LeapDay, Moon } from "src/@types";
 
-import { CreateEventModal } from "../modals/event";
-import { confirmWithModal } from "../modals/confirm";
+import { CreateEventModal } from "./modals/event";
+import { confirmWithModal } from "./modals/confirm";
 
-import Settings from "./ui/Settings.svelte";
 import MoonUI from "./ui/Moons.svelte";
-import { CreateMoonModal } from "src/modals/moons";
-import type Moon__SvelteComponent_ from "src/view/ui/Moon.svelte";
+import LeapDays from "./ui/LeapDays.svelte";
+import { CreateMoonModal } from "src/settings/modals/moons";
+import { CreateLeapDayModal } from "./modals/leapday";
 
 export enum Recurring {
     none = "None",
@@ -158,11 +158,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                     .setTooltip("Add Calendar")
                     .setButtonText("+")
                     .onClick(() => {
-                        const modal = new NewCreateCalendarModal(this.plugin);
-
-                        modal.open();
-
-                        /* const modal = new CreateCalendarModal(this.plugin);
+                        const modal = new CreateCalendarModal(this.plugin);
                         modal.onClose = async () => {
                             if (!modal.saved) return;
                             const calendar = { ...modal.calendar };
@@ -177,7 +173,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
 
                             this.showCalendars(existing);
                         };
-                        modal.open(); */
+                        modal.open();
                     })
             );
 
@@ -248,24 +244,6 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
     }
 }
 
-class NewCreateCalendarModal extends Modal {
-    calendar: Calendar = { ...DEFAULT_CALENDAR };
-    saved: boolean = false;
-    editing: boolean = false;
-    ui: Settings;
-    constructor(public plugin: FantasyCalendar, existing?: Calendar) {
-        super(plugin.app);
-        this.titleEl.createEl("h4", { text: "Create New Calendar" });
-    }
-    onOpen() {
-        this.contentEl.empty();
-        this.ui = new Settings({
-            target: this.contentEl,
-            props: { calendar: this.calendar }
-        });
-    }
-}
-
 class CreateCalendarModal extends Modal {
     calendar: Calendar = { ...DEFAULT_CALENDAR };
     saved: boolean = false;
@@ -283,6 +261,7 @@ class CreateCalendarModal extends Modal {
     dateFieldEl: HTMLDivElement;
     uiEl: HTMLDivElement;
     moonEl: HTMLDivElement;
+    leapdayEl: any;
     get static() {
         return this.calendar.static;
     }
@@ -343,6 +322,8 @@ class CreateCalendarModal extends Modal {
         this.buildWeekdays();
         this.monthEl = this.uiEl.createDiv("fantasy-calendar-element");
         this.buildMonths();
+        this.leapdayEl = this.uiEl.createDiv("fantasy-calendar-element");
+        this.buildLeapDays();
         this.eventEl = this.uiEl.createDiv("fantasy-calendar-element");
         this.buildEvents();
         this.categoryEl = this.uiEl.createDiv("fantasy-calendar-element");
@@ -526,6 +507,48 @@ class CreateCalendarModal extends Modal {
             this.checkCanSave();
         });
     }
+
+    buildLeapDays() {
+        this.leapdayEl.empty();
+        const leapdayUI = new LeapDays({
+            target: this.leapdayEl,
+            props: {
+                leapdays: this.static.leapDays
+            }
+        });
+
+        leapdayUI.$on("new-item", async (e: CustomEvent<LeapDay>) => {
+            const modal = new CreateLeapDayModal(
+                this.app,
+                this.calendar,
+                e.detail
+            );
+            modal.onClose = () => {
+                if (!modal.saved) return;
+                if (modal.editing) {
+                    const index = this.calendar.static.moons.indexOf(
+                        this.calendar.static.moons.find(
+                            (e) => e.id === modal.leapday.id
+                        )
+                    );
+
+                    this.calendar.static.leapDays.splice(index, 1, {
+                        ...modal.leapday
+                    });
+                } else {
+                    this.calendar.static.leapDays.push({ ...modal.leapday });
+                }
+                leapdayUI.$set({ leapdays: this.calendar.static.leapDays });
+                this.plugin.saveCalendar();
+            };
+            modal.open();
+        });
+
+        leapdayUI.$on("edit-leapdays", (e: CustomEvent<LeapDay[]>) => {
+            this.calendar.static.leapDays = e.detail;
+        });
+    }
+
     buildEvents() {
         this.eventEl.empty();
         this.eventsUI = new EventsUI({

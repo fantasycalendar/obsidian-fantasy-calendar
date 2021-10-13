@@ -14,7 +14,7 @@ import {
 import type { Calendar, CurrentCalendarData, Event } from "src/@types";
 import type { DayHelper } from "src/helper";
 import CalendarHelper from "src/helper";
-import { CreateEventModal } from "src/modals/event";
+import { CreateEventModal } from "src/settings/modals/event";
 import type FantasyCalendar from "../main";
 
 import "./view.css";
@@ -23,7 +23,7 @@ export const VIEW_TYPE = "FANTASY_CALENDAR";
 export const FULL_VIEW = "FANTASY_CALENDAR_FULL_VIEW";
 
 import CalendarUI from "./ui/Calendar.svelte";
-import { confirmWithModal } from "src/modals/confirm";
+import { confirmWithModal } from "src/settings/modals/confirm";
 
 addIcon(
     VIEW_TYPE,

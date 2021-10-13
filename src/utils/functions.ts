@@ -1,4 +1,4 @@
-import type { CurrentCalendarData, Event, Month } from "../@types";
+import type { CurrentCalendarData, LeapDay, Month } from "../@types";
 
 export function nanoid(len: number) {
     return "ID_xyxyxyxyxyxy".replace(/[xy]/g, function (c) {
@@ -8,7 +8,28 @@ export function nanoid(len: number) {
     });
 }
 
-function ordinal(i: number) {
+export function getIntervalDescription(leapday: LeapDay) {
+    if (!leapday.interval?.length) return "";
+    const intervals = leapday.interval.sort((a, b) => a.interval - b.interval);
+    let description = [];
+    for (let interval of intervals) {
+        const length =
+            interval.interval + (interval.ignore ? 0 : leapday.offset);
+        if (interval.exclusive) {
+            description.push(`not every ${ordinal(length)} year`);
+        } else {
+            const index = intervals.indexOf(interval);
+            const also = index > 0 && intervals[index - 1].exclusive;
+            description.push(
+                `${also ? "also " : ""}every ${ordinal(length)} year`
+            );
+        }
+    }
+    const join = description.join(", but ");
+    return join[0].toUpperCase() + join.slice(1).toLowerCase();
+}
+
+export function ordinal(i: number) {
     const j = i % 10,
         k = i % 100;
     if (j == 1 && k != 11) {
@@ -37,4 +58,7 @@ export function dateString(date: CurrentCalendarData, months: Month[]) {
         return `${months[month].name} ${ordinal(day)} of every year`;
     }
     return `${ordinal(day)} of every month`;
+}
+function LeapDay(leapday: any, LeapDay: any) {
+    throw new Error("Function not implemented.");
 }

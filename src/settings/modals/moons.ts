@@ -1,19 +1,7 @@
-import {
-    Modal,
-    App,
-    Setting,
-    Notice,
-    TextComponent,
-    DropdownComponent,
-    TextAreaComponent,
-    TFile
-} from "obsidian";
-import type { Calendar, Event, Moon } from "../@types";
+import { Modal, App, Setting, Notice } from "obsidian";
+import type { Calendar, Moon } from "../../@types";
 
-import { dateString, nanoid } from "../utils/functions";
-
-import PathSuggestionModal from "../suggester/path";
-import { confirmWithModal } from "./confirm";
+import { nanoid } from "../../utils/functions";
 
 export class CreateMoonModal extends Modal {
     saved = false;
