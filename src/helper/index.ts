@@ -71,7 +71,6 @@ export class DayHelper {
     }
     get weekday() {
         const days = this.month.daysBefore + this.number - 1;
-        console.log("🚀 ~ file: index.ts ~ line 71 ~ days", days, this.number);
 
         const firstOfYear = this.calendar.firstDayOfYear();
 
@@ -354,11 +353,7 @@ export default class CalendarHelper extends Events {
             return 0;
         }
         const months = this.months.filter((m) => m.type == "month");
-        console.log(
-            months
-                .slice(0, months.indexOf(month))
-                .reduce((a, b) => a + b.length, 0)
-        );
+
         return months
             .slice(0, months.indexOf(month))
             .reduce((a, b) => a + b.length, 0);
@@ -368,8 +363,8 @@ export default class CalendarHelper extends Events {
         return this.data.firstWeekDay;
     }
     firstDayOfYear() {
+        if (!this.data.overflow) return 0;
         if (this.displayed.year == 1) return this.firstWeekday;
-
         const leapdays = [...Array(this.displayed.year - 1).keys()]
             .map((k) => this.leapDaysForYear(k + 1))
             .reduce((a, b) => a + b.length, 0);
@@ -379,7 +374,7 @@ export default class CalendarHelper extends Events {
             ((Math.abs(this.displayed.year) * this.daysPerYear + leapdays) % //have to calculate total leap days here?
                 this.data.weekdays.length) +
                 this.firstWeekday +
-                this.data.offset,
+                (this.data.offset ?? 0),
             this.data.weekdays.length
         );
     }

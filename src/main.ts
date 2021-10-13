@@ -35,7 +35,7 @@ export const DEFAULT_CALENDAR: Calendar = {
         eras: []
     },
     current: {
-        year: null,
+        year: 1,
         month: null,
         day: null
     },

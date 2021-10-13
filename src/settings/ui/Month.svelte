@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ExtraButtonComponent } from "obsidian";
+    import { debounce, ExtraButtonComponent } from "obsidian";
     import type { Month } from "src/@types";
     import { createEventDispatcher } from "svelte";
 
@@ -17,17 +17,23 @@
         });
     };
 
-    $: {
-        month.name = name;
-    }
+    const update = debounce(
+        () => {
+            month.name = name;
+            month.type = type;
+            month.length = length;
+            dispatch("month-update");
+        },
+        300,
+        true
+    );
+
     $: {
         month.type = type;
         if (type == "intercalary") {
             length = 1;
         }
-    }
-    $: {
-        month.length = length;
+        /* dispatch("month-update", month); */
     }
 </script>
 
@@ -35,7 +41,8 @@
     <input
         type="text"
         spellcheck="false"
-        value={name}
+        bind:value={name}
+        on:input={update}
         placeholder="Name"
         style="width: 100%;"
     />
@@ -43,12 +50,13 @@
         type="number"
         spellcheck="false"
         placeholder="Length"
-        value={length}
+        bind:value={length}
+        on:input={update}
         disabled={month.type == "intercalary"}
         style="width: 100%;"
         min="0"
     />
-    <select class="dropdown" bind:value={type}>
+    <select class="dropdown" bind:value={type} on:input={update}>
         <option value="month">Month</option>
         <option value="intercalary">Intercalary</option>
     </select>

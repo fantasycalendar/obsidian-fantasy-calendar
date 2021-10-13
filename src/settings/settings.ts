@@ -157,6 +157,9 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                         modal.onClose = async () => {
                             if (!modal.saved) return;
                             const calendar = { ...modal.calendar };
+                            if (!calendar.current.year) {
+                                calendar.current.year = 1;
+                            }
                             this.data.calendars.push({ ...calendar });
                             if (!this.data.defaultCalendar) {
                                 this.data.defaultCalendar = calendar.id;
@@ -422,6 +425,7 @@ class CreateCalendarModal extends Modal {
                 );
                 this.calendar.current.month =
                     this.calendar.static.months.indexOf(index);
+                this.buildDateFields();
             });
 
         const yearEl = this.dateFieldEl.createDiv(
@@ -575,13 +579,13 @@ class CreateCalendarModal extends Modal {
     }
     checkCanSave() {
         if (
-            this.months.length &&
-            this.months.every((m) => m.name?.length) &&
-            this.months.every((m) => m.length > 0) &&
-            this.week.length &&
-            this.week.every((d) => d.name?.length) &&
-            this.calendar.name.length &&
-            this.calendar.static.firstWeekDay < this.week.length
+            this.months?.length &&
+            this.months?.every((m) => m.name?.length) &&
+            this.months?.every((m) => m.length > 0) &&
+            this.week?.length &&
+            this.week?.every((d) => d.name?.length) &&
+            this.calendar.name?.length &&
+            this.calendar.static.firstWeekDay < (this.week?.length ?? Infinity)
         ) {
             this.canSave = true;
         }

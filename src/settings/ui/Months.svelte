@@ -2,15 +2,7 @@
     import { createEventDispatcher } from "svelte";
     import { flip } from "svelte/animate";
     import { dndzone, SOURCES, TRIGGERS } from "svelte-dnd-action";
-    import {
-        ButtonComponent,
-        debounce,
-        DropdownComponent,
-        ExtraButtonComponent,
-        Notice,
-        setIcon,
-        TextComponent
-    } from "obsidian";
+    import { setIcon } from "obsidian";
     import type { Month } from "src/@types";
 
     import MonthInstance from "./Month.svelte";
@@ -28,8 +20,16 @@
                 id: nanoid(6)
             }
         ];
+
+        dispatch("month-update", months);
     };
 
+    const deleteMonth = (month: Month) => {
+        months = months.filter((m) => m.id != month.id);
+
+        dispatch("month-update", months);
+    };
+    const updateMonth = (month: Month) => {};
     const grip = (node: HTMLElement) => {
         setIcon(node, "fantasy-calendar-grip");
     };
@@ -59,6 +59,7 @@
             info: { source }
         } = e.detail;
         months = newItems;
+        dispatch("month-update", months);
         // Ensure dragging is stopped on drag finish via pointer (mouse, touch)
         if (source === SOURCES.POINTER) {
             dragDisabled = true;
@@ -90,7 +91,12 @@
                         on:mousedown={startDrag}
                         on:touchstart={startDrag}
                     />
-                    <MonthInstance {month} on:mousedown={startDrag} />
+                    <MonthInstance
+                        {month}
+                        on:mousedown={startDrag}
+                        on:month-delete={() => deleteMonth(month)}
+                        on:month-update={() => dispatch("month-update", months)}
+                    />
                 </div>
             {/each}
         </div>
