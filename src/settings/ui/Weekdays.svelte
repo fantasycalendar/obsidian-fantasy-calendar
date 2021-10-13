@@ -112,38 +112,40 @@
 </script>
 
 <Detail label="Weekdays" on:new-item={addNew}>
-    <div class="overflow" use:overflowNode />
-    {#if weekdays.length}
-        <div class="first-weekday">
-            <div class="setting-item">
-                <div class="setting-item-info">
-                    <div class="setting-item-name">First Day</div>
-                    <div class="setting-item-description">
-                        This only effects which day of the week the first year
-                        starts on.
+    <svelte:fragment slot="pre-add">
+        <div class="overflow" use:overflowNode />
+        {#if weekdays.length}
+            <div class="first-weekday">
+                <div class="setting-item">
+                    <div class="setting-item-info">
+                        <div class="setting-item-name">First Day</div>
+                        <div class="setting-item-description">
+                            This only effects which day of the week the first
+                            year starts on.
+                        </div>
+                    </div>
+                    <div class="setting-item-control">
+                        <select
+                            class="dropdown"
+                            bind:value={firstWeekday}
+                            aria-label={!overflow
+                                ? "Cannot be modified without overflow."
+                                : undefined}
+                        >
+                            {#each weekdays as weekday, index}
+                                <option
+                                    disabled={!overflow}
+                                    value={index}
+                                    selected={index == firstWeekday}
+                                    >{weekday.name ?? ""}</option
+                                >
+                            {/each}
+                        </select>
                     </div>
                 </div>
-                <div class="setting-item-control">
-                    <select
-                        class="dropdown"
-                        bind:value={firstWeekday}
-                        aria-label={!overflow
-                            ? "Cannot be modified without overflow."
-                            : undefined}
-                    >
-                        {#each weekdays as weekday, index}
-                            <option
-                                disabled={!overflow}
-                                value={index}
-                                selected={index == firstWeekday}
-                                >{weekday.name ?? ""}</option
-                            >
-                        {/each}
-                    </select>
-                </div>
             </div>
-        </div>
-    {/if}
+        {/if}
+    </svelte:fragment>
     {#if !weekdays.length}
         <div class="existing-items">
             <span>Create a new weekday to see it here.</span>

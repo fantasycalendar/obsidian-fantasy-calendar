@@ -24,6 +24,7 @@
             {label}
         </h4>
     </summary>
+    <slot name="pre-add" />
     <div class="add-new" use:add />
     <div class="fantasy-calendar-container">
         <slot />

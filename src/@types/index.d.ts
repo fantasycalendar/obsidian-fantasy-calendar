@@ -124,6 +124,7 @@ export interface StaticCalendarData {
     months: Month[];
     leapDays: LeapDay[];
     moons: Moon[];
+    displayMoons: boolean;
     eras: Era[];
     offset?: number;
 }

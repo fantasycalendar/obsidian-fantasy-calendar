@@ -40,7 +40,7 @@ export default class FantasyCalendarView extends ItemView {
     helper: CalendarHelper;
     noCalendarEl: HTMLDivElement;
     full = false;
-    moons = true;
+    moons: boolean = true;
     calendar: Calendar;
     /* calendarDropdownEl: HTMLDivElement; */
     protected _app: CalendarUI;
@@ -70,11 +70,9 @@ export default class FantasyCalendarView extends ItemView {
             this.setCurrentCalendar(
                 this.plugin.data.calendars.find((c) => c.id == this.calendar.id)
             );
-        } else if (this.plugin.currentCalendar) {
-            this.setCurrentCalendar(this.plugin.currentCalendar);
         } else if (this.plugin.defaultCalendar) {
             this.setCurrentCalendar(this.plugin.defaultCalendar);
-        } else if (this.plugin.data.calendars.length == 1 && !this.calendar) {
+        } else {
             this.setCurrentCalendar(this.plugin.data.calendars[0]);
         }
     }
@@ -82,7 +80,7 @@ export default class FantasyCalendarView extends ItemView {
     setCurrentCalendar(calendar: Calendar) {
         this.noCalendarEl?.detach();
         this.calendar = calendar;
-
+        this.moons = this.calendar.static.displayMoons;
         this.helper = new CalendarHelper(this.calendar, this.plugin);
 
         this.plugin.data.currentCalendar = calendar.id;

@@ -56,6 +56,11 @@
     border-radius: 0.5rem;
 }
 
+.fantasy-calendar-create-calendar .fantasy-calendar-container .existing-items {
+    overflow: auto;
+    max-height: 500px;
+}
+
 .fantasy-calendar-create-calendar
     .fantasy-calendar-container
     .existing-items

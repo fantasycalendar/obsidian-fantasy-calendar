@@ -22,10 +22,15 @@ import Categories from "./ui/Categories.svelte";
 
 import "./settings.css";
 import { nanoid } from "src/utils/functions";
-import type { Calendar, Event, EventCategory } from "src/@types";
+import type { Calendar, Event, EventCategory, Moon } from "src/@types";
 
 import { CreateEventModal } from "../modals/event";
 import { confirmWithModal } from "../modals/confirm";
+
+import Settings from "./ui/Settings.svelte";
+import MoonUI from "./ui/Moons.svelte";
+import { CreateMoonModal } from "src/modals/moons";
+import type Moon__SvelteComponent_ from "src/view/ui/Moon.svelte";
 
 export enum Recurring {
     none = "None",
@@ -153,7 +158,11 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                     .setTooltip("Add Calendar")
                     .setButtonText("+")
                     .onClick(() => {
-                        const modal = new CreateCalendarModal(this.plugin);
+                        const modal = new NewCreateCalendarModal(this.plugin);
+
+                        modal.open();
+
+                        /* const modal = new CreateCalendarModal(this.plugin);
                         modal.onClose = async () => {
                             if (!modal.saved) return;
                             const calendar = { ...modal.calendar };
@@ -168,7 +177,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
 
                             this.showCalendars(existing);
                         };
-                        modal.open();
+                        modal.open(); */
                     })
             );
 
@@ -239,6 +248,24 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
     }
 }
 
+class NewCreateCalendarModal extends Modal {
+    calendar: Calendar = { ...DEFAULT_CALENDAR };
+    saved: boolean = false;
+    editing: boolean = false;
+    ui: Settings;
+    constructor(public plugin: FantasyCalendar, existing?: Calendar) {
+        super(plugin.app);
+        this.titleEl.createEl("h4", { text: "Create New Calendar" });
+    }
+    onOpen() {
+        this.contentEl.empty();
+        this.ui = new Settings({
+            target: this.contentEl,
+            props: { calendar: this.calendar }
+        });
+    }
+}
+
 class CreateCalendarModal extends Modal {
     calendar: Calendar = { ...DEFAULT_CALENDAR };
     saved: boolean = false;
@@ -255,6 +282,7 @@ class CreateCalendarModal extends Modal {
     infoDetailEl: HTMLDetailsElement;
     dateFieldEl: HTMLDivElement;
     uiEl: HTMLDivElement;
+    moonEl: HTMLDivElement;
     get static() {
         return this.calendar.static;
     }
@@ -313,12 +341,14 @@ class CreateCalendarModal extends Modal {
 
         this.weekdayEl = this.uiEl.createDiv();
         this.buildWeekdays();
-        this.monthEl = this.uiEl.createDiv("fantasy-calendar-container");
+        this.monthEl = this.uiEl.createDiv("fantasy-calendar-element");
         this.buildMonths();
-        this.eventEl = this.uiEl.createDiv("fantasy-calendar-container");
+        this.eventEl = this.uiEl.createDiv("fantasy-calendar-element");
         this.buildEvents();
-        this.categoryEl = this.uiEl.createDiv("fantasy-calendar-container");
+        this.categoryEl = this.uiEl.createDiv("fantasy-calendar-element");
         this.buildCategories();
+        this.moonEl = this.uiEl.createDiv("fantasy-calendar-element");
+        this.buildMoons();
     }
     buildInfo() {
         this.infoEl.empty();
@@ -575,6 +605,51 @@ class CreateCalendarModal extends Modal {
                 categories: this.calendar.categories,
                 events: this.events
             });
+        });
+    }
+
+    buildMoons() {
+        this.moonEl.empty();
+        const moonsUI = new MoonUI({
+            target: this.moonEl,
+            props: {
+                moons: this.static.moons,
+                displayMoons: this.static.displayMoons
+            }
+        });
+        moonsUI.$on("display-toggle", (e: CustomEvent<boolean>) => {
+            this.static.displayMoons = e.detail;
+            moonsUI.$set({ displayMoons: this.static.displayMoons });
+        });
+        moonsUI.$on("new-item", async (e: CustomEvent<Moon>) => {
+            const modal = new CreateMoonModal(
+                this.app,
+                this.calendar,
+                e.detail
+            );
+            modal.onClose = () => {
+                if (!modal.saved) return;
+                if (modal.editing) {
+                    const index = this.calendar.static.moons.indexOf(
+                        this.calendar.static.moons.find(
+                            (e) => e.id === modal.moon.id
+                        )
+                    );
+
+                    this.calendar.static.moons.splice(index, 1, {
+                        ...modal.moon
+                    });
+                } else {
+                    this.calendar.static.moons.push({ ...modal.moon });
+                }
+                moonsUI.$set({ moons: this.calendar.static.moons });
+                this.plugin.saveCalendar();
+            };
+            modal.open();
+        });
+
+        moonsUI.$on("edit-moons", (e: CustomEvent<Moon[]>) => {
+            this.calendar.static.moons = e.detail;
         });
     }
     checkCanSave() {
