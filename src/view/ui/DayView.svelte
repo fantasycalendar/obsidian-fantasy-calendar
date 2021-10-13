@@ -4,16 +4,20 @@
 
     import { createEventDispatcher } from "svelte";
     import Flags from "./Flags.svelte";
+    import Moon from "./Moon.svelte";
 
     export let calendar: CalendarHelper;
 
     let currentDate = calendar.viewedDate;
     let events = calendar.getEventsOnDate(calendar.viewing);
+    let moons = calendar.getMoonsForDate(calendar.viewing);
     let categories = calendar.object.categories;
 
     calendar.on("day-update", () => {
+        console.log("🚀 ~ file: DayView.svelte ~ line 21 ~ day-update");
         currentDate = calendar.viewedDate;
         events = calendar.getEventsOnDate(calendar.viewing);
+        moons = calendar.getMoonsForDate(calendar.viewing);
     });
 
     const dispatch = createEventDispatcher();
@@ -62,6 +66,13 @@
             on:click={(evt) => calendar.goToNextDay()}
         />
     </div>
+    {#if moons && moons.length}
+        <div class="moon-container">
+            {#each moons as [moon, phase]}
+                <Moon {moon} {phase} />
+            {/each}
+        </div>
+    {/if}
     <Flags
         {events}
         {categories}
@@ -99,5 +110,11 @@
 
     .day-view :global(.flag-container > .flag) {
         padding-left: 0.5rem;
+    }
+
+    .moon-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 </style>

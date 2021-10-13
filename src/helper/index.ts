@@ -1,12 +1,14 @@
 import { Events, Notice } from "obsidian";
 import type FantasyCalendar from "src/main";
+import { MOON_PHASES, Phase } from "src/utils/constants";
 import { dateString } from "src/utils/functions";
 import type {
     Calendar,
     CurrentCalendarData,
     Month,
     Event,
-    LeapDay
+    LeapDay,
+    Moon
 } from "../@types";
 
 export class MonthHelper {
@@ -19,7 +21,12 @@ export class MonthHelper {
         return this.days.length;
     }
 
+    /** Days before this month in the year.  */
     get daysBefore() {
+        console.log(
+            "🚀 ~ file: index.ts ~ line 27 ~ this.calendar",
+            this.calendar
+        );
         return this.calendar.daysBeforeMonth(this);
     }
 
@@ -41,6 +48,7 @@ export class MonthHelper {
         public year: number,
         public calendar: CalendarHelper
     ) {
+        console.log("🚀 ~ file: index.ts ~ line 47 ~ year", year);
         this.leapDays = this.calendar.leapDaysForMonth(this);
         this.days = [
             ...new Array(data.length + this.leapDays.length).keys()
@@ -69,13 +77,16 @@ export class DayHelper {
             year: this.calendar.displayed.year
         };
     }
+    /** Days before this day in the year. */
+    get daysBefore() {
+        console.log("🚀 ~ file: index.ts ~ line 79 ~ this.month", this.month);
+        return this.month.daysBefore + this.number - 1;
+    }
     get weekday() {
-        const days = this.month.daysBefore + this.number - 1;
-
         const firstOfYear = this.calendar.firstDayOfYear();
 
         return wrap(
-            (days % this.calendar.weekdays.length) + firstOfYear,
+            (this.daysBefore % this.calendar.weekdays.length) + firstOfYear,
             this.calendar.weekdays.length
         );
     }
@@ -172,7 +183,6 @@ export default class CalendarHelper extends Events {
         this.displayed.month = n;
 
         this.trigger("month-update");
-        this.trigger("day-update");
     }
 
     goToNextDay() {
@@ -348,11 +358,13 @@ export default class CalendarHelper extends Events {
             .filter((m) => m.type === "month")
             .reduce((a, b) => a + b.length, 0);
     }
-    daysBeforeMonth(month: MonthHelper) {
+    daysBeforeMonth(month: MonthHelper, all: boolean = false) {
         if (this.months.indexOf(month) == 0) {
             return 0;
         }
-        const months = this.months.filter((m) => m.type == "month");
+        const months = all
+            ? this.months
+            : this.months.filter((m) => m.type == "month");
 
         return months
             .slice(0, months.indexOf(month))
@@ -362,21 +374,88 @@ export default class CalendarHelper extends Events {
     get firstWeekday() {
         return this.data.firstWeekDay;
     }
+
+    /**
+     *
+     * Total number of leap days that have occured before this year.
+     * @readonly
+     * @memberof CalendarHelper
+     */
+    get leapDaysBefore() {
+        if (this.displayed.year == 1) return 0;
+        return [...Array(this.displayed.year - 1).keys()]
+            .map((k) => this.leapDaysForYear(k + 1))
+            .reduce((a, b) => a + b.length, 0);
+    }
+
+    get daysBefore() {
+        return this.daysBeforeYear(this.displayed.year);
+    }
+    get totalDaysBefore() {
+        return this.daysBefore + this.leapDaysBefore;
+    }
+
+    daysBeforeYear(year: number) {
+        if (year < 1) return 0;
+        return Math.abs(year - 1) * this.daysPerYear;
+    }
+    totalDaysBeforeYear(year: number) {
+        if (year < 1) return 0;
+        return (
+            Math.abs(year - 1) *
+                this.data.months.reduce((a, b) => a + b.length, 0) +
+            this.leapDaysBefore
+        );
+    }
+
     firstDayOfYear() {
         if (!this.data.overflow) return 0;
         if (this.displayed.year == 1) return this.firstWeekday;
-        const leapdays = [...Array(this.displayed.year - 1).keys()]
-            .map((k) => this.leapDaysForYear(k + 1))
-            .reduce((a, b) => a + b.length, 0);
 
         //note: added 1 here to fix gregorian offset??
         return wrap(
-            ((Math.abs(this.displayed.year) * this.daysPerYear + leapdays) % //have to calculate total leap days here?
-                this.data.weekdays.length) +
+            (this.totalDaysBefore % this.data.weekdays.length) +
                 this.firstWeekday +
                 (this.data.offset ?? 0),
             this.data.weekdays.length
         );
+    }
+
+    /** Moons */
+    get moons() {
+        return this.data.moons;
+    }
+
+    getMoonsForDate(date: CurrentCalendarData): Array<[Moon, Phase]> {
+        const phases: Array<[Moon, Phase]> = [];
+        const month = this.months[date.month];
+
+        const months = this.months.slice(0, this.months.indexOf(month));
+
+        const day = month.days[date.day - 1];
+        const daysBefore =
+            this.totalDaysBeforeYear(date.year) +
+            this.daysBeforeMonth(month, true) +
+            day.number -
+            1;
+
+        for (let moon of this.moons) {
+            const { offset, cycle } = moon;
+            const granularity = 24;
+
+            let data = (daysBefore - offset) / cycle;
+            let position = data - Math.floor(data);
+
+            const phase = (position * granularity) % granularity;
+
+            const options = MOON_PHASES[granularity];
+
+            phases.push([
+                moon,
+                options[wrap(Math.round(phase), options.length)]
+            ]);
+        }
+        return phases;
     }
 }
 
