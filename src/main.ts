@@ -25,6 +25,7 @@ export const DEFAULT_CALENDAR: Calendar = {
     description: null,
     id: null,
     static: {
+        incrementDay: false,
         firstWeekDay: null,
         overflow: true,
         weekdays: [],

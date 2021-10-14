@@ -1,17 +1,17 @@
 <script lang="ts">
-    import type { Week } from "src/@types";
-
     import type CalendarHelper from "src/helper";
-    import type { DayHelper, MonthHelper } from "src/helper/index";
+
     import { setContext } from "svelte";
     import { writable } from "svelte/store";
     import DayView from "./DayView.svelte";
 
     import MonthView from "./Month.svelte";
     import Nav from "./Nav.svelte";
+    import YearView from "./YearView.svelte";
 
     export let fullView: boolean = false;
     export let dayView: boolean = false;
+    export let yearView: boolean = false;
     export let calendar: CalendarHelper;
     export let moons: boolean;
 
@@ -20,73 +20,86 @@
 
     $: dayViewStore.set(dayView);
     $: moonStore.set(moons);
-    
 
     setContext("dayView", dayViewStore);
     setContext("displayMoons", moonStore);
 
-    let days: {
-            previous: DayHelper[];
-            current: DayHelper[];
-            next: DayHelper[];
-        },
-        year: number,
-        month: MonthHelper,
-        weeks: number,
-        weekdays: Week;
-    $: {
-        if (calendar) {
-            weekdays = calendar.weekdays;
-            days = calendar.paddedDays;
-            year = calendar.displayed.year;
-            month = calendar.currentMonth;
-            weeks = calendar.weeksPerCurrentMonth;
-            calendar.on("month-update", () => {
-                weeks = calendar.weeksPerCurrentMonth;
-                days = calendar.paddedDays;
-                year = calendar.displayed.year;
-                month = calendar.currentMonth;
-            });
-        }
-    }
+    calendar.on("month-update", () => {
+        weeks = calendar.weeksPerCurrentMonth;
+        year = calendar.displayed.year;
+        month = calendar.currentMonth;
+        months = calendar.months;
+    });
+    calendar.on("year-update", () => {
+        year = calendar.displayed.year;
+        months = calendar.months;
+    });
+
+    $: weekdays = calendar.weekdays;
+    $: year = calendar.displayed.year;
+    $: month = calendar.currentMonth;
+    $: months = calendar.months;
+    $: weeks = calendar.weeksPerCurrentMonth;
 </script>
 
 <div
     id="calendar-container"
     class="fantasy-calendar"
     class:full-view={fullView}
+    class:year-view={yearView}
     style="--calendar-columns: {calendar.weekdays
         .length};--calendar-rows: {calendar.weeksPerCurrentMonth};"
 >
-    <Nav
-        month={month.name}
-        {year}
-        current={calendar.displayedDate}
-        on:next={() => calendar.goToNext()}
-        on:previous={() => calendar.goToPrevious()}
-        on:reset={() => calendar.reset()}
-        on:settings
-    />
-    {#if month.type == "month"}
-        <div class="weekdays">
-            {#each weekdays as day}
-                <span class="weekday fantasy-weekday"
-                    >{day.name.slice(0, 3)}</span
-                >
-            {/each}
-        </div>
+    {#if yearView && fullView}
+        <YearView
+            {months}
+            {year}
+            columns={weekdays.length}
+            current={calendar.displayedDate}
+            on:next={() => calendar.goToNextYear()}
+            on:previous={() => calendar.goToPreviousYear()}
+            on:reset={() => calendar.reset()}
+            on:settings
+            on:day-click
+            on:day-doubleclick
+            on:day-context-menu
+            on:event-click
+            on:event-mouseover
+        />
+    {:else}
+        <Nav
+            month={month.name}
+            {year}
+            current={calendar.displayedDate}
+            on:next={() => calendar.goToNext()}
+            on:previous={() => calendar.goToPrevious()}
+            on:reset={() => calendar.reset()}
+            on:settings
+        />
+        {#if month.type == "month"}
+            <div class="weekdays">
+                {#each weekdays as day}
+                    <span class="weekday fantasy-weekday"
+                        >{day.name.slice(0, 3)}</span
+                    >
+                {/each}
+            </div>
+        {/if}
+        <MonthView
+            columns={weekdays.length}
+            {weeks}
+            {month}
+            {fullView}
+            on:day-click
+            on:day-doubleclick
+            on:day-context-menu
+            on:event-click
+            on:event-mouseover
+        />
+        <!-- previous={days.previous}
+            current={days.current}
+            next={days.next} -->
     {/if}
-    <MonthView
-        columns={weekdays.length}
-        {weeks}
-        {days}
-        {fullView}
-        on:day-click
-        on:day-doubleclick
-        on:day-context-menu
-        on:event-click
-        on:event-mouseover
-    />
 </div>
 {#if dayView && !fullView}
     <hr />

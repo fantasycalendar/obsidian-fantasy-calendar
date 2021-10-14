@@ -5,7 +5,6 @@
 
     const dispatch = createEventDispatcher();
 
-    export let month: string;
     export let year: number;
     export let current: string;
 
@@ -21,16 +20,17 @@
 </script>
 
 <div class="fantasy-nav nav">
-    <h3 class="fantasy-title title">
-        <span class="fantasy-month month">{month}</span>
-        <span class="fantasy-year year">{year}</span>
-    </h3>
+    <div class="fantasy-year-nav">
+        <h2 class="fantasy-title">
+            <span class="fantasy-year">{year}</span>
+        </h2>
+    </div>
     <div class="right-nav fantasy-right-nav">
         <div class="container">
             <div
                 class="arrow calendar-clickable"
                 use:left
-                aria-label="Previous Month"
+                aria-label="Previous Year"
                 on:click={() => dispatch("previous")}
             />
             <div
@@ -40,10 +40,11 @@
             >
                 <span>Today</span>
             </div>
+
             <div
                 class="arrow right calendar-clickable"
                 use:right
-                aria-label="Next Month"
+                aria-label="Next Year"
                 on:click={(evt) => dispatch("next")}
             />
             <div
@@ -57,21 +58,26 @@
 </div>
 
 <style>
-    .fantasy-nav.nav.nav {
-        padding: 10px 0px;
+    :global(#calendar-container) .fantasy-nav.nav.nav {
+        padding: 0;
         margin: 0;
         display: flex;
         flex-flow: row nowrap;
         justify-content: space-between;
-        align-items: stretch;
+        align-items: center;
     }
+    .fantasy-year-nav {
+        display: flex;
+        align-items: center;
+        margin-right: auto;
+    }
+
     .container {
         display: flex;
         align-items: center;
     }
     .fantasy-title {
         margin: 0;
-        line-height: 1.25;
     }
     .fantasy-right-nav {
         display: flex;
@@ -84,4 +90,5 @@
         display: flex;
         justify-content: center;
     }
+
 </style>

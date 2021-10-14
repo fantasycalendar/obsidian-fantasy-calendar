@@ -8,7 +8,7 @@ import {
 } from "obsidian";
 import type { Calendar, LeapDay, LeapDayCondition } from "../../@types";
 
-import { getIntervalDescription, nanoid, ordinal } from "../../utils/functions";
+import { getIntervalDescription, nanoid } from "../../utils/functions";
 
 export class CreateLeapDayModal extends Modal {
     saved = false;

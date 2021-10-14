@@ -87,7 +87,7 @@ export class DayHelper {
     get isCurrentDay() {
         return (
             this.number == this.calendar.current.day &&
-            this.calendar.displayed.month == this.calendar.current.month &&
+            this.month.number == this.calendar.current.month &&
             this.calendar.displayed.year == this.calendar.current.year
         );
     }
@@ -195,6 +195,19 @@ export default class CalendarHelper extends Events {
         }
         this.trigger("day-update");
     }
+    goToNextCurrentDay() {
+        this.current.day += 1;
+        const currentMonth = this.months[this.current.month];
+        if (this.current.day > currentMonth.days.length) {
+            this.current.day = 1;
+            this.current.month += 1;
+            if (this.current.month > this.months.length) {
+                this.current.month = 0;
+                this.current.year += 1;
+            }
+        }
+        this.trigger("day-update");
+    }
     goToPreviousDay() {
         this.viewing.day -= 1;
         if (this.viewing.day < 1) {
@@ -223,6 +236,7 @@ export default class CalendarHelper extends Events {
         this.months = this.data.months.map(
             (m, i) => new MonthHelper(m, i, this.displayed.year, this)
         );
+        this.trigger("year-update");
     }
     get prevMonthIndex() {
         return wrap(this.displayed.month - 1, this.months.length);
@@ -245,6 +259,7 @@ export default class CalendarHelper extends Events {
         this.months = this.data.months.map(
             (m, i) => new MonthHelper(m, i, this.displayed.year, this)
         );
+        this.trigger("year-update");
     }
     get weekdays() {
         return this.data.weekdays;
@@ -303,26 +318,39 @@ export default class CalendarHelper extends Events {
                     });
             });
     }
-    get paddedDays() {
-        let previous: DayHelper[] = [];
-        let current = this.daysOfCurrentMonth;
-        let next: DayHelper[] = [];
+
+    get fullMonths() {
+        return this.months.filter((m) => m.type == "month");
+    }
+
+    getPaddedDaysForMonth(month: MonthHelper) {
+        let current = month.days;
 
         /** Get Days of Previous Month */
-        if (this.currentMonth.firstWeekday > 0) {
-            previous = this.previousMonth.days.slice(
-                -this.currentMonth.firstWeekday
-            );
+        let previous: DayHelper[] = [];
+        const previousMonthIndex = wrap(
+            this.fullMonths.indexOf(month) - 1,
+            this.fullMonths.length
+        );
+        const previousMonth = this.fullMonths[previousMonthIndex];
+        if (month.firstWeekday > 0) {
+            previous = previousMonth.days.slice(-month.firstWeekday);
         }
 
         /** Get Days of Next Month */
+        let next: DayHelper[] = [];
+        const nextMonthIndex = wrap(
+            this.fullMonths.indexOf(month) - 1,
+            this.fullMonths.length
+        );
+        const nextMonth = this.fullMonths[nextMonthIndex];
         if (
-            this.currentMonth.lastWeekday < this.weekdays.length - 1 &&
-            this.currentMonth.type == "month"
+            month.lastWeekday < this.weekdays.length - 1 &&
+            month.type == "month"
         ) {
-            next = this.nextMonth.days.slice(
+            next = nextMonth.days.slice(
                 0,
-                this.weekdays.length - this.currentMonth.lastWeekday - 1
+                this.weekdays.length - month.lastWeekday - 1
             );
         }
 
@@ -331,6 +359,10 @@ export default class CalendarHelper extends Events {
             current,
             next
         };
+    }
+
+    get paddedDays() {
+        return this.getPaddedDaysForMonth(this.currentMonth);
     }
 
     /**

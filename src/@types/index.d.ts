@@ -9,6 +9,7 @@ export interface Calendar {
     current: CurrentCalendarData;
     events: Event[];
     categories: EventCategory[];
+    date?: number;
 }
 
 export interface FantasyCalendarData {
@@ -127,6 +128,7 @@ export interface StaticCalendarData {
     displayMoons: boolean;
     eras: Era[];
     offset?: number;
+    incrementDay: boolean;
 }
 
 export interface CurrentCalendarData {

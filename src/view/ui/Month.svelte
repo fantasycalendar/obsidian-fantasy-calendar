@@ -1,28 +1,41 @@
 <script lang="ts">
-    import type { DayHelper } from "src/helper";
+    import type { DayHelper, MonthHelper } from "src/helper";
     import DayView from "./Day.svelte";
 
-    export let days: {
-        previous: DayHelper[];
-        current: DayHelper[];
-        next: DayHelper[];
-    };
+    export let yearView: boolean = false;
+    export let month: MonthHelper;
+    /* export let previous: DayHelper[];
+    export let current: DayHelper[];
+    export let next: DayHelper[]; */
+
     export let columns: number;
     export let fullView: boolean = false;
     export let weeks: number;
+
+    export let showPad: boolean = true;
+
+    $: padded = month.calendar.getPaddedDaysForMonth(month);
+    $: previous = padded.previous;
+    $: current = month.days;
+    $: next = padded.next;
 </script>
 
 <div
     class="fantasy-month"
     class:full-view={fullView}
+    class:year-view={yearView}
     style="--calendar-columns: {columns}; --calendar-rows: {fullView
         ? `${(1 / weeks) * 100}%`
         : '1fr'}; "
 >
-    {#each days.previous as day}
-        <DayView {day} adjacent={true} {fullView} />
+    {#each previous as day}
+        {#if showPad}
+            <DayView {day} adjacent={true} {fullView} />
+        {:else}
+            <div />
+        {/if}
     {/each}
-    {#each days.current as day}
+    {#each current as day}
         <DayView
             {day}
             adjacent={false}
@@ -34,8 +47,12 @@
             on:event-mouseover
         />
     {/each}
-    {#each days.next as day}
-        <DayView {day} adjacent={true} {fullView} />
+    {#each next as day}
+        {#if showPad}
+            <DayView {day} adjacent={true} {fullView} />
+        {:else}
+            <div />
+        {/if}
     {/each}
 </div>
 

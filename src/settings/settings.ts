@@ -303,7 +303,19 @@ class CreateCalendarModal extends Modal {
                         const modal = new CalendarPresetModal(this.app);
                         modal.onClose = () => {
                             if (!modal.saved) return;
+                            if (modal.preset?.name == "Gregorian Calendar") {
+                                const today = new Date();
 
+                                modal.preset.current = {
+                                    year: today.getFullYear(),
+                                    month: today.getMonth(),
+                                    day: today.getDate()
+                                };
+                                console.log(
+                                    "🚀 ~ file: settings.ts ~ line 310 ~ modal.preset.current",
+                                    modal.preset.current
+                                );
+                            }
                             this.calendar = { ...modal.preset };
                             this.display();
                         };
@@ -354,6 +366,15 @@ class CreateCalendarModal extends Modal {
             .setValue(this.calendar.description)
             .onChange((v) => {
                 this.calendar.description = v;
+            });
+
+        new Setting(this.infoDetailEl)
+            .setName("Auto Increment Day")
+            .setDesc("Automatically increment the calendar day every real day.")
+            .addToggle((t) => {
+                t.setValue(this.static.incrementDay).onChange((v) => {
+                    this.static.incrementDay = v;
+                });
             });
 
         this.dateFieldEl = this.infoDetailEl.createDiv(

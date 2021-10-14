@@ -10,6 +10,7 @@
     const dispatch = createEventDispatcher();
 
     export let day: DayHelper;
+
     export let adjacent: boolean;
     export let fullView: boolean;
 
@@ -19,19 +20,18 @@
     let dayView: boolean;
     const dayViewStore = getContext<Writable<boolean>>("dayView");
     dayViewStore.subscribe((v) => (dayView = v));
+
     let displayMoons: boolean;
     const moonStore = getContext<Writable<boolean>>("displayMoons");
     moonStore.subscribe((v) => (displayMoons = v));
 
-    let today = day.isCurrentDay;
-    let displaying = day.isDisplaying;
+    $: today = day.isCurrentDay;
+    $: displaying = day.isDisplaying;
 
-    $: {
-        if (dayView) {
-            displaying = day.isDisplaying;
-        }
-    }
-
+    day.calendar.on("month-update", () => {
+        today = day.isCurrentDay;
+        displaying = day.isDisplaying;
+    });
     day.calendar.on("day-update", () => {
         today = day.isCurrentDay;
         displaying = day.isDisplaying;

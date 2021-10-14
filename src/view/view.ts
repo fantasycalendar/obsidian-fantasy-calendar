@@ -40,6 +40,7 @@ export default class FantasyCalendarView extends ItemView {
     helper: CalendarHelper;
     noCalendarEl: HTMLDivElement;
     full = false;
+    yearView: boolean = false;
     moons: boolean = true;
     calendar: Calendar;
     /* calendarDropdownEl: HTMLDivElement; */
@@ -50,6 +51,8 @@ export default class FantasyCalendarView extends ItemView {
         public options: { calendar?: Calendar; full?: boolean } = {}
     ) {
         super(leaf);
+
+        window.view = this;
         this.registerEvent(
             this.plugin.app.workspace.on("fantasy-calendars-updated", () => {
                 this.updateCalendars();
@@ -77,11 +80,54 @@ export default class FantasyCalendarView extends ItemView {
         }
     }
 
+    interval: number;
+
     setCurrentCalendar(calendar: Calendar) {
         this.noCalendarEl?.detach();
+
         this.calendar = calendar;
+
         this.moons = this.calendar.static.displayMoons;
         this.helper = new CalendarHelper(this.calendar, this.plugin);
+
+        if (this.calendar.static.incrementDay) {
+            let current = new Date();
+
+            if (!this.calendar.date) {
+                this.calendar.date = current.valueOf();
+            }
+            if (
+                current.valueOf() - new Date(this.calendar.date).valueOf() >=
+                1 * 24 * 60 * 60 * 1000
+            ) {
+                const dif = Math.floor(
+                    current.valueOf() - new Date(this.calendar.date).valueOf()
+                );
+
+                for (let i = 0; i < dif; i++) {
+                    this.helper.goToNextCurrentDay();
+                }
+            }
+            this.interval = window.setInterval(() => {
+                console.log(
+                    new Date().toLocaleString(),
+                    current.toLocaleString()
+                );
+                if (
+                    new Date().valueOf() - current.valueOf() >=
+                    1 * 24 * 60 * 60 * 1000
+                ) {
+                    this.helper.goToNextCurrentDay();
+                    this.helper.current;
+                    current = new Date();
+                    calendar.date = current.valueOf();
+                }
+            }, 60 * 1000);
+
+            this.registerInterval(this.interval);
+        } else if (this.interval) {
+            clearInterval(this.interval);
+        }
 
         this.plugin.data.currentCalendar = calendar.id;
 
@@ -121,6 +167,7 @@ export default class FantasyCalendarView extends ItemView {
             props: {
                 calendar: this.helper,
                 fullView: this.full,
+                yearView: this.yearView,
                 moons: this.moons
             }
         });
@@ -152,16 +199,21 @@ export default class FantasyCalendarView extends ItemView {
                 const menu = new Menu(this.app);
 
                 menu.setNoIcon();
-                menu.addItem((item) => {
-                    item.setTitle("Open Day").onClick(() => {
-                        this.helper.viewing.day = day.number;
-                        this.helper.viewing.month = this.helper.displayed.month;
-                        this.helper.viewing.year = this.helper.displayed.year;
 
-                        this.helper.trigger("day-update");
-                        this._app.$set({ dayView: true });
+                if (!this.full) {
+                    menu.addItem((item) => {
+                        item.setTitle("Open Day").onClick(() => {
+                            this.helper.viewing.day = day.number;
+                            this.helper.viewing.month =
+                                this.helper.displayed.month;
+                            this.helper.viewing.year =
+                                this.helper.displayed.year;
+
+                            this.helper.trigger("day-update");
+                            this._app.$set({ dayView: true });
+                        });
                     });
-                });
+                }
                 menu.addItem((item) => {
                     item.setTitle("Set as Today").onClick(() => {
                         this.calendar.current = day.date;
@@ -170,7 +222,7 @@ export default class FantasyCalendarView extends ItemView {
 
                         this.helper.trigger("day-update");
 
-                        this.plugin.saveCalendar();
+                        this.plugin.saveSettings();
                     });
                 });
                 menu.addItem((item) =>
@@ -187,6 +239,16 @@ export default class FantasyCalendarView extends ItemView {
             const menu = new Menu(this.app);
 
             menu.setNoIcon();
+            if (this.full) {
+                menu.addItem((item) => {
+                    item.setTitle(
+                        `Open ${this.yearView ? "Month" : "Year"}`
+                    ).onClick(() => {
+                        this.yearView = !this.yearView;
+                        this._app.$set({ yearView: this.yearView });
+                    });
+                });
+            }
             menu.addItem((item) => {
                 item.setTitle(
                     this.moons ? "Hide Moons" : "Display Moons"

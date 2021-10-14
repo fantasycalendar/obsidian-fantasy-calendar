@@ -6,6 +6,8 @@ export const PRESET_CALENDARS: Calendar[] = [
         description:
             "A calendar for the real world. Note: May not be 100% accurate.",
         static: {
+            incrementDay: true,
+            displayMoons: true,
             firstWeekDay: 6,
             overflow: true,
             weekdays: [
@@ -181,9 +183,9 @@ export const PRESET_CALENDARS: Calendar[] = [
             offset: 2
         },
         current: {
-            year: 2021,
-            day: 7,
-            month: 0
+            year: null,
+            day: null,
+            month: null
         },
         events: [
             {
@@ -428,6 +430,8 @@ export const PRESET_CALENDARS: Calendar[] = [
         name: "Calendar of Greyhawk",
         description: "Calendar of the world of Greyhawk.",
         static: {
+            incrementDay: false,
+            displayMoons: true,
             firstWeekDay: 0,
             overflow: false,
             weekdays: [
@@ -833,6 +837,8 @@ export const PRESET_CALENDARS: Calendar[] = [
         description: "Calendar for the world of Pathfinder.",
         static: {
             firstWeekDay: 0,
+            incrementDay: false,
+            displayMoons: true,
             overflow: true,
             weekdays: [
                 {
@@ -2128,6 +2134,8 @@ export const PRESET_CALENDARS: Calendar[] = [
         description: "Calendar of the world of Eberron.",
         static: {
             firstWeekDay: 0,
+            incrementDay: false,
+            displayMoons: true,
             overflow: false,
             weekdays: [
                 {
@@ -2758,6 +2766,8 @@ export const PRESET_CALENDARS: Calendar[] = [
         description: "Calendar of the realm of Barovia, home of Strahd.",
         static: {
             firstWeekDay: 0,
+            incrementDay: false,
+            displayMoons: true,
             overflow: true,
             weekdays: [
                 {
@@ -3028,6 +3038,8 @@ export const PRESET_CALENDARS: Calendar[] = [
         description: "Calendar of the world of Wildemount.",
         static: {
             firstWeekDay: 2,
+            incrementDay: false,
+            displayMoons: true,
             overflow: true,
             weekdays: [
                 {
@@ -3547,6 +3559,8 @@ export const PRESET_CALENDARS: Calendar[] = [
         description: "Calendar of Faerûn of the Forgotten Realms.",
         static: {
             firstWeekDay: 0,
+            incrementDay: false,
+            displayMoons: true,
             overflow: false,
             weekdays: [
                 {
