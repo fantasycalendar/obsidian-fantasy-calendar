@@ -109,10 +109,7 @@ export default class FantasyCalendarView extends ItemView {
                 }
             }
             this.interval = window.setInterval(() => {
-                console.log(
-                    new Date().toLocaleString(),
-                    current.toLocaleString()
-                );
+
                 if (
                     new Date().valueOf() - current.valueOf() >=
                     1 * 24 * 60 * 60 * 1000

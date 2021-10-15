@@ -1,6 +1,7 @@
 <script lang="ts">
     import Flag from "./Flag.svelte";
     import type { Event, EventCategory } from "src/@types";
+import { DEFAULT_CATEGORY_COLOR } from "src/utils/constants";
 
     export let events: Event[] = [];
     export let categories: EventCategory[];
@@ -10,7 +11,7 @@
 
     const color = (event: Event) => {
         return (
-            categories.find((c) => c.id == event.category)?.color ?? "#808080"
+            categories.find((c) => c.id == event.category)?.color ?? DEFAULT_CATEGORY_COLOR
         );
     };
 </script>

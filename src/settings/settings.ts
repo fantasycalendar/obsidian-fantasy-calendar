@@ -311,10 +311,6 @@ class CreateCalendarModal extends Modal {
                                     month: today.getMonth(),
                                     day: today.getDate()
                                 };
-                                console.log(
-                                    "🚀 ~ file: settings.ts ~ line 310 ~ modal.preset.current",
-                                    modal.preset.current
-                                );
                             }
                             this.calendar = { ...modal.preset };
                             this.display();
@@ -623,6 +619,13 @@ class CreateCalendarModal extends Modal {
             props: {
                 categories: this.calendar.categories
             }
+        });
+
+        category.$on("new", (event: CustomEvent<EventCategory>) => {
+            this.calendar.categories.push(event.detail);
+            this.eventsUI.$set({
+                categories: this.calendar.categories
+            });
         });
 
         category.$on("update", (event: CustomEvent<EventCategory>) => {
