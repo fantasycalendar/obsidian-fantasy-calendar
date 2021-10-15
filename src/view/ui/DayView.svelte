@@ -9,10 +9,10 @@
 
     export let calendar: CalendarHelper;
 
-    let currentDate = calendar.viewedDate;
-    let events = calendar.getEventsOnDate(calendar.viewing);
-    let moons = calendar.getMoonsForDate(calendar.viewing);
-    let categories = calendar.object.categories;
+    $: currentDate = calendar.viewedDate;
+    $: events = calendar.getEventsOnDate(calendar.viewing);
+    $: moons = calendar.getMoonsForDate(calendar.viewing);
+    $: categories = calendar.object.categories;
 
     let displayMoons: boolean;
     const moonStore = getContext<Writable<boolean>>("displayMoons");

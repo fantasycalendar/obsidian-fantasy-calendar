@@ -8,7 +8,8 @@ import {
     PluginSettingTab,
     Setting,
     TextAreaComponent,
-    TextComponent
+    TextComponent,
+    TFolder
 } from "obsidian";
 import { DEFAULT_CALENDAR } from "../main";
 import type FantasyCalendar from "../main";
@@ -31,6 +32,7 @@ import MoonUI from "./ui/Moons.svelte";
 import LeapDays from "./ui/LeapDays.svelte";
 import { CreateMoonModal } from "src/settings/modals/moons";
 import { CreateLeapDayModal } from "./modals/leapday";
+import { FolderSuggestionModal } from "src/suggester/folder";
 
 export enum Recurring {
     none = "None",
@@ -377,6 +379,47 @@ class CreateCalendarModal extends Modal {
             "fantasy-calendar-date-fields"
         );
         this.buildDateFields();
+
+        new Setting(this.infoDetailEl)
+            .setName("Automatically Add Events")
+            .setDesc("The plugin will watch your notes and auto-create events.")
+            .addToggle((t) => {
+                t.setValue(this.calendar.watch).onChange((v) => {
+                    this.calendar.watch = v;
+                    if (v && !this.calendar.path) {
+                        this.calendar.path = "/";
+                    }
+                    this.buildInfo();
+                });
+            });
+        if (this.calendar.watch) {
+            if (!this.calendar.path) {
+                this.calendar.path = "/";
+            }
+            new Setting(this.infoDetailEl)
+                .setName("Folder to Watch")
+                .setDesc(
+                    "The plugin will only watch for changes in this folder."
+                )
+                .addText((text) => {
+                    let folders = this.app.vault
+                        .getAllLoadedFiles()
+                        .filter((f) => f instanceof TFolder);
+
+                    text.setPlaceholder(this.calendar.path ?? "/");
+                    const modal = new FolderSuggestionModal(this.app, text, [
+                        ...(folders as TFolder[])
+                    ]);
+
+                    modal.onClose = async () => {
+                        this.calendar.path = text.inputEl.value ?? "/";
+                    };
+
+                    text.inputEl.onblur = async () => {
+                        this.calendar.path = text.inputEl.value ?? "/";
+                    };
+                });
+        }
     }
     tempCurrentDays = this.calendar.current.day;
     buildDateFields() {

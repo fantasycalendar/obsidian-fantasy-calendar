@@ -110,10 +110,13 @@ export default class CalendarHelper extends Events {
     months: MonthHelper[];
     constructor(public object: Calendar, public plugin: FantasyCalendar) {
         super();
-
-        window.calendar = this;
-
         this.displayed = { ...this.current };
+        this.months = this.data.months.map(
+            (m, i) => new MonthHelper(m, i, this.displayed.year, this)
+        );
+    }
+    update(calendar: Calendar) {
+        this.object = calendar;
         this.months = this.data.months.map(
             (m, i) => new MonthHelper(m, i, this.displayed.year, this)
         );

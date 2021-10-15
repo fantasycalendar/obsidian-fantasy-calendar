@@ -51,8 +51,6 @@ export default class FantasyCalendarView extends ItemView {
         public options: { calendar?: Calendar; full?: boolean } = {}
     ) {
         super(leaf);
-
-        window.view = this;
         this.registerEvent(
             this.plugin.app.workspace.on("fantasy-calendars-updated", () => {
                 this.updateCalendars();
@@ -61,35 +59,44 @@ export default class FantasyCalendarView extends ItemView {
     }
     updateCalendars() {
         if (!this.plugin.data.calendars.length) {
+            this._app?.$destroy();
             this.contentEl.empty();
             this.noCalendarEl = this.contentEl.createDiv("fantasy-no-calendar");
             this.noCalendarEl.createSpan({
                 text: "No calendars created! Create a calendar to see it here."
             });
-        } else if (
-            this.calendar &&
-            this.plugin.data.calendars.find((c) => c.id == this.calendar.id)
-        ) {
-            this.setCurrentCalendar(
-                this.plugin.data.calendars.find((c) => c.id == this.calendar.id)
-            );
-        } else if (this.plugin.defaultCalendar) {
-            this.setCurrentCalendar(this.plugin.defaultCalendar);
+            return;
+        }
+
+        const calendar =
+            this.plugin.data.calendars.find((c) => c.id == this.calendar?.id) ??
+            this.plugin.defaultCalendar ??
+            this.plugin.data.calendars[0];
+
+        if (this.helper && this.helper.object.id == calendar.id) {
+            this.update(calendar);
         } else {
-            this.setCurrentCalendar(this.plugin.data.calendars[0]);
+            this.setCurrentCalendar(calendar);
+        }
+    }
+    update(calendar: Calendar) {
+        this.calendar = calendar;
+        this.helper.update(this.calendar);
+
+        this.registerCalendarInterval();
+
+        if (!this._app) {
+            this.build();
+        } else {
+            this._app.$set({ calendar: this.helper });
         }
     }
 
-    interval: number;
-
-    setCurrentCalendar(calendar: Calendar) {
-        this.noCalendarEl?.detach();
-
-        this.calendar = calendar;
-
-        this.moons = this.calendar.static.displayMoons;
-
-        this.helper = new CalendarHelper(this.calendar, this.plugin);
+    registerCalendarInterval() {
+        if (this.interval) {
+            clearInterval(this.interval);
+            this.interval = null;
+        }
 
         if (this.calendar.static.incrementDay) {
             let current = new Date();
@@ -117,16 +124,25 @@ export default class FantasyCalendarView extends ItemView {
                     this.helper.goToNextCurrentDay();
                     this.helper.current;
                     current = new Date();
-                    calendar.date = current.valueOf();
+                    this.calendar.date = current.valueOf();
                 }
             }, 60 * 1000);
 
             this.registerInterval(this.interval);
-        } else if (this.interval) {
-            clearInterval(this.interval);
         }
+    }
 
-        this.plugin.data.currentCalendar = calendar.id;
+    interval: number;
+
+    setCurrentCalendar(calendar: Calendar) {
+        this.noCalendarEl?.detach();
+
+        this.calendar = calendar;
+
+        this.moons = this.calendar.static.displayMoons;
+        this.helper = new CalendarHelper(this.calendar, this.plugin);
+
+        this.registerCalendarInterval();
 
         this.build();
     }
@@ -293,26 +309,33 @@ export default class FantasyCalendarView extends ItemView {
             menu.showAtMouseEvent(evt);
         });
 
-        this._app.$on("event-click", (evt: CustomEvent<Event>) => {
-            const event = evt.detail;
-            if (event.note) {
-                let leaves: WorkspaceLeaf[] = [];
-                this.app.workspace.iterateAllLeaves((leaf) => {
-                    if (!(leaf.view instanceof MarkdownView)) return;
-                    if (leaf.view.file.basename === event.note) {
-                        leaves.push(leaf);
+        this._app.$on(
+            "event-click",
+            (evt: CustomEvent<{ event: Event; modifier: boolean }>) => {
+                const { event, modifier } = evt.detail;
+                if (event.note) {
+                    let leaves: WorkspaceLeaf[] = [];
+                    this.app.workspace.iterateAllLeaves((leaf) => {
+                        if (!(leaf.view instanceof MarkdownView)) return;
+                        if (leaf.view.file.basename === event.note) {
+                            leaves.push(leaf);
+                        }
+                    });
+                    if (leaves.length) {
+                        this.app.workspace.setActiveLeaf(leaves[0]);
+                    } else {
+                        this.app.workspace.openLinkText(
+                            event.note,
+                            "",
+                            this.full || modifier
+                        );
                     }
-                });
-                if (leaves.length) {
-                    this.app.workspace.setActiveLeaf(leaves[0]);
                 } else {
-                    this.app.workspace.openLinkText(event.note, "", this.full);
+                    const modal = new ViewEventModal(event, this.plugin);
+                    modal.open();
                 }
-            } else {
-                const modal = new ViewEventModal(evt.detail, this.plugin);
-                modal.open();
             }
-        });
+        );
 
         this._app.$on(
             "event-mouseover",

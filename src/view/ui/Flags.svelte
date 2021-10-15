@@ -1,19 +1,14 @@
 <script lang="ts">
     import Flag from "./Flag.svelte";
     import type { Event, EventCategory } from "src/@types";
-import { DEFAULT_CATEGORY_COLOR } from "src/utils/constants";
 
     export let events: Event[] = [];
     export let categories: EventCategory[];
     export let dayView: boolean = false;
 
-    const MAX_EVENTS = dayView ? Infinity : 5;
+    $: events = events;
 
-    const color = (event: Event) => {
-        return (
-            categories.find((c) => c.id == event.category)?.color ?? DEFAULT_CATEGORY_COLOR
-        );
-    };
+    const MAX_EVENTS = dayView ? Infinity : 5;
 </script>
 
 <div>
@@ -21,7 +16,7 @@ import { DEFAULT_CATEGORY_COLOR } from "src/utils/constants";
         {#each events.slice(0, MAX_EVENTS) as event}
             <Flag
                 {event}
-                color={color(event)}
+                {categories}
                 {dayView}
                 on:event-click
                 on:event-mouseover

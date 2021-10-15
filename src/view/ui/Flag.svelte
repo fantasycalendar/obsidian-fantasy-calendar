@@ -1,13 +1,25 @@
 <script lang="ts">
-    import { setIcon } from "obsidian";
+    import { Platform, setIcon } from "obsidian";
 
-    import type { Event } from "src/@types";
+    import type { Event, EventCategory } from "src/@types";
+    import { DEFAULT_CATEGORY_COLOR } from "src/utils/constants";
     import { createEventDispatcher } from "svelte";
     const dispatch = createEventDispatcher();
 
     export let event: Event;
-    export let color: string;
+
     export let dayView: boolean = false;
+    export let categories: EventCategory[];
+
+    let color =
+        categories.find((c) => c.id == event.category)?.color ??
+        DEFAULT_CATEGORY_COLOR;
+
+    $: color =
+        categories.find((c) => c.id == event.category)?.color ??
+        DEFAULT_CATEGORY_COLOR;
+
+    const meta = Platform.isMacOS ? "Meta" : "Control";
 
     const note = (node: HTMLElement) => {
         setIcon(node, "note-glyph");
@@ -18,7 +30,11 @@
     class="flag"
     aria-label={!dayView ? event.name : null}
     style="--hex-alpha: {color}40; --color:{color}"
-    on:click={() => dispatch("event-click", event)}
+    on:click={(evt) =>
+        dispatch("event-click", {
+            event,
+            modifier: evt.getModifierState(meta)
+        })}
     on:mouseover={(evt) =>
         dispatch("event-mouseover", { target: evt.target, event })}
     on:focus={() => {}}

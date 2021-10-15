@@ -10,6 +10,8 @@ export interface Calendar {
     events: Event[];
     categories: EventCategory[];
     date?: number;
+    watch?: boolean;
+    path?: string;
 }
 
 export interface FantasyCalendarData {

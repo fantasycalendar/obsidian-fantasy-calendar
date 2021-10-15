@@ -1,4 +1,4 @@
-import { Platform, Plugin, WorkspaceLeaf } from "obsidian";
+import { Component, Platform, Plugin, Vault, WorkspaceLeaf } from "obsidian";
 
 import FantasyCalendarSettings from "./settings/settings";
 
@@ -11,6 +11,7 @@ import FantasyCalendarView, {
 } from "./view/view";
 
 import "./main.css";
+import { Watcher } from "./watcher/watcher";
 
 declare module "obsidian" {
     interface Workspace {
@@ -54,6 +55,7 @@ export const DEFAULT_DATA: FantasyCalendarData = {
 
 export default class FantasyCalendar extends Plugin {
     data: FantasyCalendarData;
+    watcher = new Watcher(this);
     get currentCalendar() {
         return this.data.calendars.find(
             (c) => c.id == this.data.currentCalendar
@@ -82,6 +84,8 @@ export default class FantasyCalendar extends Plugin {
         console.log("Loading Fantasy Calendars v" + this.manifest.version);
 
         await this.loadSettings();
+
+        this.watcher.load();
 
         this.addSettingTab(new FantasyCalendarSettings(this));
         this.registerView(
@@ -124,6 +128,7 @@ export default class FantasyCalendar extends Plugin {
         this.app.workspace
             .getLeavesOfType(FULL_VIEW)
             .forEach((leaf) => leaf.detach());
+        this.watcher.unload();
     }
 
     async addCalendarView(startup: boolean = false) {
