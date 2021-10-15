@@ -17,12 +17,11 @@
 
     const dayViewStore = writable(dayView);
     const moonStore = writable(moons);
+    setContext("dayView", dayViewStore);
+    setContext("displayMoons", moonStore);
 
     $: dayViewStore.set(dayView);
     $: moonStore.set(moons);
-
-    setContext("dayView", dayViewStore);
-    setContext("displayMoons", moonStore);
 
     calendar.on("month-update", () => {
         weeks = calendar.weeksPerCurrentMonth;

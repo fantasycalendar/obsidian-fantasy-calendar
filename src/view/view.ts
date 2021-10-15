@@ -88,6 +88,7 @@ export default class FantasyCalendarView extends ItemView {
         this.calendar = calendar;
 
         this.moons = this.calendar.static.displayMoons;
+
         this.helper = new CalendarHelper(this.calendar, this.plugin);
 
         if (this.calendar.static.incrementDay) {
@@ -109,7 +110,6 @@ export default class FantasyCalendarView extends ItemView {
                 }
             }
             this.interval = window.setInterval(() => {
-
                 if (
                     new Date().valueOf() - current.valueOf() >=
                     1 * 24 * 60 * 60 * 1000

@@ -657,6 +657,7 @@ class CreateCalendarModal extends Modal {
 
     buildMoons() {
         this.moonEl.empty();
+        this.static.displayMoons = this.static.displayMoons ?? true;
         const moonsUI = new MoonUI({
             target: this.moonEl,
             props: {

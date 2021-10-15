@@ -32,9 +32,6 @@
     const edit = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("pencil").setTooltip("Edit");
     };
-    const editMoon = (item: Moon) => {
-        dispatch("new-item", item);
-    };
     const deleteMoon = (item: Moon) => {
         moons = moons.filter((moon) => moon.id !== item.id);
         dispatch("edit-moons", moons);
