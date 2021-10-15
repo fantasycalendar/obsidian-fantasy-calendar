@@ -28,7 +28,7 @@ fc-date:
 
 ### Automatic Event Creation
 
-Additionally, each calendar can automatically create events if the `Automatically Add Events` calendar setting is turned on. This event is **per calendar.**
+Additionally, each calendar can automatically create events if the `Automatically Add Events` calendar setting is turned on. This setting is **per calendar.**
 
 Optionally, you can tell the calendar to only watch for new events in a specific folder. Leaving this setting blank will watch the entire vault for new events.
 
