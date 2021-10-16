@@ -1,5 +1,12 @@
 import type { CurrentCalendarData, LeapDay, Month } from "../@types";
 
+export function daysBetween(date1: Date, date2: Date) {
+    return Math.floor(
+        (date1.valueOf() - new Date(date2).valueOf()) / 1000 / 60 / 60 / 24
+    );
+    
+}
+
 export function nanoid(len: number) {
     return "ID_xyxyxyxyxyxy".replace(/[xy]/g, function (c) {
         var r = (Math.random() * 16) | 0,

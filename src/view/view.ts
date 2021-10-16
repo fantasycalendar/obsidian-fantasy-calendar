@@ -24,6 +24,7 @@ export const FULL_VIEW = "FANTASY_CALENDAR_FULL_VIEW";
 
 import CalendarUI from "./ui/Calendar.svelte";
 import { confirmWithModal } from "src/settings/modals/confirm";
+import { daysBetween } from "src/utils/functions";
 
 addIcon(
     VIEW_TYPE,
@@ -104,27 +105,23 @@ export default class FantasyCalendarView extends ItemView {
             if (!this.calendar.date) {
                 this.calendar.date = current.valueOf();
             }
-            if (
-                current.valueOf() - new Date(this.calendar.date).valueOf() >=
-                1 * 24 * 60 * 60 * 1000
-            ) {
-                const dif = Math.floor(
-                    current.valueOf() - new Date(this.calendar.date).valueOf()
-                );
 
+            const dif = daysBetween(current, new Date(this.calendar.date));
+
+            if (dif >= 1) {
                 for (let i = 0; i < dif; i++) {
                     this.helper.goToNextCurrentDay();
                 }
+                this.calendar.date = current.valueOf();
+                this.plugin.saveSettings();
             }
             this.interval = window.setInterval(() => {
-                if (
-                    new Date().valueOf() - current.valueOf() >=
-                    1 * 24 * 60 * 60 * 1000
-                ) {
+                if (daysBetween(new Date(), current) >= 1) {
                     this.helper.goToNextCurrentDay();
                     this.helper.current;
                     current = new Date();
                     this.calendar.date = current.valueOf();
+                    this.plugin.saveSettings();
                 }
             }, 60 * 1000);
 
