@@ -50,10 +50,20 @@ export const DEFAULT_DATA: FantasyCalendarData = {
     calendars: [],
     currentCalendar: null,
     defaultCalendar: null,
-    eventPreview: false
+    eventPreview: false,
+    path: "/"
 };
 
 export default class FantasyCalendar extends Plugin {
+    async addNewCalendar(calendar: Calendar) {
+        this.data.calendars.push({ ...calendar });
+        if (!this.data.defaultCalendar) {
+            this.data.defaultCalendar = calendar.id;
+        }
+        await this.saveCalendar();
+        this.watcher.registerCalendar(calendar);
+        
+    }
     data: FantasyCalendarData;
     watcher = new Watcher(this);
     get currentCalendar() {

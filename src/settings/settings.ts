@@ -148,6 +148,34 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                     this.plugin.saveSettings();
                 });
             });
+
+        new Setting(this.infoEl)
+            .setName("Folder to Watch")
+            .setDesc("The plugin will only watch for changes in this folder.")
+            .addText((text) => {
+                let folders = this.app.vault
+                    .getAllLoadedFiles()
+                    .filter((f) => f instanceof TFolder);
+
+                text.setPlaceholder(this.plugin.data.path ?? "/");
+                const modal = new FolderSuggestionModal(this.app, text, [
+                    ...(folders as TFolder[])
+                ]);
+
+                modal.onClose = async () => {
+                    const v = text.inputEl.value?.trim()
+                        ? text.inputEl.value.trim()
+                        : "/";
+                    this.plugin.data.path = v;
+                };
+
+                text.inputEl.onblur = async () => {
+                    const v = text.inputEl.value?.trim()
+                        ? text.inputEl.value.trim()
+                        : "/";
+                    this.plugin.data.path = v;
+                };
+            });
     }
     buildCalendarUI() {
         this.calendarUI.empty();
@@ -167,11 +195,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                             if (!calendar.current.year) {
                                 calendar.current.year = 1;
                             }
-                            this.data.calendars.push({ ...calendar });
-                            if (!this.data.defaultCalendar) {
-                                this.data.defaultCalendar = calendar.id;
-                            }
-                            await this.plugin.saveCalendar();
+                            await this.plugin.addNewCalendar(calendar);
 
                             this.showCalendars(existing);
                         };
@@ -379,47 +403,6 @@ class CreateCalendarModal extends Modal {
             "fantasy-calendar-date-fields"
         );
         this.buildDateFields();
-
-        new Setting(this.infoDetailEl)
-            .setName("Automatically Add Events")
-            .setDesc("The plugin will watch your notes and auto-create events.")
-            .addToggle((t) => {
-                t.setValue(this.calendar.watch).onChange((v) => {
-                    this.calendar.watch = v;
-                    if (v && !this.calendar.path) {
-                        this.calendar.path = "/";
-                    }
-                    this.buildInfo();
-                });
-            });
-        if (this.calendar.watch) {
-            if (!this.calendar.path) {
-                this.calendar.path = "/";
-            }
-            new Setting(this.infoDetailEl)
-                .setName("Folder to Watch")
-                .setDesc(
-                    "The plugin will only watch for changes in this folder."
-                )
-                .addText((text) => {
-                    let folders = this.app.vault
-                        .getAllLoadedFiles()
-                        .filter((f) => f instanceof TFolder);
-
-                    text.setPlaceholder(this.calendar.path ?? "/");
-                    const modal = new FolderSuggestionModal(this.app, text, [
-                        ...(folders as TFolder[])
-                    ]);
-
-                    modal.onClose = async () => {
-                        this.calendar.path = text.inputEl.value ?? "/";
-                    };
-
-                    text.inputEl.onblur = async () => {
-                        this.calendar.path = text.inputEl.value ?? "/";
-                    };
-                });
-        }
     }
     tempCurrentDays = this.calendar.current.day;
     buildDateFields() {

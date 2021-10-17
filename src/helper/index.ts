@@ -343,10 +343,11 @@ export default class CalendarHelper extends Events {
         /** Get Days of Next Month */
         let next: DayHelper[] = [];
         const nextMonthIndex = wrap(
-            this.fullMonths.indexOf(month) - 1,
+            this.fullMonths.indexOf(month) + 1,
             this.fullMonths.length
         );
         const nextMonth = this.fullMonths[nextMonthIndex];
+
         if (
             month.lastWeekday < this.weekdays.length - 1 &&
             month.type == "month"

@@ -1,14 +1,18 @@
-import { Component, FrontMatterCache, TFile, TFolder, Vault } from "obsidian";
+import {
+    Component,
+    FrontMatterCache,
+    Notice,
+    TFile,
+    TFolder,
+    Vault
+} from "obsidian";
 import type { Calendar, CurrentCalendarData, Event } from "src/@types";
 import type FantasyCalendar from "src/main";
 import { nanoid } from "src/utils/functions";
 
 export class Watcher extends Component {
     get calendars() {
-        return this.plugin.data.calendars.filter((c) => c.watch);
-    }
-    get paths() {
-        return this.calendars.map((c) => c.path);
+        return this.plugin.data.calendars;
     }
     get vault() {
         return this.plugin.app.vault;
@@ -22,12 +26,7 @@ export class Watcher extends Component {
     }
 
     files: Map<string, Set<Calendar>> = new Map();
-
-    getCalendarsByFile(file: TFile) {
-        return this.calendars.filter((calendar) =>
-            this.testPath(calendar.path, file.path)
-        );
-    }
+    nameMap: Map<string, Set<string>> = new Map();
 
     onload() {
         this.recurseFiles();
@@ -60,11 +59,20 @@ export class Watcher extends Component {
     }
     recurseFiles() {
         for (let calendar of this.calendars) {
-            const folder = this.vault.getAbstractFileByPath(calendar.path);
+            const folder = this.vault.getAbstractFileByPath(
+                this.plugin.data.path
+            );
             if (!folder || !(folder instanceof TFolder)) continue;
             this.recurseFolder(folder, calendar);
         }
         this.plugin.saveCalendar();
+    }
+    registerCalendar(calendar: Calendar) {
+        console.log("[Fantasy Calendar] Parsing files for events.");
+        const folder = this.vault.getAbstractFileByPath(this.plugin.data.path);
+        if (!folder || !(folder instanceof TFolder)) return;
+        this.recurseFolder(folder, calendar);
+        console.log("[Fantasy Calendar] Parsing complete.");
     }
     recurseFolder(folder: TFolder, calendar: Calendar) {
         Vault.recurseChildren(folder, (abstractFile) => {
@@ -75,13 +83,16 @@ export class Watcher extends Component {
             }
         });
     }
-    testPath(path: string, filePath: string) {
-        return `/${filePath}`.match(new RegExp(`^${path}`)) != null;
+    testPath(filePath: string) {
+        return (
+            `/${filePath}`.match(new RegExp(`^${this.plugin.data.path}`)) !=
+            null
+        );
     }
 
     parseFileForEvents(file: TFile, calendar?: Calendar) {
         //if the file is not in a calendar watch path, return;
-        if (!this.paths.some((path) => this.testPath(path, file.path))) return;
+        if (!this.testPath(file.path)) return;
 
         const cache = this.metadataCache.getFileCache(file);
         if (!cache) return;
@@ -100,7 +111,7 @@ export class Watcher extends Component {
         if (!Array.isArray(names)) names = [names];
         const calendars = calendar
             ? [calendar]
-            : this.getCalendarsByFile(file).filter((calendar) =>
+            : this.calendars.filter((calendar) =>
                   names.includes(calendar.name)
               );
 

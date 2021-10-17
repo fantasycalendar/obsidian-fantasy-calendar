@@ -10,8 +10,6 @@ export interface Calendar {
     events: Event[];
     categories: EventCategory[];
     date?: number;
-    watch?: boolean;
-    path?: string;
 }
 
 export interface FantasyCalendarData {
@@ -19,6 +17,7 @@ export interface FantasyCalendarData {
     currentCalendar: string;
     defaultCalendar: string;
     eventPreview: boolean;
+    path: string;
 }
 
 export interface TimeSpan {
