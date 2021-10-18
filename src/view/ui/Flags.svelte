@@ -1,10 +1,11 @@
 <script lang="ts">
     import Flag from "./Flag.svelte";
-    import type { Event, EventCategory } from "src/@types";
+    import type { CurrentCalendarData, Event, EventCategory } from "src/@types";
 
     export let events: Event[] = [];
     export let categories: EventCategory[];
     export let dayView: boolean = false;
+    export let date: CurrentCalendarData;
 
     $: events = events;
 
@@ -18,6 +19,7 @@
                 {event}
                 {categories}
                 {dayView}
+                {date}
                 on:event-click
                 on:event-mouseover
                 on:event-context

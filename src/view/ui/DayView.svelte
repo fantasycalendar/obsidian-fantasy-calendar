@@ -10,6 +10,7 @@
     export let calendar: CalendarHelper;
 
     $: currentDate = calendar.viewedDate;
+    $: date = calendar.viewing;
     $: events = calendar.getEventsOnDate(calendar.viewing);
     $: moons = calendar.getMoonsForDate(calendar.viewing);
     $: categories = calendar.object.categories;
@@ -19,6 +20,7 @@
     moonStore.subscribe((v) => (displayMoons = v));
 
     calendar.on("day-update", () => {
+        date = calendar.viewing;
         currentDate = calendar.viewedDate;
         events = calendar.getEventsOnDate(calendar.viewing);
         moons = calendar.getMoonsForDate(calendar.viewing);
@@ -80,6 +82,7 @@
     <Flags
         {events}
         {categories}
+        {date}
         dayView={true}
         on:event-click
         on:event-mouseover

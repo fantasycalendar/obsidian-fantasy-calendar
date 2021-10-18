@@ -1,7 +1,7 @@
 import { Events, Notice } from "obsidian";
 import type FantasyCalendar from "src/main";
 import { MOON_PHASES, Phase } from "src/utils/constants";
-import { dateString } from "src/utils/functions";
+import { dateString, wrap } from "src/utils/functions";
 import type {
     Calendar,
     CurrentCalendarData,
@@ -108,18 +108,22 @@ export class DayHelper {
 
 export default class CalendarHelper extends Events {
     months: MonthHelper[];
+    maxDays: number;
     constructor(public object: Calendar, public plugin: FantasyCalendar) {
         super();
         this.displayed = { ...this.current };
-        this.months = this.data.months.map(
-            (m, i) => new MonthHelper(m, i, this.displayed.year, this)
-        );
+        this.update(this.object);
+
+        window.calendar = this;
     }
+
+    daysBetweenDates(date1: CurrentCalendarData, date2: CurrentCalendarData) {}
     update(calendar: Calendar) {
         this.object = calendar;
         this.months = this.data.months.map(
             (m, i) => new MonthHelper(m, i, this.displayed.year, this)
         );
+        this.maxDays = Math.max(...this.months.map((m) => m.length));
     }
     get data() {
         return this.object.static;
@@ -145,16 +149,30 @@ export default class CalendarHelper extends Events {
     };
 
     getEventsOnDate(date: CurrentCalendarData) {
-        return this.object.events.filter((e) => {
+        const events = this.object.events.filter((e) => {
+            if (!e.date.day) return false;
             if (e.end) {
+                const start = { ...e.date };
+                const end = { ...e.end };
+                if (start.month == undefined)
+                    end.month = start.month = date.month;
+                if (start.year == undefined) end.year = start.year = date.year;
+
+                if (start.year != date.year && end.year != date.year)
+                    return false;
+
+                const daysBeforeStart = this.daysBeforeDate(start);
+                const daysBeforeDate = this.daysBeforeDate(date);
+
+                if (end.year > start.year) {
+                    return daysBeforeDate >= daysBeforeStart;
+                }
+
+                const daysBeforeEnd = this.daysBeforeDate(end);
+
                 return (
-                    e.date.day <= date.day &&
-                    e.end.day >= date.day &&
-                    (e.date.month == undefined ||
-                        (e.date.month <= date.month &&
-                            e.end.month >= date.month)) &&
-                    (e.date.year == undefined ||
-                        (e.date.year <= date.year && e.end.year >= date.year))
+                    daysBeforeDate >= daysBeforeStart &&
+                    daysBeforeEnd >= daysBeforeDate
                 );
             }
             return (
@@ -163,6 +181,19 @@ export default class CalendarHelper extends Events {
                 (e.date.year == undefined || e.date.year == date.year)
             );
         });
+
+        events.sort((a, b) => {
+            if (!a.end) return 0;
+            if (!b.end) return -1;
+            return (
+                a.end.day +
+                a.end.month * 10 +
+                a.end.year * 100 -
+                (b.end?.day + b.end?.month * 10 + b.end?.year * 100)
+            );
+        });
+
+        return events;
     }
 
     get currentDate() {
@@ -307,7 +338,7 @@ export default class CalendarHelper extends Events {
         });
     }
 
-    leapDaysForMonth(month: MonthHelper) {
+    leapDaysForMonth(month: MonthHelper, year = this.displayed.year) {
         return this.leapdays
             .filter((l) => l.timespan == month.number)
             .filter((l) => {
@@ -315,20 +346,18 @@ export default class CalendarHelper extends Events {
                     .sort((a, b) => a.interval - b.interval)
                     .some(({ interval, exclusive }, index, array) => {
                         if (exclusive && index == 0) {
-                            return this.displayed.year % interval != 0;
+                            return year % interval != 0;
                         }
 
                         if (exclusive) return;
 
                         if (array[index + 1] && array[index + 1].exclusive) {
                             return (
-                                this.displayed.year % interval == 0 &&
-                                this.displayed.year %
-                                    array[index + 1].interval !=
-                                    0
+                                year % interval == 0 &&
+                                year % array[index + 1].interval != 0
                             );
                         }
-                        return this.displayed.year % interval == 0;
+                        return year % interval == 0;
                     });
             });
     }
@@ -417,6 +446,17 @@ export default class CalendarHelper extends Events {
             .reduce((a, b) => a + b.length, 0);
     }
 
+    daysBeforeDate(date: CurrentCalendarData) {
+        if (date.month === 0) return date.day;
+        const year = date.year;
+        const monthsBefore = [...this.months].slice(0, date.month);
+        const daysBefore = monthsBefore.reduce(
+            (a, b) => a + (b.length + this.leapDaysForMonth(b, year).length),
+            0
+        );
+        return daysBefore + date.day;
+    }
+
     get firstWeekday() {
         return this.data.firstWeekDay;
     }
@@ -503,8 +543,4 @@ export default class CalendarHelper extends Events {
         }
         return phases;
     }
-}
-
-export function wrap(value: number, size: number): number {
-    return ((value % size) + size) % size;
 }

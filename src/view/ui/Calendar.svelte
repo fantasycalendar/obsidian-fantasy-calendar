@@ -94,6 +94,7 @@
             on:day-context-menu
             on:event-click
             on:event-mouseover
+            on:event-context
         />
         <!-- previous={days.previous}
             current={days.current}

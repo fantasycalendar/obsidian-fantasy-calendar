@@ -92,12 +92,28 @@ export class Watcher extends Component {
 
         const { frontmatter } = cache ?? {};
         if (!frontmatter) return;
-        if (!("fc-calendar" in frontmatter && "fc-date" in frontmatter)) return;
+        if (
+            !("fc-calendar" in frontmatter) &&
+            !("fc-date" in frontmatter || "fc-start" in frontmatter)
+        )
+            return;
 
-        let dates = frontmatter["fc-date"] as
-            | CurrentCalendarData
-            | CurrentCalendarData[];
+        let dates =
+            (frontmatter["fc-date"] as
+                | CurrentCalendarData
+                | CurrentCalendarData[]) ??
+            (frontmatter["fc-start"] as
+                | CurrentCalendarData
+                | CurrentCalendarData[]);
         if (!Array.isArray(dates)) dates = [dates];
+        let ends =
+            "fc-end" in frontmatter
+                ? (frontmatter["fc-end"] as
+                      | CurrentCalendarData
+                      | CurrentCalendarData[])
+                : [];
+        if (!Array.isArray(ends)) ends = [ends];
+        console.log("🚀 ~ file: watcher.ts ~ line 110 ~ ends", ends);
 
         //check for fc-calendar
         let names = frontmatter["fc-calendar"] as string | string[];
@@ -120,15 +136,20 @@ export class Watcher extends Component {
             set.add(calendar);
             let index = names.indexOf(name);
 
+            /** Clamp index to length of dates provided. */
             if (index >= dates.length) {
                 index = dates.length - 1;
             }
 
-            const date = dates[index] ?? {
+            let date = (dates[index] as CurrentCalendarData) ?? {
                 day: null,
                 month: null,
                 year: null
             };
+
+            let end: CurrentCalendarData = ends.length
+                ? ends[index] ?? ends[ends.length - 1]
+                : null;
 
             if (date?.month && typeof date?.month == "string") {
                 let month = calendar.static.months.find(
@@ -145,6 +166,18 @@ export class Watcher extends Component {
                     calendar.static.months.length
                 );
             }
+            if (end?.month && typeof end?.month == "string") {
+                let month = calendar.static.months.find(
+                    (m) => m.name == (end.month as unknown as string)
+                );
+                if (!month) {
+                    end.month = null;
+                } else {
+                    end.month = calendar.static.months.indexOf(month);
+                }
+            } else if (end?.month && typeof end?.month == "number") {
+                end.month = wrap(end.month - 1, calendar.static.months.length);
+            }
 
             const category = calendar.categories.find(
                 (cat) => cat?.name == fcCategory
@@ -153,20 +186,30 @@ export class Watcher extends Component {
             const existing = calendar.events.find(
                 (event) => event.note == file.path
             );
+            console.log(
+                "🚀 ~ file: watcher.ts ~ line 178 ~ existing",
+                existing.end
+            );
 
             if (
                 existing?.date.day == date.day &&
                 existing?.date.month == date.month &&
                 existing?.date.year == date.year &&
+                existing?.end?.day == end?.day &&
+                existing?.end?.month == end?.month &&
+                existing?.end?.year == end?.year &&
                 existing?.category == category?.id
             ) {
+                console.log("same");
                 continue;
             } else if (existing) {
+                console.log("here", end);
                 calendar.events.splice(calendar.events.indexOf(existing), 1, {
                     id: file.basename,
                     name: file.basename,
                     note: file.path,
                     date,
+                    ...(end ? { end } : {}),
                     category: category?.id,
                     description: null
                 });
@@ -176,6 +219,7 @@ export class Watcher extends Component {
                     name: file.basename,
                     note: file.path,
                     date,
+                    ...(end ? end : {}),
                     category: category?.id,
                     description: null
                 });

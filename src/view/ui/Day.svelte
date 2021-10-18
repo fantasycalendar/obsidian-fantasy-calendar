@@ -16,6 +16,7 @@
 
     $: moons = day.moons;
     $: categories = day.calendar.object.categories;
+    $: date = day.date;
 
     let dayView: boolean;
     const dayViewStore = getContext<Writable<boolean>>("dayView");
@@ -65,8 +66,10 @@
         <Flags
             events={day.events}
             {categories}
+            {date}
             on:event-click
             on:event-mouseover
+            on:event-context
         />
     {:else}
         <Dots events={day.events} {categories} />
@@ -86,7 +89,7 @@
         position: relative;
         text-align: center;
         vertical-align: baseline;
-        overflow: hidden;
+        overflow: visible;
     }
     .active {
         background-color: var(--background-secondary);

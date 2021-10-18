@@ -24,9 +24,8 @@
     class="fantasy-month"
     class:full-view={fullView}
     class:year-view={yearView}
-    style="--calendar-columns: {columns}; --calendar-rows: {fullView
-        ? `${(1 / weeks) * 100}%`
-        : '1fr'}; "
+    style="--calendar-columns: {columns}; --column-widths: {(1 / columns) *
+        100}%;--calendar-rows: {fullView ? `${(1 / weeks) * 100}%` : '1fr'}; "
 >
     {#each previous as day}
         {#if showPad}
@@ -45,6 +44,7 @@
             on:day-context-menu
             on:event-click
             on:event-mouseover
+            on:event-context
         />
     {/each}
     {#each next as day}
@@ -59,10 +59,13 @@
 <style>
     .fantasy-month {
         display: grid;
-        grid-template-columns: repeat(var(--calendar-columns), 1fr);
+        grid-template-columns: repeat(
+            var(--calendar-columns),
+            var(--column-widths)
+        );
 
         grid-auto-rows: var(--calendar-rows);
-        gap: 2px;
+        /* gap: 2px; */
     }
 
     .full-view {
