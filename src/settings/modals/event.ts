@@ -79,16 +79,33 @@ export class CreateEventModal extends Modal {
                             new Notice("The event must have a name.");
                             return;
                         }
+
                         if (this.event.end) {
+                            this.event.end = {
+                                year:
+                                    this.event.end.year ?? this.event.date.year,
+                                month:
+                                    this.event.end.month ??
+                                    this.event.date.month,
+                                day: this.event.end.day ?? this.event.date.day
+                            };
                             const date = this.event.date;
                             const end = this.event.end;
 
+                            const maxDays = Math.max(
+                                ...this.calendar.static.months.map(
+                                    (m) => m.length
+                                )
+                            );
+
                             const dateNumber =
                                 date.day +
-                                10 * (date.month + 1) +
-                                100 * date.year;
+                                ((date.month ?? -1) + 1) * maxDays +
+                                date.year * 100;
                             const endNumber =
-                                end.day + 10 * (end.month + 1) + 100 * end.year;
+                                end.day +
+                                ((end.month ?? -1) + 1) * maxDays +
+                                end.year * 100;
 
                             if (dateNumber > endNumber) {
                                 const temp = { ...this.event.end };

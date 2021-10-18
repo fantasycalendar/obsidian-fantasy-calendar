@@ -6,6 +6,10 @@ export function daysBetween(date1: Date, date2: Date) {
     );
 }
 
+export function wrap(value: number, size: number): number {
+    return ((value % size) + size) % size;
+}
+
 export function nanoid(len: number) {
     return "ID_xyxyxyxyxyxy".replace(/[xy]/g, function (c) {
         var r = (Math.random() * 16) | 0,

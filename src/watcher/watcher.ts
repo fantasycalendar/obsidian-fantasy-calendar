@@ -1,14 +1,7 @@
-import {
-    Component,
-    FrontMatterCache,
-    Notice,
-    TFile,
-    TFolder,
-    Vault
-} from "obsidian";
-import type { Calendar, CurrentCalendarData, Event } from "src/@types";
+import { wrap } from "src/utils/functions";
+import { Component, TFile, TFolder, Vault } from "obsidian";
+import type { Calendar, CurrentCalendarData } from "src/@types";
 import type FantasyCalendar from "src/main";
-import { nanoid } from "src/utils/functions";
 
 export class Watcher extends Component {
     get calendars() {
@@ -146,6 +139,11 @@ export class Watcher extends Component {
                 } else {
                     date.month = calendar.static.months.indexOf(month);
                 }
+            } else if (date?.month && typeof date?.month == "number") {
+                date.month = wrap(
+                    date.month - 1,
+                    calendar.static.months.length
+                );
             }
 
             const category = calendar.categories.find(
