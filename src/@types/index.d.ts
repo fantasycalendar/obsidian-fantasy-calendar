@@ -97,6 +97,11 @@ export interface Event {
         day: number;
         year: number;
     };
+    end?: {
+        month: number;
+        day: number;
+        year: number;
+    };
     id: string;
     note: string;
     category: string;

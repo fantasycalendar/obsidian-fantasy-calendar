@@ -4,7 +4,6 @@ export function daysBetween(date1: Date, date2: Date) {
     return Math.floor(
         (date1.valueOf() - new Date(date2).valueOf()) / 1000 / 60 / 60 / 24
     );
-    
 }
 
 export function nanoid(len: number) {
@@ -50,13 +49,51 @@ export function ordinal(i: number) {
     }
     return i + "th";
 }
-export function dateString(date: CurrentCalendarData, months: Month[]) {
+export function dateString(
+    date: CurrentCalendarData,
+    months: Month[],
+    end?: CurrentCalendarData
+) {
     if (!date || date.day == undefined) {
         return "";
     }
     const { day, month, year } = date;
+    if (month != undefined && !months[month]) return "Invalid Date";
 
-    if (!months[month]) return "Invalid Date";
+    if (end && end.day) {
+        const endDay = end.day;
+        const endMonth = end.month;
+        const endYear = end.year;
+
+        if (
+            endMonth != undefined &&
+            endYear != undefined &&
+            month != undefined &&
+            year != undefined
+        ) {
+            if (year != endYear) {
+                return `${months[month].name} ${ordinal(day)}, ${year} - ${
+                    months[endMonth].name
+                } ${ordinal(endDay)}, ${endYear}`;
+            }
+            if (endMonth == month) {
+                return `${months[month].name} ${ordinal(day)}-${ordinal(
+                    endDay
+                )}, ${year}`;
+            }
+            if (month != undefined && year != undefined) {
+                return `${months[month].name} ${ordinal(day)}-${
+                    months[endMonth].name
+                } ${ordinal(endDay)}, ${year}`;
+            }
+            if (month != undefined) {
+                return `${months[month].name} ${ordinal(day)}-${
+                    months[endMonth].name
+                } ${ordinal(endDay)} of every year`;
+            }
+            return `${ordinal(day)}-${ordinal(endDay)} of every month`;
+        }
+    }
 
     if (month != undefined && year != undefined) {
         return `${months[month].name} ${ordinal(day)}, ${year}`;

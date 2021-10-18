@@ -37,6 +37,10 @@ export class CreateEventModal extends Modal {
     yearEl: HTMLDivElement;
     fieldsEl: HTMLDivElement;
     stringEl: HTMLDivElement;
+    startDateEl: HTMLDivElement;
+    endDateEl: HTMLDivElement;
+    startEl: HTMLDivElement;
+    endEl: HTMLDivElement;
     constructor(
         app: App,
         public calendar: Calendar,
@@ -75,6 +79,23 @@ export class CreateEventModal extends Modal {
                             new Notice("The event must have a name.");
                             return;
                         }
+                        if (this.event.end) {
+                            const date = this.event.date;
+                            const end = this.event.end;
+
+                            const dateNumber =
+                                date.day +
+                                10 * (date.month + 1) +
+                                100 * date.year;
+                            const endNumber =
+                                end.day + 10 * (end.month + 1) + 100 * end.year;
+
+                            if (dateNumber > endNumber) {
+                                const temp = { ...this.event.end };
+                                this.event.end = { ...this.event.date };
+                                this.event.date = { ...temp };
+                            }
+                        }
                         this.saved = true;
                         this.close();
                     });
@@ -87,35 +108,67 @@ export class CreateEventModal extends Modal {
     }
     buildDate() {
         this.dateEl.empty();
+        this.buildStartDate();
 
-        this.fieldsEl = this.dateEl.createDiv("fantasy-calendar-date-fields");
+        this.endEl = this.dateEl.createDiv();
 
-        this.buildDateFields();
+        if (!this.event.end) {
+            new Setting(this.endEl).setName("Add End Date").addToggle((t) => {
+                t.setValue(false).onChange((v) => this.buildEndDate());
+            });
+        } else {
+            this.buildEndDate();
+        }
+
+        /* this.buildDateFields(this.endDateEl); */
 
         this.stringEl = this.dateEl.createDiv(
             "event-date-string setting-item-description"
         );
         this.buildDateString();
     }
+    buildStartDate() {
+        this.startEl = this.dateEl.createDiv("fantasy-calendar-event-date");
+        this.startEl.createSpan({ text: "Start:" });
+        this.startDateEl = this.startEl.createDiv(
+            "fantasy-calendar-date-fields"
+        );
+
+        this.buildDateFields(this.startDateEl, this.event.date);
+    }
+    buildEndDate() {
+        this.event.end = this.event.end ?? { ...this.event.date };
+        this.endEl.empty();
+        this.endEl.addClass("fantasy-calendar-event-date");
+        this.endEl.createSpan({ text: "End:" });
+        this.endDateEl = this.endEl.createDiv("fantasy-calendar-date-fields");
+
+        this.buildDateFields(this.endDateEl, this.event.end);
+    }
     buildDateString() {
         this.stringEl.empty();
         this.stringEl.createSpan({
-            text: dateString(this.event.date, this.calendar.static.months)
+            text: dateString(
+                this.event.date,
+                this.calendar.static.months,
+                this.event.end
+            )
         });
     }
-    buildDateFields() {
-        this.fieldsEl.empty();
-        const dayEl = this.fieldsEl.createDiv("fantasy-calendar-date-field");
+    buildDateFields(el: HTMLElement, field = this.event.date) {
+        el.empty();
+        const dayEl = el.createDiv("fantasy-calendar-date-field");
         dayEl.createEl("label", { text: "Day" });
         const day = new TextComponent(dayEl)
             .setPlaceholder("Day")
-            .setValue(`${this.event.date.day}`)
+            .setValue(`${field.day}`)
             .onChange((v) => {
-                this.event.date.day = Number(v);
+                field.day = Number(v);
+                this.buildDateString();
             });
         day.inputEl.setAttr("type", "number");
 
-        const monthEl = this.fieldsEl.createDiv("fantasy-calendar-date-field");
+        const monthEl = el.createDiv("fantasy-calendar-date-field");
         monthEl.createEl("label", { text: "Month" });
         new DropdownComponent(monthEl)
             .addOptions(
@@ -128,26 +181,31 @@ export class CreateEventModal extends Modal {
                 ])
             )
             .setValue(
-                this.event.date.month != undefined
-                    ? this.calendar.static.months[this.event.date.month].name
+                field.month != undefined
+                    ? this.calendar.static.months[field.month].name
                     : "select"
             )
             .onChange((v) => {
-                if (v === "select") this.event.date.month = null;
+                if (v === "select") field.month = null;
                 const index = this.calendar.static.months.find(
                     (m) => m.name == v
                 );
-                this.event.date.month =
-                    this.calendar.static.months.indexOf(index);
+                field.month = this.calendar.static.months.indexOf(index);
+                this.buildDateString();
             });
 
-        const yearEl = this.fieldsEl.createDiv("fantasy-calendar-date-field");
+        const yearEl = el.createDiv("fantasy-calendar-date-field");
         yearEl.createEl("label", { text: "Year" });
         const year = new TextComponent(yearEl)
             .setPlaceholder("Year")
-            .setValue(`${this.event.date.year}`)
+            .setValue(`${field.year}`)
             .onChange((v) => {
-                this.event.date.year = Number(v);
+                if (!v || v == undefined) {
+                    field.year = undefined;
+                } else {
+                    field.year = Number(v);
+                }
+                this.buildDateString();
             });
         year.inputEl.setAttr("type", "number");
     }

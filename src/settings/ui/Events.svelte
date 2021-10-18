@@ -48,7 +48,7 @@
                 <EventUI
                     {event}
                     category={getCategory(event.category)}
-                    date={dateString(event.date, months)}
+                    date={dateString(event.date, months, event.end)}
                     on:edit={() => editEvent(event)}
                     on:delete={() => deleteEvent(event)}
                 />

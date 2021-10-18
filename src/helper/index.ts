@@ -146,6 +146,17 @@ export default class CalendarHelper extends Events {
 
     getEventsOnDate(date: CurrentCalendarData) {
         return this.object.events.filter((e) => {
+            if (e.end) {
+                return (
+                    e.date.day <= date.day &&
+                    e.end.day >= date.day &&
+                    (e.date.month == undefined ||
+                        (e.date.month <= date.month &&
+                            e.end.month >= date.month)) &&
+                    (e.date.year == undefined ||
+                        (e.date.year <= date.year && e.end.year >= date.year))
+                );
+            }
             return (
                 e.date.day == date.day &&
                 (e.date.month == undefined || e.date.month == date.month) &&

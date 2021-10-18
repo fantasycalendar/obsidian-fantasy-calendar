@@ -140,3 +140,10 @@
     color: var(--text-muted);
     border: 0;
 }
+
+.fantasy-calendar-event-date {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 0.5rem;
+}
