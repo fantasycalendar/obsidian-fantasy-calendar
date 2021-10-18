@@ -4,6 +4,7 @@ import {
     DropdownComponent,
     ExtraButtonComponent,
     Modal,
+    normalizePath,
     Notice,
     PluginSettingTab,
     Setting,
@@ -166,14 +167,14 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                     const v = text.inputEl.value?.trim()
                         ? text.inputEl.value.trim()
                         : "/";
-                    this.plugin.data.path = v;
+                    this.plugin.data.path = normalizePath(v);
                 };
 
                 text.inputEl.onblur = async () => {
                     const v = text.inputEl.value?.trim()
                         ? text.inputEl.value.trim()
                         : "/";
-                    this.plugin.data.path = v;
+                    this.plugin.data.path = normalizePath(v);
                 };
             });
     }

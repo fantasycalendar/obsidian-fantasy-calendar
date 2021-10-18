@@ -26,7 +26,6 @@ export class Watcher extends Component {
     }
 
     files: Map<string, Set<Calendar>> = new Map();
-    nameMap: Map<string, Set<string>> = new Map();
 
     onload() {
         this.recurseFiles();
@@ -40,8 +39,13 @@ export class Watcher extends Component {
         this.registerEvent(
             this.vault.on("rename", (abstractFile, oldPath) => {
                 if (!(abstractFile instanceof TFile)) return;
-                if (!this.files.has(oldPath)) return;
+                if (!this.files.has(oldPath)) {
+                    this.parseFileForEvents(abstractFile);
+                    this.plugin.saveCalendar();
+                    return;
+                }
                 const calendars = this.files.get(oldPath);
+
                 for (let calendar of calendars) {
                     const events = calendar.events.filter(
                         (e) => e.note == oldPath
@@ -58,13 +62,9 @@ export class Watcher extends Component {
         );
     }
     recurseFiles() {
-        for (let calendar of this.calendars) {
-            const folder = this.vault.getAbstractFileByPath(
-                this.plugin.data.path
-            );
-            if (!folder || !(folder instanceof TFolder)) continue;
-            this.recurseFolder(folder, calendar);
-        }
+        const folder = this.vault.getAbstractFileByPath(this.plugin.data.path);
+        if (!folder || !(folder instanceof TFolder)) return;
+        this.recurseFolder(folder);
         this.plugin.saveCalendar();
     }
     registerCalendar(calendar: Calendar) {
@@ -74,7 +74,7 @@ export class Watcher extends Component {
         this.recurseFolder(folder, calendar);
         console.log("[Fantasy Calendar] Parsing complete.");
     }
-    recurseFolder(folder: TFolder, calendar: Calendar) {
+    recurseFolder(folder: TFolder, calendar?: Calendar) {
         Vault.recurseChildren(folder, (abstractFile) => {
             if (!abstractFile) return;
 
@@ -119,7 +119,7 @@ export class Watcher extends Component {
 
         const fcCategory = frontmatter["fc-category"];
 
-        const set = new Set<Calendar>();
+        const set = this.files.get(file.path) ?? new Set<Calendar>();
         for (let name of names) {
             const calendar = calendars.find((c) => c.name == name);
             if (!calendar) continue;
