@@ -113,7 +113,6 @@ export class Watcher extends Component {
                       | CurrentCalendarData[])
                 : [];
         if (!Array.isArray(ends)) ends = [ends];
-        console.log("🚀 ~ file: watcher.ts ~ line 110 ~ ends", ends);
 
         //check for fc-calendar
         let names = frontmatter["fc-calendar"] as string | string[];
@@ -186,10 +185,6 @@ export class Watcher extends Component {
             const existing = calendar.events.find(
                 (event) => event.note == file.path
             );
-            console.log(
-                "🚀 ~ file: watcher.ts ~ line 178 ~ existing",
-                existing.end
-            );
 
             if (
                 existing?.date.day == date.day &&
@@ -200,10 +195,8 @@ export class Watcher extends Component {
                 existing?.end?.year == end?.year &&
                 existing?.category == category?.id
             ) {
-                console.log("same");
                 continue;
             } else if (existing) {
-                console.log("here", end);
                 calendar.events.splice(calendar.events.indexOf(existing), 1, {
                     id: file.basename,
                     name: file.basename,
