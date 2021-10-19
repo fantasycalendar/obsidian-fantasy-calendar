@@ -1,12 +1,9 @@
 <script lang="ts">
-    import type { DayHelper, MonthHelper } from "src/helper";
-    import DayView from "./Day.svelte";
+    import type { MonthHelper } from "src/helper";
+    import Day from "./Day.svelte";
 
     export let yearView: boolean = false;
     export let month: MonthHelper;
-    /* export let previous: DayHelper[];
-    export let current: DayHelper[];
-    export let next: DayHelper[]; */
 
     export let columns: number;
     export let fullView: boolean = false;
@@ -29,13 +26,13 @@
 >
     {#each previous as day}
         {#if showPad}
-            <DayView {day} adjacent={true} {fullView} />
+            <Day {day} adjacent={true} {fullView} />
         {:else}
             <div />
         {/if}
     {/each}
     {#each current as day}
-        <DayView
+        <Day
             {day}
             adjacent={false}
             {fullView}
@@ -49,7 +46,7 @@
     {/each}
     {#each next as day}
         {#if showPad}
-            <DayView {day} adjacent={true} {fullView} />
+            <Day {day} adjacent={true} {fullView} />
         {:else}
             <div />
         {/if}

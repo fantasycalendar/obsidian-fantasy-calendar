@@ -8,8 +8,12 @@ import {
     Menu,
     Modal,
     Notice,
+    Platform,
+    Setting,
     TextComponent,
-    WorkspaceLeaf
+    WorkspaceLeaf,
+    WorkspaceMobileDrawer,
+    WorkspaceSidedock
 } from "obsidian";
 import type { Calendar, CurrentCalendarData, Event } from "src/@types";
 import type { DayHelper } from "src/helper";
@@ -36,11 +40,25 @@ addIcon(
     `<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="calendar-day" class="svg-inline--fa fa-calendar-day fa-w-14" role="img" viewBox="0 0 448 512"><path fill="currentColor" d="M0 464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V192H0v272zm64-192c0-8.8 7.2-16 16-16h96c8.8 0 16 7.2 16 16v96c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16v-96zM400 64h-48V16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v48H160V16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v48H48C21.5 64 0 85.5 0 112v48h448v-48c0-26.5-21.5-48-48-48z"/></svg>`
 );
 
+declare module "obsidian" {
+    interface WorkspaceItem {
+        id: string;
+    }
+}
+
 export default class FantasyCalendarView extends ItemView {
     dropdownEl: HTMLDivElement;
     helper: CalendarHelper;
     noCalendarEl: HTMLDivElement;
-    full = false;
+    /* full =  false; */
+    get root() {
+        return this.leaf.getRoot();
+    }
+    get full() {
+        return !(Platform.isMobile
+            ? this.root instanceof WorkspaceMobileDrawer
+            : this.root instanceof WorkspaceSidedock);
+    }
     yearView: boolean = false;
     moons: boolean = true;
     calendar: Calendar;
@@ -52,9 +70,18 @@ export default class FantasyCalendarView extends ItemView {
         public options: { calendar?: Calendar; full?: boolean } = {}
     ) {
         super(leaf);
+
         this.registerEvent(
             this.plugin.app.workspace.on("fantasy-calendars-updated", () => {
                 this.updateCalendars();
+            })
+        );
+        this.registerEvent(
+            this.plugin.app.workspace.on("layout-change", () => {
+                this._app.$set({
+                    fullView: this.full,
+                    ...(this.full ? { dayView: false } : {})
+                });
             })
         );
         window.view = this;
@@ -250,16 +277,14 @@ export default class FantasyCalendarView extends ItemView {
             const menu = new Menu(this.app);
 
             menu.setNoIcon();
-            if (this.full) {
-                menu.addItem((item) => {
-                    item.setTitle(
-                        `Open ${this.yearView ? "Month" : "Year"}`
-                    ).onClick(() => {
-                        this.yearView = !this.yearView;
-                        this._app.$set({ yearView: this.yearView });
-                    });
+            menu.addItem((item) => {
+                item.setTitle(
+                    `Open ${this.yearView ? "Month" : "Year"}`
+                ).onClick(() => {
+                    this.yearView = !this.yearView;
+                    this._app.$set({ yearView: this.yearView });
                 });
-            }
+            });
             menu.addItem((item) => {
                 item.setTitle(
                     this.moons ? "Hide Moons" : "Display Moons"
@@ -269,7 +294,7 @@ export default class FantasyCalendarView extends ItemView {
                 });
             });
             menu.addItem((item) => {
-                item.setTitle("Change Current Day");
+                item.setTitle("View Day");
 
                 item.onClick(() => {
                     const modal = new ChangeDateModal(
@@ -278,10 +303,14 @@ export default class FantasyCalendarView extends ItemView {
                     );
                     modal.onClose = () => {
                         if (!modal.confirmed) return;
-
-                        this.calendar.current = { ...modal.date };
-
-                        this.setCurrentCalendar(this.calendar);
+                        if (modal.setCurrent) {
+                            this.calendar.current = { ...modal.date };
+                            this.setCurrentCalendar(this.calendar);
+                        } else {
+                            this.helper.displayed = { ...modal.date };
+                            this.helper.update();
+                            this._app.$set({ calendar: this.helper });
+                        }
 
                         this.plugin.saveSettings();
                     };
@@ -444,10 +473,10 @@ export default class FantasyCalendarView extends ItemView {
     async onunload() {}
 }
 
-export class FullCalendarView extends FantasyCalendarView {
+/* export class FullCalendarView extends FantasyCalendarView {
     full = true;
 }
-
+ */
 class SwitchModal extends Modal {
     confirmed: boolean = false;
     constructor(public plugin: FantasyCalendar, public calendar: Calendar) {
@@ -496,6 +525,8 @@ class ChangeDateModal extends Modal {
     date: CurrentCalendarData;
     dateFieldEl: HTMLDivElement;
     tempCurrentDays: number;
+    setCurrent: boolean = false;
+
     constructor(public plugin: FantasyCalendar, public calendar: Calendar) {
         super(plugin.app);
         this.date = { ...this.calendar.current };
@@ -503,14 +534,25 @@ class ChangeDateModal extends Modal {
     }
     async display() {
         this.contentEl.empty();
-        this.contentEl.createEl("h4", { text: "Change Current Day" });
+        this.contentEl.createEl("h4", { text: "View Day" });
         this.dateFieldEl = this.contentEl.createDiv(
             "fantasy-calendar-date-fields"
         );
         this.buildDateFields();
+
+        new Setting(this.contentEl)
+            .setName("Set as Current Date")
+            .setDesc("Also set this date to today's date.")
+            .addToggle((t) =>
+                t.setValue(this.setCurrent).onChange((v) => {
+                    this.setCurrent = v;
+                })
+            );
+
         const buttonEl = this.contentEl.createDiv(
             "fantasy-calendar-confirm-buttons"
         );
+
         new ButtonComponent(buttonEl)
             .setButtonText("Switch")
             .setCta()

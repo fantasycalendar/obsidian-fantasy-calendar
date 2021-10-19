@@ -7,7 +7,11 @@
     import Flags from "./Flags.svelte";
     import Moon from "./Moon.svelte";
 
-    export let calendar: CalendarHelper;
+    const calendarStore = getContext<Writable<CalendarHelper>>("calendar");
+    let calendar: CalendarHelper;
+    calendarStore.subscribe((c) => {
+        calendar = c;
+    });
 
     $: currentDate = calendar.viewedDate;
     $: date = calendar.viewing;

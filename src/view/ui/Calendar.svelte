@@ -15,13 +15,20 @@
     export let calendar: CalendarHelper;
     export let moons: boolean;
 
+    $: {
+        if (yearView) dayView = false;
+    }
+
     const dayViewStore = writable(dayView);
     const moonStore = writable(moons);
+    const calendarStore = writable(calendar);
     setContext("dayView", dayViewStore);
     setContext("displayMoons", moonStore);
+    setContext("calendar", calendarStore);
 
     $: dayViewStore.set(dayView);
     $: moonStore.set(moons);
+    $: calendarStore.set(calendar);
 
     calendar.on("month-update", () => {
         weeks = calendar.weeksPerCurrentMonth;
@@ -49,10 +56,11 @@
     style="--calendar-columns: {calendar.weekdays
         .length};--calendar-rows: {calendar.weeksPerCurrentMonth};"
 >
-    {#if yearView && fullView}
+    {#if yearView}
         <YearView
             {months}
             {year}
+            {fullView}
             columns={weekdays.length}
             current={calendar.displayedDate}
             on:next={() => calendar.goToNextYear()}
@@ -104,7 +112,6 @@
 {#if dayView && !fullView}
     <hr />
     <DayView
-        {calendar}
         on:close={() => (dayView = false)}
         on:event-click
         on:event-mouseover
@@ -113,10 +120,13 @@
 {/if}
 
 <style>
+    #calendar-container.year-view {
+        height: 100%;
+    }
     #calendar-container.fantasy-calendar.full-view {
         width: 100%;
+        padding: 0 0.5rem 0.5rem;
         height: 100%;
-        padding: 0.5rem;
 
         display: flex;
         flex-flow: column;

@@ -59,7 +59,7 @@ export class DayHelper {
         return {
             day: this.number,
             month: this.month.number,
-            year: this.calendar.displayed.year
+            year: this.year
         };
     }
     get events(): Event[] {
@@ -69,15 +69,18 @@ export class DayHelper {
         return {
             day: this.number,
             month: this.month.name,
-            year: this.calendar.displayed.year
+            year: this.year
         };
     }
     /** Days before this day in the year. */
     get daysBefore() {
         return this.month.daysBefore + this.number - 1;
     }
+    get year() {
+        return this.month.year;
+    }
     get weekday() {
-        const firstOfYear = this.calendar.firstDayOfYear();
+        const firstOfYear = this.calendar.firstDayOfYear(this.year);
 
         return wrap(
             (this.daysBefore % this.calendar.weekdays.length) + firstOfYear,
@@ -117,9 +120,13 @@ export default class CalendarHelper extends Events {
         window.calendar = this;
     }
 
-    daysBetweenDates(date1: CurrentCalendarData, date2: CurrentCalendarData) {}
-    update(calendar: Calendar) {
-        this.object = calendar;
+    getMonthsForYear(year: number) {
+        return this.data.months.map(
+            (m, i) => new MonthHelper(m, i, year, this)
+        );
+    }
+    update(calendar?: Calendar) {
+        this.object = calendar ?? this.object;
         this.months = this.data.months.map(
             (m, i) => new MonthHelper(m, i, this.displayed.year, this)
         );
@@ -218,6 +225,9 @@ export default class CalendarHelper extends Events {
 
     reset() {
         this.displayed = { ...this.current };
+        this.months = this.data.months.map(
+            (m, i) => new MonthHelper(m, i, this.displayed.year, this)
+        );
 
         this.trigger("month-update");
         this.trigger("day-update");
@@ -366,27 +376,38 @@ export default class CalendarHelper extends Events {
         return this.months.filter((m) => m.type == "month");
     }
 
+    getMonth(number: number, year: number) {
+        let index = wrap(number, this.data.months.length);
+
+        if (number < 0) year -= 1;
+        if (year == 0) return null;
+
+        if (number >= this.data.months.length) year += 1;
+
+        return new MonthHelper(this.data.months[index], index, year, this);
+    }
+
     getPaddedDaysForMonth(month: MonthHelper) {
         let current = month.days;
 
         /** Get Days of Previous Month */
         let previous: DayHelper[] = [];
-        const previousMonthIndex = wrap(
+
+        const previousMonth = this.getMonth(
             this.fullMonths.indexOf(month) - 1,
-            this.fullMonths.length
+            this.displayed.year
         );
-        const previousMonth = this.fullMonths[previousMonthIndex];
-        if (month.firstWeekday > 0) {
+        if (month.firstWeekday > 0 && previousMonth != null) {
             previous = previousMonth.days.slice(-month.firstWeekday);
         }
 
         /** Get Days of Next Month */
         let next: DayHelper[] = [];
-        const nextMonthIndex = wrap(
+
+        const nextMonth = this.getMonth(
             this.fullMonths.indexOf(month) + 1,
-            this.fullMonths.length
+            this.displayed.year
         );
-        const nextMonth = this.fullMonths[nextMonthIndex];
 
         if (
             month.lastWeekday < this.weekdays.length - 1 &&
@@ -434,15 +455,15 @@ export default class CalendarHelper extends Events {
             .reduce((a, b) => a + b.length, 0);
     }
     daysBeforeMonth(month: MonthHelper, all: boolean = false) {
-        if (this.months.indexOf(month) == 0) {
+        if (month.number == 0) {
             return 0;
         }
-        const months = all
-            ? this.months
-            : this.months.filter((m) => m.type == "month");
+        const months = this.getMonthsForYear(month.year);
+        const filtered = all ? months : months.filter((m) => m.type == "month");
+        const index = filtered.find((m) => m.data.id == month.data.id);
 
-        return months
-            .slice(0, months.indexOf(month))
+        return filtered
+            .slice(0, filtered.indexOf(index))
             .reduce((a, b) => a + b.length, 0);
     }
 
@@ -473,7 +494,12 @@ export default class CalendarHelper extends Events {
             .map((k) => this.leapDaysForYear(k + 1))
             .reduce((a, b) => a + b.length, 0);
     }
-
+    leapDaysBeforeYear(year: number) {
+        if (year == 1) return 0;
+        return [...Array(year - 1).keys()]
+            .map((k) => this.leapDaysForYear(k + 1))
+            .reduce((a, b) => a + b.length, 0);
+    }
     get daysBefore() {
         return this.daysBeforeYear(this.displayed.year);
     }
@@ -490,17 +516,17 @@ export default class CalendarHelper extends Events {
         return (
             Math.abs(year - 1) *
                 this.data.months.reduce((a, b) => a + b.length, 0) +
-            this.leapDaysBefore
+            this.leapDaysBeforeYear(year)
         );
     }
 
-    firstDayOfYear() {
+    firstDayOfYear(year = this.displayed.year) {
         if (!this.data.overflow) return 0;
-        if (this.displayed.year == 1) return this.firstWeekday;
+        if (year == 1) return this.firstWeekday;
 
         //note: added 1 here to fix gregorian offset??
         return wrap(
-            (this.totalDaysBefore % this.data.weekdays.length) +
+            (this.totalDaysBeforeYear(year) % this.data.weekdays.length) +
                 this.firstWeekday +
                 (this.data.offset ?? 0),
             this.data.weekdays.length

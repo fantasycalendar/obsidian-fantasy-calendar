@@ -27,12 +27,12 @@
     </div>
     <div class="right-nav fantasy-right-nav">
         <div class="container">
-            <div
+            <!-- <div
                 class="arrow calendar-clickable"
                 use:left
                 aria-label="Previous Year"
                 on:click={() => dispatch("previous")}
-            />
+            /> -->
             <div
                 class="reset-button calendar-clickable"
                 on:click={() => dispatch("reset")}
@@ -41,12 +41,12 @@
                 <span>Today</span>
             </div>
 
-            <div
+            <!-- <div
                 class="arrow right calendar-clickable"
                 use:right
                 aria-label="Next Year"
                 on:click={(evt) => dispatch("next")}
-            />
+            /> -->
             <div
                 class="calendar-clickable"
                 use:settings
@@ -65,6 +65,9 @@
         flex-flow: row nowrap;
         justify-content: space-between;
         align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 2;
     }
     .fantasy-year-nav {
         display: flex;
@@ -90,5 +93,4 @@
         display: flex;
         justify-content: center;
     }
-
 </style>

@@ -6,8 +6,8 @@ import type { Calendar, FantasyCalendarData } from "./@types";
 
 import FantasyCalendarView, {
     VIEW_TYPE,
-    FULL_VIEW,
-    FullCalendarView
+    FULL_VIEW
+    /* FullCalendarView */
 } from "./view/view";
 
 import "./main.css";
@@ -62,7 +62,6 @@ export default class FantasyCalendar extends Plugin {
         }
         await this.saveCalendar();
         this.watcher.registerCalendar(calendar);
-        
     }
     data: FantasyCalendarData;
     watcher = new Watcher(this);
@@ -110,7 +109,7 @@ export default class FantasyCalendar extends Plugin {
         });
 
         this.registerView(FULL_VIEW, (leaf: WorkspaceLeaf) => {
-            return new FullCalendarView(this, leaf, { full: true });
+            return new FantasyCalendarView(this, leaf, { full: true });
         });
 
         this.addCommand({

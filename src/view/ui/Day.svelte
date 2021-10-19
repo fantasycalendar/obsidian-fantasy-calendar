@@ -21,6 +21,7 @@
     let dayView: boolean;
     const dayViewStore = getContext<Writable<boolean>>("dayView");
     dayViewStore.subscribe((v) => (dayView = v));
+    $: dayView = dayView;
 
     let displayMoons: boolean;
     const moonStore = getContext<Writable<boolean>>("displayMoons");
