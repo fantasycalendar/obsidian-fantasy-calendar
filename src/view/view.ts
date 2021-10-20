@@ -78,6 +78,7 @@ export default class FantasyCalendarView extends ItemView {
         );
         this.registerEvent(
             this.plugin.app.workspace.on("layout-change", () => {
+                if (!this._app) return;
                 this._app.$set({
                     fullView: this.full,
                     ...(this.full ? { dayView: false } : {})

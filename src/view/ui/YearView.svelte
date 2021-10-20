@@ -2,7 +2,7 @@
     import type CalendarHelper from "src/helper";
 
     import type { MonthHelper } from "src/helper";
-    import { getContext, onMount } from "svelte";
+    import { getContext, onMount, tick } from "svelte";
     import type { Writable } from "svelte/store";
 
     import Month from "./Month.svelte";
@@ -20,38 +20,95 @@
     let calendar: CalendarHelper;
     calendarStore.subscribe((c) => {
         calendar = c;
-        months = [
-            ...calendar.getMonthsForYear(year - 1),
-            ...months,
-            ...calendar.getMonthsForYear(year + 1)
-        ];
     });
 
-    let currentEl: HTMLDivElement;
-    let nextEl: HTMLDivElement;
-    let previousEl: HTMLDivElement;
-    let dif: number;
-    let mounted = false;
+    let appendObserver = new IntersectionObserver(
+        () => {
+            appendMonth();
+            appendObserver.disconnect();
+            appendObserver.observe(yearContainer.lastElementChild);
+        },
+        {
+            root: yearContainer,
+            rootMargin: "0px",
+            threshold: 0.5
+        }
+    );
+    let prependObserver = new IntersectionObserver(
+        () => {
+            prependMonth();
+            prependObserver.disconnect();
+            prependObserver.observe(yearContainer.firstElementChild);
+        },
+        {
+            root: yearContainer,
+            rootMargin: "0px",
+            threshold: 0.5
+        }
+    );
 
-    onMount(() => {
-        mounted = true;
-        const currentEl = yearContainer.querySelector<HTMLDivElement>(
-            `#MONTH-${calendar.data.months[0].id}-${year}`
+    onMount(async () => {
+        const currentEl = yearContainer.querySelector(
+            `#MONTH-${calendar.currentMonth.id}-${year}`
         );
-        const nextEl = yearContainer.querySelector<HTMLDivElement>(
-            `#MONTH-${calendar.data.months[0].id}-${year + 1}`
-        );
-
-        dif = nextEl.offsetTop - currentEl.offsetTop;
-
         currentEl.scrollIntoView(true);
+        prependMonth();
+        appendMonth();
+
+        prependObserver.observe(yearContainer.children[0]);
+        appendObserver.observe(
+            yearContainer.children[yearContainer.children.length - 1]
+        );
     });
+
+    const dayViewStore = getContext<Writable<boolean>>("dayView");
+    const moonStore = getContext<Writable<boolean>>("displayMoons");
+    //https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API
+    const prependMonth = () => {
+        let previous = calendar.getMonth(-1, year);
+        const month = new Month({
+            target: yearContainer,
+            anchor: yearContainer.children[0],
+            props: {
+                month: previous,
+                fullView: false,
+                yearView: true,
+                columns,
+                weeks: calendar.weekdays.length,
+                showPad: false
+            },
+            context: new Map([
+                ["dayView", dayViewStore],
+                ["displayMoons", moonStore]
+            ])
+        });
+    };
+    const appendMonth = () => {
+        let previous = calendar.getMonth(calendar.months.length, year);
+        const month = new Month({
+            target: yearContainer,
+            props: {
+                month: previous,
+                fullView: false,
+                yearView: true,
+                columns,
+                weeks: calendar.weekdays.length,
+                showPad: false
+            },
+            context: new Map([
+                ["dayView", dayViewStore],
+                ["displayMoons", moonStore]
+            ])
+        });
+        return month;
+    };
+
     const reset = () => {
         const year = calendar.current.year;
         months = [
-            ...calendar.getMonthsForYear(year - 1),
-            ...calendar.getMonthsForYear(year),
-            ...calendar.getMonthsForYear(year + 1)
+            /* ...calendar.getMonthsForYear(year - 1), */
+            ...calendar.getMonthsForYear(year)
+            /* ...calendar.getMonthsForYear(year + 1) */
         ];
         const currentEl = yearContainer.querySelector(
             `#MONTH-${calendar.data.months[0].id}-${year}`
@@ -59,29 +116,9 @@
 
         currentEl.scrollIntoView(true);
     };
-    let previousTop: number;
-    let accum: number;
-    //TODO: months = [...months etc] wasn't just pushing, it was updating what was displayed on screen
-    const checkScroll = (evt: Event) => {
-        const target = evt.target as HTMLDivElement;
-        const scrollHeight = target.scrollHeight;
 
-        const top = target.scrollTop;
-        if (!previousTop) previousTop = top;
-        const bottom = target.scrollTop + target.clientHeight;
-
-        console.log(top, dif / 2);
-
-        if (top < previousTop && top <= dif / 2) {
-            //scrolled up;
-            console.log("up");
-        } else if (top > previousTop) {
-            //scrolled down
-            console.log("down");
-        }
-
-        previousTop = top;
-    };
+    //use an intersection observer
+    const checkScroll = (evt: Event) => {};
 </script>
 
 <div class="year-view">
@@ -100,27 +137,20 @@
         on:scroll={checkScroll}
         bind:this={yearContainer}
     >
-        {#each months as month, index}
-            {#if index > 0 && months[index - 1].year != month.year}
-                <h2 class="fantasy-title">
-                    <span class="fantasy-year">{month.year}</span>
-                </h2>
-            {/if}
-            <div class="month" id={`MONTH-${month.data.id}-${month.year}`}>
-                <h3 class="month-name">{month.name}</h3>
-                <Month
-                    {month}
-                    fullView={false}
-                    {columns}
-                    weeks={month.calendar.weekdays.length}
-                    showPad={false}
-                    on:day-click
-                    on:day-doubleclick
-                    on:day-context-menu
-                    on:event-click
-                    on:event-mouseover
-                />
-            </div>
+        {#each months as month}
+            <Month
+                {month}
+                fullView={false}
+                yearView={true}
+                {columns}
+                weeks={month.calendar.weekdays.length}
+                showPad={false}
+                on:day-click
+                on:day-doubleclick
+                on:day-context-menu
+                on:event-click
+                on:event-mouseover
+            />
         {/each}
     </div>
     <!-- </div> -->
@@ -149,16 +179,5 @@
     }
     .fantasy-title {
         margin: 0;
-    }
-    .month {
-        border-radius: 1rem;
-        padding: 0.25rem;
-    }
-
-    .month-name {
-        margin: 0;
-    }
-    .month :global(.fantasy-day.day) {
-        padding: 0px;
     }
 </style>

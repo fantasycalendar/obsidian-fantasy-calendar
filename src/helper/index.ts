@@ -14,6 +14,12 @@ import type {
 export class MonthHelper {
     days: DayHelper[] = [];
     leapDays: LeapDay[] = [];
+    get id() {
+        return this.data.id;
+    }
+    get index() {
+        return this.calendar.data.months.indexOf(this.data);
+    }
     get name() {
         return this.data.name;
     }
@@ -44,7 +50,7 @@ export class MonthHelper {
         public year: number,
         public calendar: CalendarHelper
     ) {
-        this.leapDays = this.calendar.leapDaysForMonth(this);
+        this.leapDays = this.calendar.leapDaysForMonth(this, year);
         this.days = [
             ...new Array(data.length + this.leapDays.length).keys()
         ].map((k) => new DayHelper(this, k + 1));
@@ -394,7 +400,7 @@ export default class CalendarHelper extends Events {
         let previous: DayHelper[] = [];
 
         const previousMonth = this.getMonth(
-            this.fullMonths.indexOf(month) - 1,
+            month.index - 1,
             this.displayed.year
         );
         if (month.firstWeekday > 0 && previousMonth != null) {
@@ -404,10 +410,7 @@ export default class CalendarHelper extends Events {
         /** Get Days of Next Month */
         let next: DayHelper[] = [];
 
-        const nextMonth = this.getMonth(
-            this.fullMonths.indexOf(month) + 1,
-            this.displayed.year
-        );
+        const nextMonth = this.getMonth(month.index + 1, this.displayed.year);
 
         if (
             month.lastWeekday < this.weekdays.length - 1 &&
@@ -540,11 +543,11 @@ export default class CalendarHelper extends Events {
 
     getMoonsForDate(date: CurrentCalendarData): Array<[Moon, Phase]> {
         const phases: Array<[Moon, Phase]> = [];
-        const month = this.months[date.month];
 
-        const months = this.months.slice(0, this.months.indexOf(month));
+        const month = this.getMonth(date.month, date.year);
 
         const day = month.days[date.day - 1];
+
         const daysBefore =
             this.totalDaysBeforeYear(date.year) +
             this.daysBeforeMonth(month, true) +
@@ -567,6 +570,7 @@ export default class CalendarHelper extends Events {
                 options[wrap(Math.round(phase), options.length)]
             ]);
         }
+
         return phases;
     }
 }
