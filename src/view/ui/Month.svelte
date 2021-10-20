@@ -17,7 +17,11 @@
     $: next = padded.next;
 </script>
 
-<div class="month" id={`MONTH-${month.id}-${month.year}`}>
+<div
+    class="month"
+    class:full-view={fullView}
+    id={`MONTH-${month.id}-${month.year}`}
+>
     {#if yearView}
         <h3 class="month-name">{month.name}</h3>
     {/if}

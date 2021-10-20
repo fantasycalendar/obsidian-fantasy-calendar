@@ -8,6 +8,7 @@
     import MonthView from "./Month.svelte";
     import Nav from "./Nav.svelte";
     import YearView from "./YearView.svelte";
+    import YearViewBig from "./YearViewBig.svelte";
 
     export let fullView: boolean = false;
     export let dayView: boolean = false;
@@ -31,13 +32,9 @@
     $: calendarStore.set(calendar);
 
     calendar.on("month-update", () => {
-        weeks = calendar.weeksPerCurrentMonth;
         year = calendar.displayed.year;
         month = calendar.currentMonth;
-        months = calendar.months;
-    });
-    calendar.on("year-update", () => {
-        year = calendar.displayed.year;
+        weeks = calendar.weeksOfMonth(month);
         months = calendar.months;
     });
 
@@ -45,7 +42,7 @@
     $: year = calendar.displayed.year;
     $: month = calendar.currentMonth;
     $: months = calendar.months;
-    $: weeks = calendar.weeksPerCurrentMonth;
+    $: weeks = calendar.weeksOfMonth(month);
 </script>
 
 <div
@@ -56,11 +53,26 @@
     style="--calendar-columns: {calendar.weekdays
         .length};--calendar-rows: {calendar.weeksPerCurrentMonth};"
 >
-    {#if yearView}
+    {#if yearView && !fullView}
         <YearView
             {months}
             {year}
             {fullView}
+            columns={weekdays.length}
+            current={calendar.displayedDate}
+            on:next={() => calendar.goToNextYear()}
+            on:previous={() => calendar.goToPreviousYear()}
+            on:reset={() => calendar.reset()}
+            on:settings
+            on:day-click
+            on:day-doubleclick
+            on:day-context-menu
+            on:event-click
+            on:event-mouseover
+        />
+    {:else if yearView}
+        <YearViewBig
+            {year}
             columns={weekdays.length}
             current={calendar.displayedDate}
             on:next={() => calendar.goToNextYear()}

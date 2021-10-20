@@ -85,7 +85,7 @@ export default class FantasyCalendarView extends ItemView {
                 });
             })
         );
-        window.view = this;
+        /* window.view = this; */
     }
     updateCalendars() {
         if (!this.plugin.data.calendars.length) {
@@ -225,9 +225,11 @@ export default class FantasyCalendarView extends ItemView {
             this.helper.viewing.month = this.helper.displayed.month;
             this.helper.viewing.year = this.helper.displayed.year;
 
-            this.helper.trigger("day-update");
+            this.yearView = false;
 
+            this._app.$set({ yearView: false });
             this._app.$set({ dayView: true });
+            this.helper.trigger("day-update");
         });
 
         this._app.$on(
@@ -248,8 +250,11 @@ export default class FantasyCalendarView extends ItemView {
                             this.helper.viewing.year =
                                 this.helper.displayed.year;
 
-                            this.helper.trigger("day-update");
+                            this.yearView = false;
+
+                            this._app.$set({ yearView: false });
                             this._app.$set({ dayView: true });
+                            this.helper.trigger("day-update");
                         });
                     });
                 }

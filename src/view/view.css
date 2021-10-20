@@ -28,3 +28,11 @@
     text-align: center;
     padding: 0.5rem;
 }
+
+.fantasy-title {
+    margin: 0;
+}
+
+.full-view .fantasy-title {
+    grid-column: span 3;
+}

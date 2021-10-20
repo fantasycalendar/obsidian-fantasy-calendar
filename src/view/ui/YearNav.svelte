@@ -6,6 +6,8 @@
     const dispatch = createEventDispatcher();
 
     export let year: number;
+    console.log("🚀 ~ file: YearNav.svelte ~ line 9 ~ year", year);
+    export let arrows = false;
     export let current: string;
 
     const left = (node: HTMLElement) => {
@@ -27,12 +29,14 @@
     </div>
     <div class="right-nav fantasy-right-nav">
         <div class="container">
-            <!-- <div
-                class="arrow calendar-clickable"
-                use:left
-                aria-label="Previous Year"
-                on:click={() => dispatch("previous")}
-            /> -->
+            {#if arrows}
+                <div
+                    class="arrow calendar-clickable"
+                    use:left
+                    aria-label="Previous Year"
+                    on:click={() => dispatch("previous")}
+                />
+            {/if}
             <div
                 class="reset-button calendar-clickable"
                 on:click={() => dispatch("reset")}
@@ -41,12 +45,14 @@
                 <span>Today</span>
             </div>
 
-            <!-- <div
-                class="arrow right calendar-clickable"
-                use:right
-                aria-label="Next Year"
-                on:click={(evt) => dispatch("next")}
-            /> -->
+            {#if arrows}
+                <div
+                    class="arrow right calendar-clickable"
+                    use:right
+                    aria-label="Next Year"
+                    on:click={(evt) => dispatch("next")}
+                />
+            {/if}
             <div
                 class="calendar-clickable"
                 use:settings

@@ -97,7 +97,7 @@ export class DayHelper {
         return (
             this.number == this.calendar.current.day &&
             this.month.number == this.calendar.current.month &&
-            this.calendar.displayed.year == this.calendar.current.year
+            this.month.year == this.calendar.current.year
         );
     }
     get isDisplaying() {
@@ -123,7 +123,7 @@ export default class CalendarHelper extends Events {
         this.displayed = { ...this.current };
         this.update(this.object);
 
-        window.calendar = this;
+        /* window.calendar = this; */
     }
 
     getMonthsForYear(year: number) {
@@ -445,7 +445,11 @@ export default class CalendarHelper extends Events {
                 this.data.weekdays.length
         );
     }
-
+    weeksOfMonth(month: MonthHelper) {
+        return Math.ceil(
+            (month.length + month.firstWeekday) / this.data.weekdays.length
+        );
+    }
     /**
      * Total number of days in a year.
      *
