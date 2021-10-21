@@ -39,7 +39,8 @@
     const moonStore = getContext<Writable<boolean>>("displayMoons");
 
     const appendObserver = new IntersectionObserver(
-        (entries) => {
+        (entries, observer) => {
+            if (observer !== appendObserver) return;
             if (!entries.length) return;
             if (!entries[0].isIntersecting) return;
             appendObserver.disconnect();
@@ -58,7 +59,8 @@
         appendObserver.observe(el);
     };
     const appendHeaderObserver = new IntersectionObserver(
-        (entries) => {
+        (entries, observer) => {
+            if (observer !== appendHeaderObserver) return;
             /**
              * This observer looks at the prepended header (current year). Once this header is fully in view, the year variable should be decremented.
              */
@@ -108,7 +110,8 @@
     };
 
     const prependObserver = new IntersectionObserver(
-        (entries) => {
+        (entries, observer) => {
+            if (observer !== prependObserver) return;
             if (!entries.length) return;
             if (!entries[0].isIntersecting) return;
             prependObserver.disconnect();
@@ -127,7 +130,8 @@
         prependObserver.observe(el);
     };
     const prependHeaderObserver = new IntersectionObserver(
-        (entries) => {
+        (entries, observer) => {
+            if (observer !== prependHeaderObserver) return;
             /**
              * This observer looks at the prepended header (current year). Once this header is fully in view, the year variable should be decremented.
              */

@@ -23,6 +23,7 @@
 
     let yearContainer: HTMLElement;
 
+    /** Setup for eventual infinite scroll of big year view. */
     const createYear = (year: number, anchor: boolean = false) => {
         const months =
             year === calendar.current.year

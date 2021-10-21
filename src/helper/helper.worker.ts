@@ -1,3 +1,5 @@
+/** Worker for eventual offloading of calendar calculation. */
+
 const ctx: Worker = self as any;
 
 // Respond to message from parent thread

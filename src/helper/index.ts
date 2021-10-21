@@ -258,7 +258,10 @@ export default class CalendarHelper extends Events {
     }
     goToNextCurrentDay() {
         this.current.day += 1;
-        const currentMonth = this.months[this.current.month];
+        const currentMonth = this.getMonth(
+            this.current.month,
+            this.current.year
+        );
         if (this.current.day >= currentMonth.days.length) {
             this.current.day = 1;
             this.current.month += 1;
@@ -266,16 +269,6 @@ export default class CalendarHelper extends Events {
                 this.current.month = 0;
                 this.current.year += 1;
             }
-        }
-        this.trigger("day-update");
-    }
-    goToPreviousDay() {
-        this.viewing.day -= 1;
-        if (this.viewing.day < 1) {
-            this.goToPrevious();
-            this.viewing.month = this.displayed.month;
-            this.viewing.year = this.displayed.year;
-            this.viewing.day = this.currentMonth.days.length;
         }
         this.trigger("day-update");
     }
@@ -328,9 +321,6 @@ export default class CalendarHelper extends Events {
     get currentMonth() {
         return this.months[this.displayed.month];
     }
-    get daysOfCurrentMonth() {
-        return this.currentMonth.days;
-    }
 
     leapDaysForYear(year: number) {
         return this.leapdays.filter((l) => {
@@ -376,10 +366,6 @@ export default class CalendarHelper extends Events {
                         return year % interval == 0;
                     });
             });
-    }
-
-    get fullMonths() {
-        return this.months.filter((m) => m.type == "month");
     }
 
     getMonth(number: number, year: number) {

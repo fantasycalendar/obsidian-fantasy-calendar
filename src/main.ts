@@ -102,7 +102,7 @@ export default class FantasyCalendar extends Plugin {
             (leaf: WorkspaceLeaf) => new FantasyCalendarView(this, leaf)
         );
         this.app.workspace.onLayoutReady(() => this.addCalendarView(true));
-        this.addRibbonIcon(VIEW_TYPE, "Open Big Fantasy Calendar", (evt) => {
+        this.addRibbonIcon(VIEW_TYPE, "Open Large Fantasy Calendar", (evt) => {
             this.app.workspace
                 .getLeaf(evt.getModifierState(MODIFIER_KEY))
                 .setViewState({ type: FULL_VIEW });
@@ -122,7 +122,7 @@ export default class FantasyCalendar extends Plugin {
 
         this.addCommand({
             id: "open-big-fantasy-calendar",
-            name: "Open Big Fantasy Calendar",
+            name: "Open Large Fantasy Calendar",
             callback: () => {
                 this.addFullCalendarView();
             }
@@ -146,7 +146,7 @@ export default class FantasyCalendar extends Plugin {
         await this.app.workspace.getRightLeaf(false).setViewState({
             type: VIEW_TYPE
         });
-        if (this.view) this.app.workspace.revealLeaf(this.view.leaf);
+        /* if (this.view) this.app.workspace.revealLeaf(this.view.leaf); */
     }
     async addFullCalendarView(startup: boolean = false) {
         if (startup && this.app.workspace.getLeavesOfType(FULL_VIEW).length)

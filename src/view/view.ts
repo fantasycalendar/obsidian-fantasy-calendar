@@ -55,9 +55,8 @@ export default class FantasyCalendarView extends ItemView {
         return this.leaf.getRoot();
     }
     get full() {
-        return !(Platform.isMobile
-            ? this.root instanceof WorkspaceMobileDrawer
-            : this.root instanceof WorkspaceSidedock);
+        return !("collapse" in this.root);
+    
     }
     yearView: boolean = false;
     moons: boolean = true;

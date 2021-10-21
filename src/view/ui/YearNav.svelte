@@ -6,7 +6,6 @@
     const dispatch = createEventDispatcher();
 
     export let year: number;
-    console.log("🚀 ~ file: YearNav.svelte ~ line 9 ~ year", year);
     export let arrows = false;
     export let current: string;
 
