@@ -248,7 +248,7 @@ export default class CalendarHelper extends Events {
     goToNextDay() {
         this.viewing.day += 1;
         const currentMonth = this.months[this.displayed.month];
-        if (this.viewing.day >= currentMonth.days.length) {
+        if (this.viewing.day > currentMonth.days.length) {
             this.goToNext();
             this.viewing.month = this.displayed.month;
             this.viewing.year = this.displayed.year;
