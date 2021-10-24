@@ -308,6 +308,16 @@ export default class CalendarHelper extends Events {
         }
         this.setCurrentMonth(this.prevMonthIndex);
     }
+    goToPreviousDay() {
+        this.viewing.day -= 1;
+        if (this.viewing.day < 1) {
+            this.goToPrevious();
+            this.viewing.month = this.displayed.month;
+            this.viewing.year = this.displayed.year;
+            this.viewing.day = this.currentMonth.days.length;
+        }
+        this.trigger("day-update");
+    }
     goToPreviousYear() {
         this.displayed.year -= 1;
         this.months = this.data.months.map(
