@@ -100,19 +100,36 @@ export class Watcher extends Component {
 
         let dates =
             (frontmatter["fc-date"] as
+                | string
+                | string[]
                 | CurrentCalendarData
                 | CurrentCalendarData[]) ??
             (frontmatter["fc-start"] as
+                | string
+                | string[]
                 | CurrentCalendarData
                 | CurrentCalendarData[]);
-        if (!Array.isArray(dates)) dates = [dates];
+        const dateArray: Array<CurrentCalendarData> = [dates]
+            .flat(2)
+            .map((date) => parseDate(date));
+        console.log(
+            "🚀 ~ file: watcher.ts ~ line 113 ~ dateArray",
+            dateArray,
+            file.basename
+        );
+
         let ends =
             "fc-end" in frontmatter
                 ? (frontmatter["fc-end"] as
+                      | string
+                      | string[]
                       | CurrentCalendarData
                       | CurrentCalendarData[])
                 : [];
-        if (!Array.isArray(ends)) ends = [ends];
+        const endArray: Array<CurrentCalendarData> = [ends]
+            .flat(2)
+            .map((date) => parseDate(date));
+        console.log("🚀 ~ file: watcher.ts ~ line 130 ~ endArray", endArray);
 
         //check for fc-calendar
         let names = frontmatter["fc-calendar"] as string | string[];
@@ -136,18 +153,18 @@ export class Watcher extends Component {
             let index = names.indexOf(name);
 
             /** Clamp index to length of dates provided. */
-            if (index >= dates.length) {
-                index = dates.length - 1;
+            if (index >= dateArray.length) {
+                index = dateArray.length - 1;
             }
 
-            let date = (dates[index] as CurrentCalendarData) ?? {
+            let date = (dateArray[index] as CurrentCalendarData) ?? {
                 day: null,
                 month: null,
                 year: null
             };
 
-            let end: CurrentCalendarData = ends.length
-                ? ends[index] ?? ends[ends.length - 1]
+            let end: CurrentCalendarData = endArray.length
+                ? endArray[index] ?? endArray[endArray.length - 1]
                 : null;
 
             if (date?.month && typeof date?.month == "string") {
@@ -222,3 +239,25 @@ export class Watcher extends Component {
     }
     onunload() {}
 }
+
+const parseDate = (date: string | CurrentCalendarData) => {
+    if (typeof date === "string") {
+        try {
+            const split = date.split(/[\-\/]/).map((d) => Number(d));
+            console.log(
+                "🚀 ~ file: watcher.ts ~ line 116 ~ date",
+                date.split(/[\-\/]/),
+                split
+            );
+            return {
+                year: split[0],
+                month: split[1],
+                day: split[2]
+            };
+        } catch (e) {
+            return;
+        }
+    } else {
+        return date;
+    }
+};
