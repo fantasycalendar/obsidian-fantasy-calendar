@@ -98,14 +98,19 @@ export class CreateEventModal extends Modal {
                                 )
                             );
 
+                            // total days per year (does not need to be accurate)
+                            const totalDays =
+                                maxDays * this.calendar.static.months.length;
+
                             const dateNumber =
-                                date.day +
-                                ((date.month ?? -1) + 1) * maxDays +
-                                date.year * 100;
+                                (date.year - 1) * totalDays +
+                                (date.month ?? -1) * maxDays +
+                                date.day;
+
                             const endNumber =
-                                end.day +
-                                ((end.month ?? -1) + 1) * maxDays +
-                                end.year * 100;
+                                (end.year - 1) * totalDays +
+                                (end.month ?? -1) * maxDays +
+                                end.day;
 
                             if (dateNumber > endNumber) {
                                 const temp = { ...this.event.end };
