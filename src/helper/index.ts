@@ -164,34 +164,26 @@ export default class CalendarHelper extends Events {
     getEventsOnDate(date: CurrentCalendarData) {
         const events = this.object.events.filter((e) => {
             if (!e.date.day) return false;
-            if (e.end) {
-                const start = { ...e.date };
-                const end = { ...e.end };
-                if (start.month == undefined)
-                    end.month = start.month = date.month;
-                if (start.year == undefined) end.year = start.year = date.year;
-
-                if (start.year != date.year && end.year != date.year)
-                    return false;
-
-                const daysBeforeStart = this.daysBeforeDate(start);
-                const daysBeforeDate = this.daysBeforeDate(date);
-
-                if (end.year > start.year) {
-                    return daysBeforeDate >= daysBeforeStart;
-                }
-
-                const daysBeforeEnd = this.daysBeforeDate(end);
-
-                return (
-                    daysBeforeDate >= daysBeforeStart &&
-                    daysBeforeEnd >= daysBeforeDate
-                );
+            if (!e.end) {
+                e.end = { ...e.date };
             }
+            const start = { ...e.date };
+            const end = { ...e.end };
+            if (start.month == undefined) end.month = start.month = date.month;
+            if (start.year == undefined) end.year = start.year = date.year;
+
+            if (start.year != date.year && end.year != date.year) return false;
+
+            const daysBeforeStart = this.daysBeforeDate(start);
+            const daysBeforeDate = this.daysBeforeDate(date);
+            if (end.year > date.year) {
+                return daysBeforeDate >= daysBeforeStart;
+            }
+
+            const daysBeforeEnd = this.daysBeforeDate(end);
             return (
-                e.date.day == date.day &&
-                (e.date.month == undefined || e.date.month == date.month) &&
-                (e.date.year == undefined || e.date.year == date.year)
+                daysBeforeDate >= daysBeforeStart &&
+                daysBeforeEnd >= daysBeforeDate
             );
         });
 
@@ -471,14 +463,20 @@ export default class CalendarHelper extends Events {
     }
 
     daysBeforeDate(date: CurrentCalendarData) {
-        if (date.month === 0) return date.day;
+        const daysBeforeYear = this.daysBeforeYear(date.year);
+        const daysBeforeMonth = this.daysBeforeMonth(
+            this.getMonth(date.month, date.year),
+            true
+        );
+        return daysBeforeYear + daysBeforeMonth + date.day;
+        /* if (date.month === 0) return date.day;
         const year = date.year;
         const monthsBefore = [...this.months].slice(0, date.month);
         const daysBefore = monthsBefore.reduce(
             (a, b) => a + (b.length + this.leapDaysForMonth(b, year).length),
             0
         );
-        return daysBefore + date.day;
+        return daysBefore + date.day; */
     }
 
     get firstWeekday() {
