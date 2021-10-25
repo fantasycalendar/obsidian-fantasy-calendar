@@ -37,11 +37,4 @@
     .year:not(.full-view) {
         grid-template-columns: 1fr;
     }
-
-    .full-view .fantasy-title {
-        grid-column: span 3;
-    }
-    .fantasy-title {
-        margin: 0;
-    }
 </style>
