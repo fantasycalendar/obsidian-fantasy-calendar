@@ -112,11 +112,6 @@ export class Watcher extends Component {
         const dateArray: Array<CurrentCalendarData> = [dates]
             .flat(2)
             .map((date) => parseDate(date));
-        console.log(
-            "🚀 ~ file: watcher.ts ~ line 113 ~ dateArray",
-            dateArray,
-            file.basename
-        );
 
         let ends =
             "fc-end" in frontmatter
@@ -129,7 +124,6 @@ export class Watcher extends Component {
         const endArray: Array<CurrentCalendarData> = [ends]
             .flat(2)
             .map((date) => parseDate(date));
-        console.log("🚀 ~ file: watcher.ts ~ line 130 ~ endArray", endArray);
 
         //check for fc-calendar
         let names = frontmatter["fc-calendar"] as string | string[];
@@ -244,11 +238,7 @@ const parseDate = (date: string | CurrentCalendarData) => {
     if (typeof date === "string") {
         try {
             const split = date.split(/[\-\/]/).map((d) => Number(d));
-            console.log(
-                "🚀 ~ file: watcher.ts ~ line 116 ~ date",
-                date.split(/[\-\/]/),
-                split
-            );
+
             return {
                 year: split[0],
                 month: split[1],
