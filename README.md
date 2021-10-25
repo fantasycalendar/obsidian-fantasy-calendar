@@ -195,16 +195,51 @@ Optionally, you can tell the calendar to only watch for new events in a specific
 
 Automatic event creation uses `fc-date` and `fc-category`, as well as an additional property: `fc-calendar`.
 
-| Property      | Description                                                                     |
-| ------------- | ------------------------------------------------------------------------------- |
-| `fc-calendar` | Calendar name or array of calendar names to the event should be added to.       |
-| `fc-date`     | Date object or array of date objects with `year`, `month` and `day` parameters. |
-| `fc-end`      | Date object or array of date objects with `year`, `month` and `day` parameters. |
-| `fc-category` | Name of the event category.                                                     |
+| Property      | Description                                                                               |
+| ------------- | ----------------------------------------------------------------------------------------- |
+| `fc-calendar` | Calendar name or array of calendar names to the event should be added to.                 |
+| `fc-date`     | UTC date, date object or array of date objects with `year`, `month` and `day` parameters. |
+| `fc-end`      | UTC date, date object or array of date objects with `year`, `month` and `day` parameters. |
+| `fc-category` | Name of the event category.                                                               |
 
 Once this setting is turned on, the calendar will look through its specified folder for events it should add to itself. When it finds them, they will be added - **unless an event with that exact date linked to that note is already on the calendar.**
 
 The calendar will additionally watch for changes to notes and update itself accordingly. **Events will never be deleted. Once they are added, they must manually be removed.**
+
+#### Frontmatter Dates
+
+Frontmatter dates can be supplied two ways - as a UTC-formatted date or as a date object.
+
+UTC dates **must** be formatted as `YYYY-MM-DD`.
+
+If you need the event to repeat (such as every year or every month), a date object can be supplied instead. The only value that _must_ be supplied for a date object is the day, and the plugin will repeat the event for the unsupplied values. Please note that months may be supplied as the month _name_ or the month _number_ (ie, 2 for February).
+
+```
+---
+fc-date:        # Event will repeat on the 2nd day of every month of every year.
+  day: 3
+---
+
+---
+fc-date:        # Event will repeat on the 3rd day of the 2nd month of every year.
+  day: 3
+  month: 2
+---
+
+---
+fc-date:        # Event will repeat on the 3rd day of every month of the 2021st year.
+  day: 3
+  year: 2021
+---
+
+---
+fc-date:        # Event will repeat on the 3rd day of the month of February of the 2021st year.
+  day: 3
+  month: February
+  year: 2021
+---
+
+```
 
 #### Single Calendar
 
@@ -213,10 +248,7 @@ A note can be registered to a single calendar like so:
 ```
 ---
 fc-calendar: My Custom Calendar
-fc-date:
-  year: 837
-  month: Custom Month
-  day: 17
+fc-date: 837-02-28                  # 28th day of the second month of the 837th year.
 fc-category: Event Category 1
 ---
 ```
