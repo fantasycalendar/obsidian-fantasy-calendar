@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.1](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.1.0...1.1.1) (2021-10-25)
+
+
+### Bug Fixes
+
+* fixed event calculations (fix [#2](https://github.com/valentine195/obsidian-fantasy-calendar/issues/2)) ([0ad8c6b](https://github.com/valentine195/obsidian-fantasy-calendar/commit/0ad8c6bfea5668e47ec2e2f5e750c8faa8c4eb9d))
+* fixed event creation parsing issue with end dates ([532d6e8](https://github.com/valentine195/obsidian-fantasy-calendar/commit/532d6e84adc9b7fdbbc7b18e731f43ea12ca7bdc))
+* removed logs ([ed9f12e](https://github.com/valentine195/obsidian-fantasy-calendar/commit/ed9f12e88c8ee873bc986068f2e18ca3f17bd7b0))
+
 ## [1.1.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.0.2...1.1.0) (2021-10-25)
 
 
