@@ -13,3 +13,7 @@ All notable changes to this project will be documented in this file. See [standa
 ### Bug Fixes
 
 * removed unused css classes ([32197e6](https://github.com/valentine195/obsidian-fantasy-calendar/commit/32197e6e060ce40c8cf583709017fdce411db036))
+
+## 1.0.0
+
+Plugin released to the community.
