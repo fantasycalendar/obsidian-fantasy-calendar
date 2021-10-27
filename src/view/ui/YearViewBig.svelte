@@ -25,10 +25,7 @@
 
     /** Setup for eventual infinite scroll of big year view. */
     const createYear = (year: number, anchor: boolean = false) => {
-        const months =
-            year === calendar.current.year
-                ? [...calendar.months]
-                : calendar.getMonthsForYear(year);
+        const months = calendar.getMonthsForYear(year);
         const svelteInstance = new YearViewContainer({
             target: yearContainer,
             anchor: anchor ? yearContainer.children[0] : null,

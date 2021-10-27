@@ -116,7 +116,6 @@ export class DayHelper {
 }
 
 export default class CalendarHelper extends Events {
-    months: MonthHelper[];
     maxDays: number;
     constructor(public object: Calendar, public plugin: FantasyCalendar) {
         super();
@@ -133,10 +132,7 @@ export default class CalendarHelper extends Events {
     }
     update(calendar?: Calendar) {
         this.object = calendar ?? this.object;
-        this.months = this.data.months.map(
-            (m, i) => new MonthHelper(m, i, this.displayed.year, this)
-        );
-        this.maxDays = Math.max(...this.months.map((m) => m.length));
+        this.maxDays = Math.max(...this.data.months.map((m) => m.length));
     }
     get data() {
         return this.object.static;
@@ -202,30 +198,18 @@ export default class CalendarHelper extends Events {
     }
 
     get currentDate() {
-        return dateString(
-            this.current,
-            this.months.map((m) => m.data)
-        );
+        return dateString(this.current, this.data.months);
     }
 
     get displayedDate() {
-        return dateString(
-            this.displayed,
-            this.months.map((m) => m.data)
-        );
+        return dateString(this.displayed, this.data.months);
     }
     get viewedDate() {
-        return dateString(
-            this.viewing,
-            this.months.map((m) => m.data)
-        );
+        return dateString(this.viewing, this.data.months);
     }
 
     reset() {
         this.displayed = { ...this.current };
-        this.months = this.data.months.map(
-            (m, i) => new MonthHelper(m, i, this.displayed.year, this)
-        );
 
         this.trigger("month-update");
         this.trigger("day-update");
@@ -239,7 +223,10 @@ export default class CalendarHelper extends Events {
 
     goToNextDay() {
         this.viewing.day += 1;
-        const currentMonth = this.months[this.displayed.month];
+        const currentMonth = this.getMonth(
+            this.displayed.month,
+            this.displayed.year
+        );
         if (this.viewing.day > currentMonth.days.length) {
             this.goToNext();
             this.viewing.month = this.displayed.month;
@@ -257,7 +244,7 @@ export default class CalendarHelper extends Events {
         if (this.current.day >= currentMonth.days.length) {
             this.current.day = 1;
             this.current.month += 1;
-            if (this.current.month >= this.months.length) {
+            if (this.current.month >= this.data.months.length) {
                 this.current.month = 0;
                 this.current.year += 1;
             }
@@ -266,29 +253,38 @@ export default class CalendarHelper extends Events {
     }
 
     get nextMonthIndex() {
-        return wrap(this.displayed.month + 1, this.months.length);
+        return wrap(this.displayed.month + 1, this.data.months.length);
     }
     get nextMonth() {
-        return this.months[this.nextMonthIndex];
+        return this.getMonth(this.displayed.month + 1, this.displayed.year);
+    }
+    canGoToNextYear() {
+        return (
+            !this.data.useCustomYears ||
+            this.displayed.year < this.data.years.length
+        );
     }
     goToNext() {
         if (this.nextMonthIndex < this.displayed.month) {
+            if (!this.canGoToNextYear()) {
+                new Notice(
+                    "This is the last year. Additional years can be created in settings."
+                );
+                return;
+            }
             this.goToNextYear();
         }
         this.setCurrentMonth(this.nextMonthIndex);
     }
     goToNextYear() {
         this.displayed.year += 1;
-        this.months = this.data.months.map(
-            (m, i) => new MonthHelper(m, i, this.displayed.year, this)
-        );
         this.trigger("year-update");
     }
     get prevMonthIndex() {
-        return wrap(this.displayed.month - 1, this.months.length);
+        return wrap(this.displayed.month - 1, this.data.months.length);
     }
     get previousMonth() {
-        return this.months[this.prevMonthIndex];
+        return this.getMonth(this.displayed.month - 1, this.displayed.year);
     }
     goToPrevious() {
         if (this.prevMonthIndex > this.displayed.month) {
@@ -312,16 +308,13 @@ export default class CalendarHelper extends Events {
     }
     goToPreviousYear() {
         this.displayed.year -= 1;
-        this.months = this.data.months.map(
-            (m, i) => new MonthHelper(m, i, this.displayed.year, this)
-        );
         this.trigger("year-update");
     }
     get weekdays() {
         return this.data.weekdays;
     }
     get currentMonth() {
-        return this.months[this.displayed.month];
+        return this.getMonth(this.displayed.month, this.displayed.year);
     }
 
     leapDaysForYear(year: number) {
@@ -391,8 +384,11 @@ export default class CalendarHelper extends Events {
             month.index - 1,
             this.displayed.year
         );
-        if (month.firstWeekday > 0 && previousMonth != null) {
-            previous = previousMonth.days.slice(-month.firstWeekday);
+        if (month.firstWeekday > 0) {
+            previous =
+                previousMonth != null
+                    ? previousMonth.days.slice(-month.firstWeekday)
+                    : Array(month.firstWeekday).fill(null);
         }
 
         /** Get Days of Next Month */
@@ -469,14 +465,6 @@ export default class CalendarHelper extends Events {
             true
         );
         return daysBeforeYear + daysBeforeMonth + date.day;
-        /* if (date.month === 0) return date.day;
-        const year = date.year;
-        const monthsBefore = [...this.months].slice(0, date.month);
-        const daysBefore = monthsBefore.reduce(
-            (a, b) => a + (b.length + this.leapDaysForMonth(b, year).length),
-            0
-        );
-        return daysBefore + date.day; */
     }
 
     get firstWeekday() {

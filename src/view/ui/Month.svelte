@@ -35,7 +35,7 @@
             : '1fr'}; "
     >
         {#each previous as day}
-            {#if showPad}
+            {#if showPad && day != null}
                 <Day {day} adjacent={true} {fullView} />
             {:else}
                 <div />

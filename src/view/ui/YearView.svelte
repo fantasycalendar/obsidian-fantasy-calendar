@@ -230,7 +230,7 @@
         /** Slice it so append and prepend functions can create their headers. */
         months = calendar
             .getMonthsForYear(year)
-            .slice(1, calendar.months.length - 1);
+            .slice(1, calendar.data.months.length - 1);
         firstMonth = months[0];
         lastMonth = months[months.length - 1];
 

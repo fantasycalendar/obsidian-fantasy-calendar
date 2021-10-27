@@ -35,13 +35,13 @@
         year = calendar.displayed.year;
         month = calendar.currentMonth;
         weeks = calendar.weeksOfMonth(month);
-        months = calendar.months;
+        months = calendar.getMonthsForYear(year);
     });
 
     $: weekdays = calendar.weekdays;
     $: year = calendar.displayed.year;
     $: month = calendar.currentMonth;
-    $: months = calendar.months;
+    $: months = calendar.getMonthsForYear(year);
     $: weeks = calendar.weeksOfMonth(month);
 </script>
 
