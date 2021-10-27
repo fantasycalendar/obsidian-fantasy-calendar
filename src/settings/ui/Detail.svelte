@@ -6,16 +6,25 @@
 
     export let label: string;
     export let open: boolean = false;
+    export let disabled: boolean = false;
 
+    let button: ButtonComponent;
     const add = (node: HTMLElement) => {
-        const b = new ButtonComponent(node)
+        button = new ButtonComponent(node)
             .setTooltip("Add New")
             .setButtonText("+")
+            .setDisabled(disabled)
             .onClick(async () => {
                 dispatch("new-item");
             });
-        b.buttonEl.style.width = "100%";
+        button.buttonEl.style.width = "100%";
     };
+
+    $: {
+        if (button) {
+            button.setDisabled(disabled);
+        }
+    }
 </script>
 
 <details {open}>

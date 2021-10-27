@@ -27,6 +27,7 @@ export interface TimeSpan {
 }
 
 export interface Day extends TimeSpan {}
+export interface Year extends TimeSpan {}
 export type Week = Day[];
 export interface Month extends TimeSpan {
     length: number;
@@ -135,6 +136,8 @@ export interface StaticCalendarData {
     eras: Era[];
     offset?: number;
     incrementDay: boolean;
+    useCustomYears?: boolean;
+    years?: Year[];
 }
 
 export interface CurrentCalendarData {

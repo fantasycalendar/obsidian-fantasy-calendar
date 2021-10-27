@@ -82,6 +82,12 @@ New months can be created and managed in this section. Each month must have a na
 
 Months may also be set to intercalary. Intercalary months are a _single day_ that do not fit into an existing month. They do not correspond to a weekday.
 
+### Years
+
+Custom years can be created in this section. Each year must be given a name.
+
+If custom years are created, the calendar will be limited to *only* the years specified.
+
 ### Leap Days
 
 Leap days can be created and managed in this section.

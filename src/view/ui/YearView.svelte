@@ -22,6 +22,8 @@
     export let columns: number;
     export let fullView: boolean;
 
+    $: yearDisplay = calendar.getNameForYear(year);
+
     let yearContainer: HTMLDivElement;
 
     let firstMonth = months[0];
@@ -44,6 +46,11 @@
             if (!entries.length) return;
             if (!entries[0].isIntersecting) return;
             appendObserver.disconnect();
+            if (
+                !calendar.canGoToNextYear(lastMonth.year) &&
+                lastMonth.number === calendar.data.months.length - 1
+            )
+                return;
             appendMonth();
             destroy(trackedMonths.shift());
             resetAppend();
@@ -83,6 +90,11 @@
     );
     /** This function will append a new month svelte instance to the year container. */
     const appendMonth = (reset = true) => {
+        if (
+            !calendar.canGoToNextYear(lastMonth.year) &&
+            lastMonth.number === calendar.data.months.length - 1
+        )
+            return;
         lastMonth = calendar.getMonth(lastMonth.number + 1, lastMonth.year);
 
         if (
@@ -90,7 +102,7 @@
             !(yearContainer.lastElementChild instanceof HTMLHeadingElement)
         ) {
             const header = yearContainer.createEl("h2", {
-                text: `${lastMonth.year}`,
+                text: calendar.getNameForYear(lastMonth.year),
                 cls: "fantasy-title"
             });
             trackedMonths.push(header);
@@ -102,8 +114,8 @@
 
         if (reset) {
             firstMonth = calendar.getMonth(
-                firstMonth.number + 1,
-                firstMonth.year
+                (firstMonth?.number ?? 0) + 1,
+                firstMonth?.year ?? 1
             );
             resetPrepend();
         }
@@ -115,6 +127,7 @@
             if (!entries.length) return;
             if (!entries[0].isIntersecting) return;
             prependObserver.disconnect();
+            if (!firstMonth) return;
             prependMonth();
             destroy(trackedMonths.pop());
             resetPrepend();
@@ -152,14 +165,14 @@
     /** This function will prepend a new month svelte instance to the year container. */
     const prependMonth = (reset = true) => {
         firstMonth = calendar.getMonth(firstMonth.number - 1, firstMonth.year);
-
+        if (!firstMonth) return;
         trackedMonths.unshift(createMonth(firstMonth, true));
         if (
             firstMonth.number === 0 &&
             !(yearContainer.firstElementChild instanceof HTMLHeadingElement)
         ) {
             const header = createEl("h2", {
-                text: `${firstMonth.year}`,
+                text: calendar.getNameForYear(firstMonth.year),
                 cls: "fantasy-title"
             });
             yearContainer.prepend(header);
@@ -271,7 +284,7 @@
 
 <div class="year-view">
     <YearNav
-        {year}
+        year={yearDisplay}
         {current}
         on:next
         on:previous

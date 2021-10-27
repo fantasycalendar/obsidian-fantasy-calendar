@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { Notice } from "obsidian";
+
     import type CalendarHelper from "src/helper";
 
     import { createEventDispatcher, getContext, onMount, tick } from "svelte";
@@ -21,6 +23,7 @@
     export let current: string;
     export let columns: number;
 
+    $: yearDisplay = calendar.getNameForYear(year);
     let yearContainer: HTMLElement;
 
     /** Setup for eventual infinite scroll of big year view. */
@@ -65,10 +68,20 @@
     const years: Array<HTMLHeadingElement | YearViewContainer> = [];
 
     const next = () => {
+        if (!calendar.canGoToNextYear(year)) {
+            new Notice(
+                "This is the last year. Additional years can be created in settings."
+            );
+            return;
+        }
         year = year + 1;
         reset(year);
     };
     const previous = () => {
+        if (year === 1) {
+            new Notice("This is the earliest year.");
+            return;
+        }
         year = year - 1;
         reset(year);
     };
@@ -93,7 +106,7 @@
 
 <div class="year-view">
     <YearNav
-        {year}
+        year={yearDisplay}
         {current}
         arrows={true}
         on:next={() => next()}

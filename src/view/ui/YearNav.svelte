@@ -5,7 +5,7 @@
 
     const dispatch = createEventDispatcher();
 
-    export let year: number;
+    export let year: string;
     export let arrows = false;
     export let current: string;
 

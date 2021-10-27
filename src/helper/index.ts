@@ -116,6 +116,16 @@ export class DayHelper {
 }
 
 export default class CalendarHelper extends Events {
+    getNameForYear(year: number): string {
+        if (!this.data.useCustomYears) return `${year}`;
+        if (
+            this.data.useCustomYears &&
+            year - 1 >= 0 &&
+            year <= this.data.years?.length
+        ) {
+            return this.data.years[year - 1].name;
+        }
+    }
     maxDays: number;
     constructor(public object: Calendar, public plugin: FantasyCalendar) {
         super();
@@ -258,11 +268,8 @@ export default class CalendarHelper extends Events {
     get nextMonth() {
         return this.getMonth(this.displayed.month + 1, this.displayed.year);
     }
-    canGoToNextYear() {
-        return (
-            !this.data.useCustomYears ||
-            this.displayed.year < this.data.years.length
-        );
+    canGoToNextYear(year = this.displayed.year) {
+        return !this.data.useCustomYears || year < this.data.years.length;
     }
     goToNext() {
         if (this.nextMonthIndex < this.displayed.month) {

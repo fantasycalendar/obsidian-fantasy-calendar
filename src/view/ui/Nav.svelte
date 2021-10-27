@@ -6,7 +6,7 @@
     const dispatch = createEventDispatcher();
 
     export let month: string;
-    export let year: number;
+    export let year: string;
     export let current: string;
 
     const left = (node: HTMLElement) => {

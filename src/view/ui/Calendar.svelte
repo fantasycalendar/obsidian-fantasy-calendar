@@ -33,6 +33,7 @@
 
     calendar.on("month-update", () => {
         year = calendar.displayed.year;
+        yearDisplay = calendar.getNameForYear(calendar.displayed.year);
         month = calendar.currentMonth;
         weeks = calendar.weeksOfMonth(month);
         months = calendar.getMonthsForYear(year);
@@ -40,6 +41,7 @@
 
     $: weekdays = calendar.weekdays;
     $: year = calendar.displayed.year;
+    $: yearDisplay = calendar.getNameForYear(calendar.displayed.year);
     $: month = calendar.currentMonth;
     $: months = calendar.getMonthsForYear(year);
     $: weeks = calendar.weeksOfMonth(month);
@@ -88,7 +90,7 @@
     {:else}
         <Nav
             month={month.name}
-            {year}
+            year={yearDisplay}
             current={calendar.displayedDate}
             on:next={() => calendar.goToNext()}
             on:previous={() => calendar.goToPrevious()}
