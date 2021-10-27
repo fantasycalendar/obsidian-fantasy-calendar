@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.1.3...1.2.0) (2021-10-27)
+
+
+### Features
+
+* Custom years can now be created and used ([2901625](https://github.com/valentine195/obsidian-fantasy-calendar/commit/2901625f38150e0fd384a7bdffcbdf100b0e2abe))
+
+
+### Bug Fixes
+
+* edited calendars in settings were maintaing changes even when canceled ([f8bfeac](https://github.com/valentine195/obsidian-fantasy-calendar/commit/f8bfeac8e7f938f37b82a0d324ca1a35e7f147d9))
+
 ### [1.1.3](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.1.2...1.1.3) (2021-10-27)
 
 
