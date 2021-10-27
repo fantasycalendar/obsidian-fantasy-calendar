@@ -397,7 +397,7 @@ export const PRESET_CALENDARS: Calendar[] = [
                 category: "historical-events"
             }
         ],
-        id: "ID_89b9bb487979",
+        id: null,
         categories: [
             {
                 name: "Natural Events",
@@ -803,7 +803,7 @@ export const PRESET_CALENDARS: Calendar[] = [
                 category: null
             }
         ],
-        id: "ID_aacad8784b29",
+        id: null,
         categories: [
             {
                 name: "Natural Events",
@@ -2100,7 +2100,7 @@ export const PRESET_CALENDARS: Calendar[] = [
                 category: null
             }
         ],
-        id: "ID_bb2b99daca48",
+        id: null,
         categories: [
             {
                 name: "Natural Events",
@@ -2758,7 +2758,7 @@ export const PRESET_CALENDARS: Calendar[] = [
                 category: null
             }
         ],
-        id: "ID_99598aa9db98",
+        id: null,
         categories: []
     },
     {
@@ -3024,7 +3024,7 @@ export const PRESET_CALENDARS: Calendar[] = [
                 category: "natural-event"
             }
         ],
-        id: "ID_a9e8985aeb3b",
+        id: null,
         categories: [
             {
                 name: "Natural Event",
@@ -3540,7 +3540,7 @@ export const PRESET_CALENDARS: Calendar[] = [
                 category: "secular-holidays"
             }
         ],
-        id: "ID_2adba9ab690b",
+        id: null,
         categories: [
             {
                 name: "Religious Holidays",
@@ -3880,7 +3880,7 @@ export const PRESET_CALENDARS: Calendar[] = [
                 category: "festivals"
             }
         ],
-        id: "ID_29389bca4adb",
+        id: null,
         categories: [
             {
                 name: "Natural Events",

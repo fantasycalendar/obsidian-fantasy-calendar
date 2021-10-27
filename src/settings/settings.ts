@@ -303,11 +303,11 @@ class CreateCalendarModal extends Modal {
     }
     constructor(public plugin: FantasyCalendar, existing?: Calendar) {
         super(plugin.app);
-        this.calendar.id = nanoid(6);
         if (existing) {
             this.editing = true;
             this.calendar = { ...existing };
         }
+        this.calendar.id = nanoid(6);
         this.containerEl.addClass("fantasy-calendar-create-calendar");
     }
     async display() {
