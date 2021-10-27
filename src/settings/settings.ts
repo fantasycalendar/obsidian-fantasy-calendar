@@ -12,6 +12,9 @@ import {
     TextComponent,
     TFolder
 } from "obsidian";
+
+import copy from "fast-copy";
+
 import { DEFAULT_CALENDAR } from "../main";
 import type FantasyCalendar from "../main";
 import Importer from "./import/importer";
@@ -21,10 +24,18 @@ import Weekdays from "./ui/Weekdays.svelte";
 import Months from "./ui/Months.svelte";
 import EventsUI from "./ui/Events.svelte";
 import Categories from "./ui/Categories.svelte";
+import Year from "./ui/Year.svelte";
 
 import "./settings.css";
 import { nanoid } from "src/utils/functions";
-import type { Calendar, Event, EventCategory, LeapDay, Moon } from "src/@types";
+import type {
+    Calendar,
+    Event,
+    EventCategory,
+    LeapDay,
+    Moon,
+    Year as YearType
+} from "src/@types";
 
 import { CreateEventModal } from "./modals/event";
 import { confirmWithModal } from "./modals/confirm";
@@ -192,7 +203,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                         const modal = new CreateCalendarModal(this.plugin);
                         modal.onClose = async () => {
                             if (!modal.saved) return;
-                            const calendar = { ...modal.calendar };
+                            const calendar = copy(modal.calendar);
                             if (!calendar.current.year) {
                                 calendar.current.year = 1;
                             }
@@ -227,11 +238,14 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                             calendar
                         );
                         modal.onClose = async () => {
-                            if (!modal.saved) return;
+                            if (!modal.saved) {
+                                this.showCalendars(element);
+                                return;
+                            }
                             this.data.calendars.splice(
                                 this.data.calendars.indexOf(calendar),
                                 1,
-                                { ...modal.calendar }
+                                copy(modal.calendar)
                             );
 
                             await this.plugin.saveCalendar();
@@ -259,11 +273,8 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                                 (c) => c.id != calendar.id
                             );
                         await this.plugin.saveCalendar();
-                        if (this.data.defaultCalendar == calendar.id) {
-                            this.data.defaultCalendar =
-                                this.data.calendars[0]?.id ?? null;
-                        }
 
+                        this.buildInfo();
                         this.showCalendars(element);
                     });
                 });
@@ -289,6 +300,7 @@ class CreateCalendarModal extends Modal {
     uiEl: HTMLDivElement;
     moonEl: HTMLDivElement;
     leapdayEl: any;
+    yearEl: HTMLDivElement;
     get static() {
         return this.calendar.static;
     }
@@ -306,7 +318,7 @@ class CreateCalendarModal extends Modal {
         this.calendar.id = nanoid(6);
         if (existing) {
             this.editing = true;
-            this.calendar = { ...existing };
+            this.calendar = copy(existing);
         }
         this.containerEl.addClass("fantasy-calendar-create-calendar");
     }
@@ -360,6 +372,8 @@ class CreateCalendarModal extends Modal {
         this.buildWeekdays();
         this.monthEl = this.uiEl.createDiv("fantasy-calendar-element");
         this.buildMonths();
+        this.yearEl = this.uiEl.createDiv("fantasy-calendar-element");
+        this.buildYear();
         this.leapdayEl = this.uiEl.createDiv("fantasy-calendar-element");
         this.buildLeapDays();
         this.eventEl = this.uiEl.createDiv("fantasy-calendar-element");
@@ -369,6 +383,7 @@ class CreateCalendarModal extends Modal {
         this.moonEl = this.uiEl.createDiv("fantasy-calendar-element");
         this.buildMoons();
     }
+
     buildInfo() {
         this.infoEl.empty();
         this.infoDetailEl = this.infoEl.createEl("details", {
@@ -554,7 +569,25 @@ class CreateCalendarModal extends Modal {
             this.checkCanSave();
         });
     }
-
+    buildYear() {
+        this.yearEl.empty();
+        const years = new Year({
+            target: this.yearEl,
+            props: {
+                useCustomYears: this.static.useCustomYears,
+                years: this.static.years,
+                app: this.app
+            }
+        });
+        years.$on("years-update", (e: CustomEvent<YearType[]>) => {
+            this.calendar.static.years = e.detail;
+            this.buildEvents();
+        });
+        years.$on("use-custom-update", (e: CustomEvent<boolean>) => {
+            this.calendar.static.useCustomYears = e.detail;
+            this.buildEvents();
+        });
+    }
     buildLeapDays() {
         this.leapdayEl.empty();
         const leapdayUI = new LeapDays({
@@ -738,7 +771,12 @@ class CreateCalendarModal extends Modal {
             this.week?.length &&
             this.week?.every((d) => d.name?.length) &&
             this.calendar.name?.length &&
-            this.calendar.static.firstWeekDay < (this.week?.length ?? Infinity)
+            this.calendar.static.firstWeekDay <
+                (this.week?.length ?? Infinity) &&
+            (!this.calendar.static.useCustomYears ||
+                (this.calendar.static.useCustomYears &&
+                    this.calendar.static.years?.length &&
+                    this.calendar.static.years.every((y) => y.name?.length)))
         ) {
             this.canSave = true;
         }
@@ -766,6 +804,16 @@ class CreateCalendarModal extends Modal {
                         new Notice("Every month must have a name.");
                     } else if (!this.months.every((m) => m.length)) {
                         new Notice("Every month must have a length.");
+                    } else if (
+                        this.calendar.static.useCustomYears &&
+                        !this.calendar.static.years?.length
+                    ) {
+                        new Notice("Custom years must be defined.");
+                    } else if (
+                        this.calendar.static.useCustomYears &&
+                        !this.calendar.static.years.every((y) => y.name?.length)
+                    ) {
+                        new Notice("Each custom year must be named.");
                     } else if (
                         this.calendar.static.firstWeekDay >= this.week.length
                     ) {
