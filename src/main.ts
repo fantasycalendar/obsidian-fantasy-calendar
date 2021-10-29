@@ -146,7 +146,7 @@ export default class FantasyCalendar extends Plugin {
         await this.app.workspace.getRightLeaf(false).setViewState({
             type: VIEW_TYPE
         });
-        /* if (this.view) this.app.workspace.revealLeaf(this.view.leaf); */
+        if (this.view) this.app.workspace.revealLeaf(this.view.leaf);
     }
     async addFullCalendarView(startup: boolean = false) {
         if (startup && this.app.workspace.getLeavesOfType(FULL_VIEW).length)

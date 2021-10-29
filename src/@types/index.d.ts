@@ -10,6 +10,7 @@ export interface Calendar {
     events: Event[];
     categories: EventCategory[];
     date?: number;
+    displayWeeks?: boolean;
 }
 
 export interface FantasyCalendarData {

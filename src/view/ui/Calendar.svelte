@@ -15,6 +15,7 @@
     export let yearView: boolean = false;
     export let calendar: CalendarHelper;
     export let moons: boolean;
+    export let displayWeeks: boolean;
 
     $: {
         if (yearView) dayView = false;
@@ -37,12 +38,14 @@
         month = calendar.currentMonth;
         weeks = calendar.weeksOfMonth(month);
         months = calendar.getMonthsForYear(year);
+        firstWeek = calendar.weekNumbersOfMonth(month);
     });
 
     $: weekdays = calendar.weekdays;
     $: year = calendar.displayed.year;
     $: yearDisplay = calendar.getNameForYear(calendar.displayed.year);
     $: month = calendar.currentMonth;
+    $: firstWeek = calendar.weekNumbersOfMonth(month);
     $: months = calendar.getMonthsForYear(year);
     $: weeks = calendar.weeksOfMonth(month);
 </script>
@@ -53,7 +56,8 @@
     class:full-view={fullView}
     class:year-view={yearView}
     style="--calendar-columns: {calendar.weekdays
-        .length};--calendar-rows: {calendar.weeksPerCurrentMonth};"
+        .length};  --column-widths: {(1 / calendar.weekdays.length) *
+        100}%; --calendar-rows: {calendar.weeksPerCurrentMonth};"
 >
     {#if yearView && !fullView}
         <YearView
@@ -97,30 +101,42 @@
             on:reset={() => calendar.reset()}
             on:settings
         />
-        {#if month.type == "month"}
-            <div class="weekdays">
-                {#each weekdays as day}
-                    <span class="weekday fantasy-weekday"
-                        >{day.name.slice(0, 3)}</span
-                    >
-                {/each}
+        <div class="month-container">
+            <div class="weeks">
+                {#if displayWeeks}
+                    <span class="week-num weekday fantasy-weekday">W</span>
+                    <div class="week-num-container">
+                        {#each [...Array(weeks).keys()] as num}
+                            <span class="week-num">{firstWeek + 1 + num}</span>
+                        {/each}
+                    </div>
+                {/if}
             </div>
-        {/if}
-        <MonthView
-            columns={weekdays.length}
-            {weeks}
-            {month}
-            {fullView}
-            on:day-click
-            on:day-doubleclick
-            on:day-context-menu
-            on:event-click
-            on:event-mouseover
-            on:event-context
-        />
-        <!-- previous={days.previous}
-            current={days.current}
-            next={days.next} -->
+            <div class="month-view">
+                {#if month.type == "month"}
+                    <div class="weekdays">
+                        {#each weekdays as day}
+                            <span class="weekday fantasy-weekday"
+                                >{day.name.slice(0, 3)}</span
+                            >
+                        {/each}
+                    </div>
+                {/if}
+
+                <MonthView
+                    columns={weekdays.length}
+                    {weeks}
+                    {month}
+                    {fullView}
+                    on:day-click
+                    on:day-doubleclick
+                    on:day-context-menu
+                    on:event-click
+                    on:event-mouseover
+                    on:event-context
+                />
+            </div>
+        </div>
     {/if}
 </div>
 {#if dayView && !fullView}
@@ -145,11 +161,45 @@
         display: flex;
         flex-flow: column;
     }
+
+    .month-container {
+        display: flex;
+    }
+    .month-view {
+        flex-grow: 2;
+    }
+    .weeks {
+        display: grid;
+        grid-template-rows: auto 1fr;
+    }
+    .week-num-container {
+        display: grid;
+        grid-template-rows: repeat(var(--calendar-rows), auto);
+        padding: 0.25rem 0;
+    }
+    .week-num {
+        background-color: transparent;
+        border: 2px solid transparent;
+        border-radius: 4px;
+        color: var(--color-text-day);
+        cursor: pointer;
+        font-size: 0.8em;
+        height: 100%;
+        padding: 2px;
+        position: relative;
+        text-align: center;
+        vertical-align: baseline;
+        overflow: visible;
+    }
     .weekdays {
         display: grid;
         grid-template-columns: repeat(var(--calendar-columns), 1fr);
         grid-template-rows: auto;
+        padding: 0 0.25rem;
         gap: 2px;
+    }
+    .weekdays.display-weeks {
+        grid-template-columns: auto repeat(var(--calendar-columns), 1fr);
     }
     .weekday {
         background-color: var(--color-background-heading);
@@ -159,6 +209,7 @@
         padding: 4px;
         text-transform: uppercase;
         text-align: center;
+        border: 2px solid transparent;
     }
     hr {
         margin: 1rem 0;

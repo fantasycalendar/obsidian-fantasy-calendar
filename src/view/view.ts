@@ -56,7 +56,6 @@ export default class FantasyCalendarView extends ItemView {
     }
     get full() {
         return !("collapse" in this.root);
-    
     }
     yearView: boolean = false;
     moons: boolean = true;
@@ -206,7 +205,8 @@ export default class FantasyCalendarView extends ItemView {
                 calendar: this.helper,
                 fullView: this.full,
                 yearView: this.yearView,
-                moons: this.moons
+                moons: this.moons,
+                displayWeeks: this.helper.displayWeeks
             }
         });
         this._app.$on("day-click", (event: CustomEvent<DayHelper>) => {
@@ -282,6 +282,18 @@ export default class FantasyCalendarView extends ItemView {
             const menu = new Menu(this.app);
 
             menu.setNoIcon();
+            menu.addItem((item) => {
+                item.setTitle(
+                    `${this.calendar.displayWeeks ? "Hide" : "Show"} Weeks`
+                ).onClick(() => {
+                    this.calendar.displayWeeks = !this.calendar.displayWeeks;
+                    this.helper.update(this.calendar);
+                    this._app.$set({
+                        displayWeeks: this.calendar.displayWeeks
+                    });
+                    this.plugin.saveSettings();
+                });
+            });
             menu.addItem((item) => {
                 item.setTitle(
                     `Open ${this.yearView ? "Month" : "Year"}`

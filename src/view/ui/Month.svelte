@@ -29,8 +29,7 @@
         class="fantasy-month"
         class:full-view={fullView}
         class:year-view={yearView}
-        style="--calendar-columns: {columns}; --column-widths: {(1 / columns) *
-            100}%;--calendar-rows: {fullView
+        style="--calendar-columns: {columns};--calendar-rows: {fullView
             ? `${(1 / weeks) * 100}%`
             : '1fr'}; "
     >
@@ -73,7 +72,7 @@
         );
 
         grid-auto-rows: var(--calendar-rows);
-        /* gap: 2px; */
+
     }
 
     .full-view {

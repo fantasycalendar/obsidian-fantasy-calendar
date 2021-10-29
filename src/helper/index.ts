@@ -127,6 +127,9 @@ export default class CalendarHelper extends Events {
         }
     }
     maxDays: number;
+    get displayWeeks() {
+        return this.object.displayWeeks;
+    }
     constructor(public object: Calendar, public plugin: FantasyCalendar) {
         super();
         this.displayed = { ...this.current };
@@ -432,7 +435,7 @@ export default class CalendarHelper extends Events {
      */
     get weeksPerCurrentMonth() {
         return Math.ceil(
-            this.data.months[this.displayed.month].length /
+            this.getMonth(this.displayed.month, this.displayed.year).length /
                 this.data.weekdays.length
         );
     }
@@ -440,6 +443,10 @@ export default class CalendarHelper extends Events {
         return Math.ceil(
             (month.length + month.firstWeekday) / this.data.weekdays.length
         );
+    }
+    weekNumbersOfMonth(month: MonthHelper) {
+        const daysBefore = month.daysBefore + this.firstDayOfYear(month.year);
+        return Math.floor(daysBefore / this.data.weekdays.length);
     }
     /**
      * Total number of days in a year.
