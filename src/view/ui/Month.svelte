@@ -20,6 +20,7 @@
 <div
     class="month"
     class:full-view={fullView}
+    data-id={month.id}
     id={`MONTH-${month.id}-${month.year}`}
 >
     {#if yearView}
@@ -72,7 +73,6 @@
         );
 
         grid-auto-rows: var(--calendar-rows);
-
     }
 
     .full-view {

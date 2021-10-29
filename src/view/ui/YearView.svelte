@@ -17,7 +17,7 @@
     const dispatch = createEventDispatcher();
 
     export let current: string;
-    export let months: MonthHelper[];
+
     export let year: number;
     export let columns: number;
     export let fullView: boolean;
@@ -97,10 +97,6 @@
         )
             return;
         lastMonth = calendar.getMonth(lastMonth.number + 1, lastMonth.year);
-        console.log(
-            "🚀 ~ file: YearView.svelte ~ line 100 ~ lastMonth",
-            lastMonth
-        );
 
         if (
             lastMonth.number === 0 &&
@@ -247,10 +243,7 @@
         await tick();
 
         year = calendar.current.year;
-        /** Slice it so append and prepend functions can create their headers. */
-        months = calendar
-            .getMonthsForYear(year)
-            .slice(1, calendar.data.months.length - 1);
+
         firstMonth = calendar.getMonth(
             calendar.displayed.month - 1,
             calendar.displayed.year
@@ -258,7 +251,7 @@
         /* firstMonth = months[0];*/
         lastMonth = firstMonth;
         /* trackedMonths.push(createMonth(firstMonth, false)); */
-        for (let month of months) {
+        for (let i = 0; i < calendar.data.months.length; i++) {
             appendMonth(false);
             /* trackedMonths.push(createMonth(month, false)); */
         }
