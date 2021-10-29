@@ -26,8 +26,8 @@
 
     let yearContainer: HTMLDivElement;
 
-    let firstMonth = months[0];
-    let lastMonth = months[months.length - 1];
+    let firstMonth: MonthHelper;
+    let lastMonth: MonthHelper;
 
     const calendarStore = getContext<Writable<CalendarHelper>>("calendar");
     let calendar: CalendarHelper;
@@ -63,6 +63,7 @@
     );
     const resetAppend = () => {
         const el = yearContainer.children[yearContainer.children.length - 2];
+        if (!el) return;
         appendObserver.observe(el);
     };
     const appendHeaderObserver = new IntersectionObserver(
@@ -96,6 +97,10 @@
         )
             return;
         lastMonth = calendar.getMonth(lastMonth.number + 1, lastMonth.year);
+        console.log(
+            "🚀 ~ file: YearView.svelte ~ line 100 ~ lastMonth",
+            lastMonth
+        );
 
         if (
             lastMonth.number === 0 &&
@@ -117,8 +122,8 @@
                 (firstMonth?.number ?? 0) + 1,
                 firstMonth?.year ?? 1
             );
-            resetPrepend();
         }
+        resetPrepend();
     };
 
     const prependObserver = new IntersectionObserver(
@@ -140,6 +145,7 @@
     );
     const resetPrepend = () => {
         const el = yearContainer.children[1];
+        if (!el) return;
         prependObserver.observe(el);
     };
     const prependHeaderObserver = new IntersectionObserver(
@@ -165,6 +171,7 @@
     /** This function will prepend a new month svelte instance to the year container. */
     const prependMonth = (reset = true) => {
         firstMonth = calendar.getMonth(firstMonth.number - 1, firstMonth.year);
+
         if (!firstMonth) return;
         trackedMonths.unshift(createMonth(firstMonth, true));
         if (
@@ -185,8 +192,8 @@
 
         if (reset) {
             lastMonth = calendar.getMonth(lastMonth.number - 1, lastMonth.year);
-            resetAppend();
         }
+        resetAppend();
     };
 
     const createMonth = (month: MonthHelper, anchor: boolean) => {
@@ -244,14 +251,18 @@
         months = calendar
             .getMonthsForYear(year)
             .slice(1, calendar.data.months.length - 1);
-        firstMonth = months[0];
-        lastMonth = months[months.length - 1];
-
+        firstMonth = calendar.getMonth(
+            calendar.displayed.month - 1,
+            calendar.displayed.year
+        );
+        /* firstMonth = months[0];*/
+        lastMonth = firstMonth;
+        /* trackedMonths.push(createMonth(firstMonth, false)); */
         for (let month of months) {
-            trackedMonths.push(createMonth(month, false));
+            appendMonth(false);
+            /* trackedMonths.push(createMonth(month, false)); */
         }
         prependMonth(false);
-        appendMonth(false);
 
         await tick();
         /** All months are created when year view is reset, so current month exists. */

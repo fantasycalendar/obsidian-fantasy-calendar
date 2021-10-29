@@ -28,6 +28,9 @@
                 (event.end.month == undefined ||
                     date.month == event.end.month) &&
                 (event.end.year == undefined || date.year === event.end.year);
+            if (start && end) {
+                multi = false;
+            }
         }
     }
 
