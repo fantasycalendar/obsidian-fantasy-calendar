@@ -505,13 +505,37 @@ class CreateCalendarModal extends Modal {
             "fantasy-calendar-date-field"
         );
         yearEl.createEl("label", { text: "Year" });
-        const year = new TextComponent(yearEl)
-            .setPlaceholder("Year")
-            .setValue(`${this.calendar.current.year}`)
-            .onChange((v) => {
-                this.calendar.current.year = Number(v);
+        if (this.calendar.static.useCustomYears) {
+            const yearDrop = new DropdownComponent(yearEl);
+            (this.calendar.static.years ?? []).forEach((year) => {
+                yearDrop.addOption(year.id, year.name);
             });
-        year.inputEl.setAttr("type", "number");
+            if (
+                this.calendar.current.year > this.calendar.static.years?.length
+            ) {
+                this.calendar.current.year = this.calendar.static.years
+                    ? this.calendar.static.years.length
+                    : null;
+            }
+            yearDrop
+                .setValue(
+                    this.calendar.static.years?.[this.calendar.current.year - 1]
+                        ?.id
+                )
+                .onChange((v) => {
+                    this.calendar.current.year =
+                        this.calendar.static.years.findIndex((y) => y.id == v) +
+                        1;
+                });
+        } else {
+            const year = new TextComponent(yearEl)
+                .setPlaceholder("Year")
+                .setValue(`${this.calendar.current.year}`)
+                .onChange((v) => {
+                    this.calendar.current.year = Number(v);
+                });
+            year.inputEl.setAttr("type", "number");
+        }
     }
 
     buildWeekdays() {
@@ -581,10 +605,12 @@ class CreateCalendarModal extends Modal {
         });
         years.$on("years-update", (e: CustomEvent<YearType[]>) => {
             this.calendar.static.years = e.detail;
+            this.buildDateFields();
             this.buildEvents();
         });
         years.$on("use-custom-update", (e: CustomEvent<boolean>) => {
             this.calendar.static.useCustomYears = e.detail;
+            this.buildDateFields();
             this.buildEvents();
         });
     }

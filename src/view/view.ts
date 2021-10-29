@@ -116,6 +116,7 @@ export default class FantasyCalendarView extends ItemView {
         if (!this._app) {
             this.build();
         } else {
+            console.log("reset", this.helper.current);
             this._app.$set({ calendar: this.helper });
         }
     }
@@ -651,13 +652,44 @@ class ChangeDateModal extends Modal {
             "fantasy-calendar-date-field"
         );
         yearEl.createEl("label", { text: "Year" });
+        if (this.calendar.static.useCustomYears) {
+            const yearDrop = new DropdownComponent(yearEl);
+            (this.calendar.static.years ?? []).forEach((year) => {
+                yearDrop.addOption(year.id, year.name);
+            });
+            if (this.date.year > this.calendar.static.years?.length) {
+                this.date.year = this.calendar.static.years
+                    ? this.calendar.static.years.length
+                    : null;
+            }
+            yearDrop
+                .setValue(this.calendar.static.years?.[this.date.year - 1]?.id)
+                .onChange((v) => {
+                    this.date.year =
+                        this.calendar.static.years.findIndex((y) => y.id == v) +
+                        1;
+                });
+        } else {
+            const year = new TextComponent(yearEl)
+                .setPlaceholder("Year")
+                .setValue(`${this.date.year}`)
+                .onChange((v) => {
+                    this.date.year = Number(v);
+                });
+            year.inputEl.setAttr("type", "number");
+        }
+
+        /* const yearEl = this.dateFieldEl.createDiv(
+            "fantasy-calendar-date-field"
+        );
+        yearEl.createEl("label", { text: "Year" });
         const year = new TextComponent(yearEl)
             .setPlaceholder("Year")
             .setValue(`${this.date.year}`)
             .onChange((v) => {
                 this.date.year = Number(v);
             });
-        year.inputEl.setAttr("type", "number");
+        year.inputEl.setAttr("type", "number"); */
     }
     onOpen() {
         this.display();
