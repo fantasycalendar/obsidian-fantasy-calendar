@@ -162,6 +162,10 @@
         flex-flow: column;
     }
 
+    .fantasy-calendar.full-view .month-container {
+        height: 100%;
+    }
+
     .month-container {
         display: flex;
     }
