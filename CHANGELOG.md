@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.2.0...1.3.0) (2021-10-29)
+
+
+### Features
+
+* added week numbers display ([cddb7bf](https://github.com/valentine195/obsidian-fantasy-calendar/commit/cddb7bf3c16b08377c005058a84469960ab9f28b))
+
+
+### Bug Fixes
+
+* fixed issue with current date not being clamped inside custom years ([1f02d02](https://github.com/valentine195/obsidian-fantasy-calendar/commit/1f02d0274fef10929a43e2e1da87203b9c0cd383))
+
 ## [1.2.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.1.3...1.2.0) (2021-10-27)
 
 
