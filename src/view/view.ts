@@ -116,7 +116,7 @@ export default class FantasyCalendarView extends ItemView {
         if (!this._app) {
             this.build();
         } else {
-            console.log("reset", this.helper.current);
+            
             this._app.$set({ calendar: this.helper });
         }
     }
@@ -678,18 +678,6 @@ class ChangeDateModal extends Modal {
                 });
             year.inputEl.setAttr("type", "number");
         }
-
-        /* const yearEl = this.dateFieldEl.createDiv(
-            "fantasy-calendar-date-field"
-        );
-        yearEl.createEl("label", { text: "Year" });
-        const year = new TextComponent(yearEl)
-            .setPlaceholder("Year")
-            .setValue(`${this.date.year}`)
-            .onChange((v) => {
-                this.date.year = Number(v);
-            });
-        year.inputEl.setAttr("type", "number"); */
     }
     onOpen() {
         this.display();
