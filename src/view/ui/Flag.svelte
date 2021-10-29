@@ -21,14 +21,13 @@
                 date.day === event.date.day &&
                 (event.date.month == undefined ||
                     date.month == event.date.month) &&
-                (event.date.year === undefined ||
-                    date.year === event.date.year);
+                (event.date.year == undefined || date.year === event.date.year);
             first = start || date.day == 1;
             end =
                 date.day === event.end.day &&
                 (event.end.month == undefined ||
                     date.month == event.end.month) &&
-                (event.end.year === undefined || date.year === event.end.year);
+                (event.end.year == undefined || date.year === event.end.year);
         }
     }
 
