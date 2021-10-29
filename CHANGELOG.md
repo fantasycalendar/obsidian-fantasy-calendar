@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.1](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.3.0...1.3.1) (2021-10-29)
+
+
+### Bug Fixes
+
+* doubled first month in some situations in year view ([b00b4d9](https://github.com/valentine195/obsidian-fantasy-calendar/commit/b00b4d9ec30eec1a5b6a4817b4fa4fb91a75800a))
+* fixed css issue caused by addition of weeks ([0e6c1e4](https://github.com/valentine195/obsidian-fantasy-calendar/commit/0e6c1e42fdb3ded4e6b0eb969c10002a42564788))
+* issue with single day length "multi" events ([af6c52c](https://github.com/valentine195/obsidian-fantasy-calendar/commit/af6c52cd74810ceb48757d37640112a677ef2cb9))
+* removed console.logs ([89de4a2](https://github.com/valentine195/obsidian-fantasy-calendar/commit/89de4a2c826663088568829f471716a22375f54d))
+* single day events can no longer be considered multi ([cc4f352](https://github.com/valentine195/obsidian-fantasy-calendar/commit/cc4f352eac9a5835b7a9dba435924e257b5cf1f7))
+
 ## [1.3.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.2.0...1.3.0) (2021-10-29)
 
 
