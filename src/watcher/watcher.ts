@@ -115,24 +115,7 @@ export class Watcher extends Component {
         });
     }
     onunload() {
+        this.worker.terminate();
         this.worker = null;
     }
 }
-
-const parseDate = (date: string | CurrentCalendarData) => {
-    if (typeof date === "string") {
-        try {
-            const split = date.split(/[\-\/]/).map((d) => Number(d));
-
-            return {
-                year: split[0],
-                month: split[1],
-                day: split[2]
-            };
-        } catch (e) {
-            return;
-        }
-    } else {
-        return date;
-    }
-};
