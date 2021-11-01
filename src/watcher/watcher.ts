@@ -56,6 +56,21 @@ export class Watcher extends Component {
                 });
             })
         );
+        this.registerEvent(
+            this.vault.on("delete", (abstractFile) => {
+                if (!(abstractFile instanceof TFile)) return;
+
+                for (let calendar of this.calendars) {
+                    for (let event of calendar.events) {
+                        if (!event.note) continue;
+                        if (event.note === abstractFile.path) {
+                            event.note = null;
+                        }
+                    }
+                }
+                this.plugin.saveCalendar();
+            })
+        );
 
         this.worker.onmessage = async (
             evt: MessageEvent<OutgoingCalendarMessage>
