@@ -450,16 +450,17 @@ export default class FantasyCalendarView extends ItemView {
                                 `${newFilePath}/${event.name}.md`
                             );
 
-                            const file = this.app.vault.getAbstractFileByPath(
+                            let file = this.app.vault.getAbstractFileByPath(
                                 event.note
                             );
                             if (!file) {
-                                await this.app.vault.create(
+                                file = await this.app.vault.create(
                                     event.note,
                                     `---\n${stringifyYaml(content)}\n---`
                                 );
                             }
                             this.plugin.saveCalendar();
+
                             if (file instanceof TFile) {
                                 const fileViews =
                                     this.app.workspace.getLeavesOfType(
@@ -472,12 +473,11 @@ export default class FantasyCalendarView extends ItemView {
                                 if (existing) {
                                     this.app.workspace.setActiveLeaf(existing);
                                 } else {
-                                    const leaf = MODIFIER_KEY
-                                        ? this.app.workspace.splitActiveLeaf()
-                                        : this.app.workspace.getUnpinnedLeaf();
-                                    await leaf.openFile(file, {
-                                        active: true
-                                    });
+                                    await this.app.workspace
+                                        .getUnpinnedLeaf()
+                                        .openFile(file, {
+                                            active: true
+                                        });
                                 }
                             }
                         });
