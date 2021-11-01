@@ -61,7 +61,6 @@
 >
     {#if yearView && !fullView}
         <YearView
-            {months}
             {year}
             {fullView}
             columns={weekdays.length}
@@ -201,9 +200,6 @@
         grid-template-rows: auto;
         padding: 0 0.25rem;
         gap: 2px;
-    }
-    .weekdays.display-weeks {
-        grid-template-columns: auto repeat(var(--calendar-columns), 1fr);
     }
     .weekday {
         background-color: var(--color-background-heading);

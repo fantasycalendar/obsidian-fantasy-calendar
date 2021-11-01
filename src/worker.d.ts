@@ -4,8 +4,3 @@ declare module "*.worker.ts" {
     }
     export = WebpackWorker;
 }
-
-declare module "*.png" {
-    const PngFile: string;
-    export = PngFile;
-}

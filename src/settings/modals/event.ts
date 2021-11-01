@@ -238,7 +238,9 @@ export class CreateEventModal extends Modal {
             .setDesc("Link the event to a note.")
             .addText((text) => {
                 let files = this.app.vault.getFiles();
-                text.setPlaceholder("Path").setValue(this.event.note);
+                text.setPlaceholder("Path").setValue(
+                    this.event.note?.split("/").pop().split(".").shift()
+                );
                 const modal = new PathSuggestionModal(this.app, text, [
                     ...files
                 ]);
@@ -246,7 +248,7 @@ export class CreateEventModal extends Modal {
                 modal.onClose = async () => {
                     text.inputEl.blur();
 
-                    this.event.note = text.inputEl.value;
+                    this.event.note = modal.file.path;
 
                     this.tryParse(this.event.note, modal.file);
                 };
@@ -283,7 +285,7 @@ export class CreateEventModal extends Modal {
         });
     }
     async tryParse(note: string, file: TFile) {
-        if (
+        /* if (
             this.event.name ||
             this.event.description ||
             this.event.date.day ||
@@ -298,8 +300,8 @@ export class CreateEventModal extends Modal {
                 ))
             )
                 return;
-        }
-        this.event.name = note;
+        } */
+        this.event.name = note?.split("/").pop().split(".").shift();
         const cache = this.app.metadataCache.getFileCache(file);
 
         const { frontmatter } = cache;
