@@ -2,15 +2,19 @@ import {
     addIcon,
     ButtonComponent,
     DropdownComponent,
+    FileView,
     ItemView,
     MarkdownRenderer,
     MarkdownView,
     Menu,
     Modal,
+    normalizePath,
     Notice,
     Platform,
     Setting,
+    stringifyYaml,
     TextComponent,
+    TFile,
     WorkspaceLeaf,
     WorkspaceMobileDrawer,
     WorkspaceSidedock
@@ -29,6 +33,7 @@ export const FULL_VIEW = "FANTASY_CALENDAR_FULL_VIEW";
 import CalendarUI from "./ui/Calendar.svelte";
 import { confirmWithModal } from "src/settings/modals/confirm";
 import { daysBetween } from "src/utils/functions";
+import { MODIFIER_KEY } from "../main";
 
 addIcon(
     VIEW_TYPE,
@@ -116,7 +121,6 @@ export default class FantasyCalendarView extends ItemView {
         if (!this._app) {
             this.build();
         } else {
-            
             this._app.$set({ calendar: this.helper });
         }
     }
@@ -406,6 +410,80 @@ export default class FantasyCalendarView extends ItemView {
                 const menu = new Menu(this.app);
 
                 menu.setNoIcon();
+
+                if (!event.note) {
+                    menu.addItem((item) => {
+                        item.setTitle("Create Note").onClick(async () => {
+                            const path =
+                                this.app.workspace.getActiveFile()?.path;
+                            const newFilePath = path
+                                ? this.app.fileManager.getNewFileParent(path)
+                                      ?.parent ?? "/"
+                                : "/";
+
+                            const date = `${event.date.year}-${
+                                event.date.month + 1
+                            }-${event.date.day}`;
+
+                            let end: string;
+                            if (event.end) {
+                                end = `${event.end.year}-${
+                                    event.end.month + 1
+                                }-${event.end.day}`;
+                            }
+
+                            const content = {
+                                "fc-calendar": this.calendar.name,
+                                "fc-date": date,
+                                ...(event.end ? { "fc-end": end } : {}),
+                                ...(event.category
+                                    ? {
+                                          "fc-category":
+                                              this.calendar.categories.find(
+                                                  (cat) =>
+                                                      cat.id == event.category
+                                              )?.name
+                                      }
+                                    : {})
+                            };
+                            event.note = normalizePath(
+                                `${newFilePath}/${event.name}.md`
+                            );
+
+                            const file = this.app.vault.getAbstractFileByPath(
+                                event.note
+                            );
+                            if (!file) {
+                                await this.app.vault.create(
+                                    event.note,
+                                    `---\n${stringifyYaml(content)}\n---`
+                                );
+                            }
+                            this.plugin.saveCalendar();
+                            if (file instanceof TFile) {
+                                const fileViews =
+                                    this.app.workspace.getLeavesOfType(
+                                        "markdown"
+                                    );
+                                const existing = fileViews.find((l) => {
+                                    l.view instanceof FileView &&
+                                        l.view.file.path == event.note;
+                                });
+                                if (existing) {
+                                    this.app.workspace.setActiveLeaf(existing);
+                                } else {
+                                    const leaf = MODIFIER_KEY
+                                        ? this.app.workspace.splitActiveLeaf()
+                                        : this.app.workspace.getUnpinnedLeaf();
+                                    await leaf.openFile(file, {
+                                        active: true
+                                    });
+                                }
+                            }
+                        });
+                    });
+                }
+
                 menu.addItem((item) => {
                     item.setTitle("Edit Event").onClick(() => {
                         const modal = new CreateEventModal(

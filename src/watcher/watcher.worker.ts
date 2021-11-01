@@ -1,6 +1,6 @@
 import { CachedMetadata, FrontMatterCache } from "obsidian";
 import { Calendar, CurrentCalendarData, Event } from "src/@types";
-import { wrap } from "src/utils/functions";
+import { nanoid, wrap } from "src/utils/functions";
 
 export type ParseCalendarMessage = {
     type: "parse";
@@ -119,7 +119,7 @@ ctx.addEventListener(
                     id: calendar.id,
                     index: calendar.events.indexOf(existing),
                     event: {
-                        id: existing.id,
+                        id: existing?.id ?? nanoid(6),
                         name: existing?.name ?? file.basename,
                         note: file.path,
                         date,
