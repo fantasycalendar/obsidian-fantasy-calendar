@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.3.1...1.4.0) (2021-11-01)
+
+
+### Features
+
+* add "Create Note" option to event flag context menu ([2aaa21d](https://github.com/valentine195/obsidian-fantasy-calendar/commit/2aaa21d587d116b6d2575b44ae8dac74b555822c))
+
+
+### Bug Fixes
+
+* events are now unlinked from note if note is deleted ([b4abe11](https://github.com/valentine195/obsidian-fantasy-calendar/commit/b4abe118e33f4d1091defe6a5250ffe80ec28232))
+* Files linked to notes through the modal will now be parsed (close [#6](https://github.com/valentine195/obsidian-fantasy-calendar/issues/6)) ([4d712ff](https://github.com/valentine195/obsidian-fantasy-calendar/commit/4d712ff4de26652d22ed21e2ba833113bc82fbfd))
+
 ### [1.3.1](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.3.0...1.3.1) (2021-10-29)
 
 
