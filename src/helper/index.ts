@@ -373,15 +373,20 @@ export default class CalendarHelper extends Events {
             });
     }
 
-    getMonth(number: number, year: number) {
-        let index = wrap(number, this.data.months.length);
+    getMonth(number: number, year: number, direction: number = 0): MonthHelper {
+        const months = this.data.months;
+        let index = wrap(number, months.length);
 
         if (number < 0) year -= 1;
         if (year == 0) return null;
 
-        if (number >= this.data.months.length) year += 1;
+        if (number >= months.length) year += 1;
 
-        return new MonthHelper(this.data.months[index], index, year, this);
+        if (months[index].type == "intercalary" && direction != 0) {
+            return this.getMonth(number + direction, year, direction);
+        }
+
+        return new MonthHelper(months[index], index, year, this);
     }
 
     getPaddedDaysForMonth(month: MonthHelper) {
@@ -392,9 +397,10 @@ export default class CalendarHelper extends Events {
 
         const previousMonth = this.getMonth(
             month.index - 1,
-            this.displayed.year
+            this.displayed.year,
+            -1
         );
-        if (month.firstWeekday > 0) {
+        if (month.firstWeekday > 0 && month.type == "month") {
             previous =
                 previousMonth != null
                     ? previousMonth.days.slice(-month.firstWeekday)
@@ -404,7 +410,11 @@ export default class CalendarHelper extends Events {
         /** Get Days of Next Month */
         let next: DayHelper[] = [];
 
-        const nextMonth = this.getMonth(month.index + 1, this.displayed.year);
+        const nextMonth = this.getMonth(
+            month.index + 1,
+            this.displayed.year,
+            1
+        );
 
         if (
             month.lastWeekday < this.weekdays.length - 1 &&
@@ -518,7 +528,9 @@ export default class CalendarHelper extends Events {
         if (year < 1) return 0;
         return (
             Math.abs(year - 1) *
-                this.data.months.reduce((a, b) => a + b.length, 0) +
+                this.data.months
+                    .filter((m) => m.type == "month")
+                    .reduce((a, b) => a + b.length, 0) +
             this.leapDaysBeforeYear(year)
         );
     }

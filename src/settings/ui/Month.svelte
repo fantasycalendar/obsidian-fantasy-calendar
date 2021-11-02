@@ -30,9 +30,6 @@
 
     $: {
         month.type = type;
-        if (type == "intercalary") {
-            length = 1;
-        }
         /* dispatch("month-update", month); */
     }
 </script>
@@ -52,7 +49,6 @@
         placeholder="Length"
         bind:value={length}
         on:input={update}
-        disabled={month.type == "intercalary"}
         style="width: 100%;"
         min="0"
     />

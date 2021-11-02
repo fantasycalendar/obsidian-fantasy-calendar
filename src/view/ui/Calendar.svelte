@@ -37,7 +37,6 @@
         yearDisplay = calendar.getNameForYear(calendar.displayed.year);
         month = calendar.currentMonth;
         weeks = calendar.weeksOfMonth(month);
-        months = calendar.getMonthsForYear(year);
         firstWeek = calendar.weekNumbersOfMonth(month);
     });
 
@@ -46,7 +45,6 @@
     $: yearDisplay = calendar.getNameForYear(calendar.displayed.year);
     $: month = calendar.currentMonth;
     $: firstWeek = calendar.weekNumbersOfMonth(month);
-    $: months = calendar.getMonthsForYear(year);
     $: weeks = calendar.weeksOfMonth(month);
 </script>
 
@@ -112,7 +110,7 @@
                 {/if}
             </div>
             <div class="month-view">
-                {#if month.type == "month"}
+                <!-- {#if month.type == "month"} -->
                     <div class="weekdays">
                         {#each weekdays as day}
                             <span class="weekday fantasy-weekday"
@@ -120,7 +118,7 @@
                             >
                         {/each}
                     </div>
-                {/if}
+                <!-- {/if} -->
 
                 <MonthView
                     columns={weekdays.length}
