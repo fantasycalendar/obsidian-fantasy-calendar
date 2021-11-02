@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.4.1...1.5.0) (2021-11-02)
+
+
+### Features
+
+* added ability to have multi-day intercalary months ([e9b5d87](https://github.com/valentine195/obsidian-fantasy-calendar/commit/e9b5d87988d0c32899a9ca3b0b15561d20cc1105))
+
 ### [1.3.2](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.4.0...1.3.2) (2021-11-01)
 
 ## [1.4.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.3.1...1.4.0) (2021-11-01)
