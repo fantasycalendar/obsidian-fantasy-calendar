@@ -402,6 +402,7 @@ export default class FantasyCalendarView extends ItemView {
                 }
             }
         );
+
         this._app.$on(
             "event-context",
             (custom: CustomEvent<{ evt: MouseEvent; event: Event }>) => {
@@ -553,6 +554,16 @@ export default class FantasyCalendarView extends ItemView {
                 menu.showAtMouseEvent(evt);
             }
         );
+
+        this._app.$on("reset", () => {
+            this.helper.reset();
+
+            this.yearView = false;
+
+            this._app.$set({ yearView: false });
+            this._app.$set({ dayView: true });
+            this.helper.trigger("day-update");
+        });
     }
 
     async onClose() {}
