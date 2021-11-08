@@ -65,7 +65,7 @@
             current={calendar.displayedDate}
             on:next={() => calendar.goToNextYear()}
             on:previous={() => calendar.goToPreviousYear()}
-            on:reset={() => calendar.reset()}
+            on:reset
             on:settings
             on:day-click
             on:day-doubleclick
@@ -80,7 +80,7 @@
             current={calendar.displayedDate}
             on:next={() => calendar.goToNextYear()}
             on:previous={() => calendar.goToPreviousYear()}
-            on:reset={() => calendar.reset()}
+            on:reset
             on:settings
             on:day-click
             on:day-doubleclick
@@ -95,7 +95,7 @@
             current={calendar.displayedDate}
             on:next={() => calendar.goToNext()}
             on:previous={() => calendar.goToPrevious()}
-            on:reset={() => calendar.reset()}
+            on:reset
             on:settings
         />
         <div class="month-container">
@@ -111,13 +111,13 @@
             </div>
             <div class="month-view">
                 <!-- {#if month.type == "month"} -->
-                    <div class="weekdays">
-                        {#each weekdays as day}
-                            <span class="weekday fantasy-weekday"
-                                >{day.name.slice(0, 3)}</span
-                            >
-                        {/each}
-                    </div>
+                <div class="weekdays">
+                    {#each weekdays as day}
+                        <span class="weekday fantasy-weekday"
+                            >{day.name.slice(0, 3)}</span
+                        >
+                    {/each}
+                </div>
                 <!-- {/if} -->
 
                 <MonthView
