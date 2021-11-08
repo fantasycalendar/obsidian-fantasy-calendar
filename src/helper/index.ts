@@ -223,6 +223,7 @@ export default class CalendarHelper extends Events {
 
     reset() {
         this.displayed = { ...this.current };
+        this.viewing = { ...this.current };
 
         this.trigger("month-update");
         this.trigger("day-update");
