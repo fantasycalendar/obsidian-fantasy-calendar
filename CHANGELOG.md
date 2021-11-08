@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.2](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.5.1...1.5.2) (2021-11-08)
+
+
+### Bug Fixes
+
+* "today" button now opens day view (Fixes [#9](https://github.com/valentine195/obsidian-fantasy-calendar/issues/9)) ([d0af6e6](https://github.com/valentine195/obsidian-fantasy-calendar/commit/d0af6e68147482f8a8aa79336fa7ace18f8eb377))
+
 ### [1.5.1](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.5.0...1.5.1) (2021-11-08)
 
 ## [1.5.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.4.1...1.5.0) (2021-11-02)
