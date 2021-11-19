@@ -138,7 +138,7 @@ export default class FantasyCalendarView extends ItemView {
                 this.calendar.date = current.valueOf();
             }
 
-            const dif = daysBetween(current, new Date(this.calendar.date));
+            const dif = daysBetween(new Date(this.calendar.date), current);
 
             if (dif >= 1) {
                 for (let i = 0; i < dif; i++) {
