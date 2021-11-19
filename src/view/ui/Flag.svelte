@@ -30,6 +30,8 @@
                 (event.end.year == undefined || date.year === event.end.year);
             if (start && end) {
                 multi = false;
+                start = false;
+                end = false;
             }
         }
     }
@@ -98,6 +100,7 @@
         display: flex;
         gap: 0.25rem;
         align-items: flex-start;
+        justify-content: space-between;
     }
     .day-view .flag-content {
         justify-content: space-between;
