@@ -238,9 +238,16 @@ export class CreateEventModal extends Modal {
             .setDesc("Link the event to a note.")
             .addText((text) => {
                 let files = this.app.vault.getFiles();
-                text.setPlaceholder("Path").setValue(
-                    this.event.note?.split("/").pop().split(".").shift()
-                );
+                text.setPlaceholder("Path");
+                if (this.event.note) {
+                    const note = this.app.vault.getAbstractFileByPath(
+                        this.event.note
+                    );
+                    if (note && note instanceof TFile) {
+                        text.setValue(note.basename);
+                    }
+                }
+
                 const modal = new PathSuggestionModal(this.app, text, [
                     ...files
                 ]);
@@ -250,7 +257,7 @@ export class CreateEventModal extends Modal {
 
                     this.event.note = modal.file.path;
 
-                    this.tryParse(this.event.note, modal.file);
+                    this.tryParse(modal.file);
                 };
             });
 
@@ -284,24 +291,8 @@ export class CreateEventModal extends Modal {
                 .onChange((v) => (this.event.category = v));
         });
     }
-    async tryParse(note: string, file: TFile) {
-        /* if (
-            this.event.name ||
-            this.event.description ||
-            this.event.date.day ||
-            this.event.date.month ||
-            this.event.date.year ||
-            this.event.category
-        ) {
-            if (
-                !(await confirmWithModal(
-                    this.app,
-                    "Parse frontmatter and overwrite this event's data?"
-                ))
-            )
-                return;
-        } */
-        this.event.name = note?.split("/").pop().split(".").shift();
+    async tryParse(/* note: string,  */ file: TFile) {
+        this.event.name = file.basename;
         const cache = this.app.metadataCache.getFileCache(file);
 
         const { frontmatter } = cache;
