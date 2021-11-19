@@ -44,7 +44,7 @@
     class:day={true}
     class:fantasy-day={true}
     class:active={today && !adjacent}
-    class:viewing={dayView && displaying}
+    class:viewing={dayView && displaying && !adjacent}
     class={adjacent ? "adjacent-month fantasy-adjacent-month" : ""}
     aria-label={!fullView && day.events.length
         ? `${day.events.length} event${day.events.length == 1 ? "" : "s"}`
