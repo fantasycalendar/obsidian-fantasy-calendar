@@ -143,6 +143,7 @@
         on:event-click
         on:event-mouseover
         on:event-context
+        on:event
     />
 {/if}
 

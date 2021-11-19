@@ -44,6 +44,12 @@
                 calendar.setCurrentMonth(calendar.viewing.month);
             });
     };
+    const event = (node: HTMLElement) => {
+        new ExtraButtonComponent(node)
+            .setIcon("plus-with-circle")
+            .setTooltip("New Event")
+            .onClick(() => dispatch("event", date));
+    };
     const left = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("left-arrow");
     };
@@ -54,7 +60,10 @@
 
 <div class="day-view">
     <div class="nav">
-        <div use:reveal on:click={() => dispatch("reveal")} />
+        <div class="left-nav">
+            <div use:reveal on:click={() => dispatch("reveal")} />
+            <div use:event />
+        </div>
         <div use:close on:click={() => dispatch("close")} />
     </div>
     <div class="date">
@@ -107,6 +116,12 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+    }
+    .left-nav {
+        display: flex;
+    }
+    .left-nav :global(.clickable-icon) {
+        margin-right: 0;
     }
 
     .calendar-clickable {

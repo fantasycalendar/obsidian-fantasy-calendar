@@ -175,13 +175,8 @@ export default class FantasyCalendarView extends ItemView {
 
         this.build();
     }
-    createEventForDay(day: DayHelper) {
-        const modal = new CreateEventModal(
-            this.app,
-            this.calendar,
-            null,
-            day.date
-        );
+    createEventForDay(date: CurrentCalendarData) {
+        const modal = new CreateEventModal(this.app, this.calendar, null, date);
 
         modal.onClose = () => {
             if (!modal.saved) return;
@@ -218,7 +213,7 @@ export default class FantasyCalendarView extends ItemView {
             const day = event.detail;
 
             if (day.events.length) return;
-            this.createEventForDay(day);
+            this.createEventForDay(day.date);
         });
 
         this._app.$on("day-doubleclick", (event: CustomEvent<DayHelper>) => {
@@ -275,7 +270,7 @@ export default class FantasyCalendarView extends ItemView {
                 });
                 menu.addItem((item) =>
                     item.setTitle("New Event").onClick(() => {
-                        this.createEventForDay(day);
+                        this.createEventForDay(day.date);
                     })
                 );
                 menu.showAtMouseEvent(evt);
@@ -554,6 +549,11 @@ export default class FantasyCalendarView extends ItemView {
                 menu.showAtMouseEvent(evt);
             }
         );
+
+        this._app.$on("event", (e: CustomEvent<CurrentCalendarData>) => {
+            const date = e.detail;
+            this.createEventForDay(date);
+        });
 
         this._app.$on("reset", () => {
             this.helper.reset();
