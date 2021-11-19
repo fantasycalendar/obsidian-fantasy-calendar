@@ -19,7 +19,7 @@
 
     const addEvents = async () => {
         overflow = 0;
-        if (events.length) {
+        if (events.length && container && flags) {
             flags.empty();
             const height = container.getBoundingClientRect().height;
             let remaining = height;

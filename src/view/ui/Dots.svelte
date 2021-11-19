@@ -76,6 +76,7 @@
         display: flex;
         flex-flow: row nowrap;
         width: fit-content;
+        margin: auto;
         line-height: 6px;
         min-height: 6px;
     }
