@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.8.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.7.0...1.8.0) (2021-11-19)
+
+
+### Features
+
+* added Toggle Moons command ([05da3b5](https://github.com/valentine195/obsidian-fantasy-calendar/commit/05da3b5c9c464f91f1f508017879e864740512f0))
+
+
+### Bug Fixes
+
+* allow moons to wrap ([9401d4e](https://github.com/valentine195/obsidian-fantasy-calendar/commit/9401d4e0830b20d05e135ad3ca34d8b8bc0d50b9))
+
 ## [1.7.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.6.0...1.7.0) (2021-11-19)
 
 
