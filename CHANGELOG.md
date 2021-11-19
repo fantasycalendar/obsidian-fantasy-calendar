@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.5.3...1.6.0) (2021-11-19)
+
+
+### Features
+
+* new "Add Event" button on day view ([ff5256e](https://github.com/valentine195/obsidian-fantasy-calendar/commit/ff5256eb4de637d3706008f4e65a729d13519f4d))
+
+
+### Bug Fixes
+
+* "Open Day" view indicator doesn't display on adjacent months (close [#7](https://github.com/valentine195/obsidian-fantasy-calendar/issues/7)) ([a62a7ed](https://github.com/valentine195/obsidian-fantasy-calendar/commit/a62a7ede7e2d0e25e24113d4f201612a2b133440))
+* fixed moment import error ([0913bad](https://github.com/valentine195/obsidian-fantasy-calendar/commit/0913bade7fbe3d597abfdec775338371e4d0b7e9))
+
 ### [1.5.3](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.5.2...1.5.3) (2021-11-19)
 
 

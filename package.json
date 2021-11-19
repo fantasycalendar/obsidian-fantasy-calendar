@@ -1,6 +1,6 @@
 {
     "name": "fantasy-calendar",
-    "version": "1.5.3",
+    "version": "1.6.0",
     "description": "Create fantasy calendars in Obsidian!",
     "main": "main.js",
     "scripts": {
