@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.6.0...1.7.0) (2021-11-19)
+
+
+### Features
+
+* event dots now auto-detect overflow ([f095d9f](https://github.com/valentine195/obsidian-fantasy-calendar/commit/f095d9f01b4cfa7780fb55a9a9d9ff3adb241639))
+* flags now auto-detect overflow (close [#5](https://github.com/valentine195/obsidian-fantasy-calendar/issues/5)) ([6029669](https://github.com/valentine195/obsidian-fantasy-calendar/commit/6029669ed97138182d5592a62a207b2f4a2af36e))
+
+
+### Bug Fixes
+
+* styling for single-day event flags ([3f4edbb](https://github.com/valentine195/obsidian-fantasy-calendar/commit/3f4edbb481bfb4bf8b0cc8803d0dd58b88cc67d1))
+
 ## [1.6.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.5.3...1.6.0) (2021-11-19)
 
 
