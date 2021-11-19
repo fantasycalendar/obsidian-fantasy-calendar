@@ -3,7 +3,7 @@
     import Dots from "./Dots.svelte";
     import Moon from "./Moon.svelte";
 
-    import { createEventDispatcher, getContext } from "svelte";
+    import { createEventDispatcher, getContext, onMount } from "svelte";
     import Flags from "./Flags.svelte";
     import type { Writable } from "svelte/store";
 
@@ -68,6 +68,7 @@
             events={day.events}
             {categories}
             {date}
+            calendar={day.calendar}
             on:event-click
             on:event-mouseover
             on:event-context
@@ -91,6 +92,8 @@
         text-align: center;
         vertical-align: baseline;
         overflow: visible;
+        display: flex;
+        flex-flow: column nowrap;
     }
     .active {
         background-color: var(--background-secondary);

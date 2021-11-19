@@ -97,6 +97,7 @@
         {categories}
         {date}
         dayView={true}
+        {calendar}
         on:event-click
         on:event-mouseover
         on:event-context

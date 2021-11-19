@@ -1,6 +1,7 @@
 import {
     addIcon,
     ButtonComponent,
+    debounce,
     DropdownComponent,
     FileView,
     ItemView,
@@ -567,6 +568,9 @@ export default class FantasyCalendarView extends ItemView {
     }
 
     async onClose() {}
+    onResize() {
+        this.helper.trigger("view-resized");
+    }
     getViewType() {
         return VIEW_TYPE;
     }
