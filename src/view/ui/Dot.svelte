@@ -23,9 +23,11 @@
 <style>
     .dot {
         display: inline-block;
+        min-height: 6px;
+        min-width: 6px;
         height: 6px;
         width: 6px;
-        margin: 0 1px;
+        margin: 0 2px;
     }
     .active {
         color: var(--text-on-accent);

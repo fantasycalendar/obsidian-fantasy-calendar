@@ -74,7 +74,7 @@
             on:event-context
         />
     {:else}
-        <Dots events={day.events} {categories} />
+        <Dots events={day.events} {categories} calendar={day.calendar} />
     {/if}
 </div>
 

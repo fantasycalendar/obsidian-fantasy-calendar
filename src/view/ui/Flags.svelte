@@ -24,13 +24,11 @@
             const height = container.getBoundingClientRect().height;
             let remaining = height;
 
-            const clone = [...events];
-
-            while ((remaining > 0 || dayView) && clone.length) {
+            for (const event of events) {
                 const flag = new Flag({
                     target: flags,
                     props: {
-                        event: clone.shift(),
+                        event,
                         categories,
                         dayView,
                         date
@@ -46,10 +44,15 @@
                     dispatch("event-context", e.detail)
                 );
                 remaining = height - flags.getBoundingClientRect().height;
-
-                if (remaining < 0 && !dayView) {
-                    flags.lastElementChild.detach();
-                    overflow = clone.length + 1;
+                if (!dayView) {
+                    if (remaining < 0) {
+                        flags.lastElementChild.detach();
+                        overflow = events.length - events.indexOf(event);
+                        break;
+                    } else if (remaining == 0) {
+                        overflow = events.length - events.indexOf(event) - 1;
+                        break;
+                    }
                 }
             }
         }
