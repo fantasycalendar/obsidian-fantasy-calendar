@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.3](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.5.2...1.5.3) (2021-11-19)
+
+
+### Bug Fixes
+
+* fixed display issue with the event modal and notes with `.` in the name ([be8b3ba](https://github.com/valentine195/obsidian-fantasy-calendar/commit/be8b3ba9c74f826c9969e5f5a384d04204b0367d))
+* increment current day logic should be better ([#8](https://github.com/valentine195/obsidian-fantasy-calendar/issues/8)) ([a322a0e](https://github.com/valentine195/obsidian-fantasy-calendar/commit/a322a0e50cdb9919e03da992ad635faaf2fad81d))
+
 ### [1.5.2](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.5.1...1.5.2) (2021-11-08)
 
 
