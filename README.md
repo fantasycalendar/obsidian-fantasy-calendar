@@ -28,6 +28,8 @@ The year view for the calendar may be opened or closed from this menu.
 
 Moons may be displayed or hidden by selecting the option in the menu.
 
+Additionally, there is a "Toggle Moons" command available when a calendar is open.
+
 #### View Day
 
 An arbitrary date can be opened by selecting View Day. Additionally, the current date of the calendar may also be set to this date.
@@ -86,7 +88,7 @@ Months may also be set to intercalary. Intercalary months are a _single day_ tha
 
 Custom years can be created in this section. Each year must be given a name.
 
-If custom years are created, the calendar will be limited to *only* the years specified.
+If custom years are created, the calendar will be limited to _only_ the years specified.
 
 ### Leap Days
 
@@ -195,7 +197,7 @@ fc-date:
 
 ### Automatic Event Creation
 
-Additionally, each calendar can automatically create events using frontmatter tags. 
+Additionally, each calendar can automatically create events using frontmatter tags.
 
 Optionally, you can tell the plugin to only watch for new events in a specific folder. Leaving this setting blank will watch the entire vault for new events.
 

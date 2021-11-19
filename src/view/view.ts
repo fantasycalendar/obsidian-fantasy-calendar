@@ -307,8 +307,7 @@ export default class FantasyCalendarView extends ItemView {
                 item.setTitle(
                     this.moons ? "Hide Moons" : "Display Moons"
                 ).onClick(() => {
-                    this.moons = !this.moons;
-                    this._app.$set({ moons: this.moons });
+                    this.toggleMoons();
                 });
             });
             menu.addItem((item) => {
@@ -565,6 +564,10 @@ export default class FantasyCalendarView extends ItemView {
             this._app.$set({ dayView: true });
             this.helper.trigger("day-update");
         });
+    }
+    toggleMoons() {
+        this.moons = !this.moons;
+        this._app.$set({ moons: this.moons });
     }
 
     async onClose() {}

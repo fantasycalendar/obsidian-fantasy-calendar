@@ -127,6 +127,21 @@ export default class FantasyCalendar extends Plugin {
                 this.addFullCalendarView();
             }
         });
+
+        this.addCommand({
+            id: "toggle-moons",
+            name: "Toggle Moons",
+            checkCallback: (checking) => {
+                const view =
+                    this.app.workspace.getActiveViewOfType(FantasyCalendarView);
+                if (view) {
+                    if (!checking) {
+                        view.toggleMoons();
+                    }
+                    return true;
+                }
+            }
+        });
     }
 
     async onunload() {
