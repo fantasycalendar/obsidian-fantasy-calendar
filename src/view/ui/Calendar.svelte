@@ -213,4 +213,11 @@
     hr {
         margin: 1rem 0;
     }
+
+    :global(.moon-container) {
+        display: flex;
+        flex-flow: row wrap;
+        align-items: center;
+        justify-content: center;
+    }
 </style>

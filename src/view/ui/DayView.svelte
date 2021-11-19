@@ -139,9 +139,5 @@
         padding-left: 0.5rem;
     }
 
-    .moon-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+    
 </style>
