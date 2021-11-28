@@ -25,6 +25,7 @@
         "@types/he": "^1.1.2",
         "@types/jest": "^27.0.2",
         "@types/node": "^14.17.21",
+        "@types/xmldom": "^0.1.31",
         "babel-jest": "^27.2.5",
         "babel-loader": "^8.2.2",
         "copy-webpack-plugin": "^9.0.1",
@@ -50,7 +51,8 @@
         "webpack": "^5.41.1",
         "webpack-cli": "^4.7.2",
         "webpack-node-externals": "^3.0.0",
-        "worker-loader": "^3.0.8"
+        "worker-loader": "^3.0.8",
+        "xmldom": "^0.6.0"
     },
     "dependencies": {
         "@popperjs/core": "^2.10.2"
