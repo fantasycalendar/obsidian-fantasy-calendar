@@ -201,12 +201,10 @@ export default class CalendarHelper extends Events {
         events.sort((a, b) => {
             if (!a.end) return 0;
             if (!b.end) return -1;
-            return (
-                a.end.day +
-                a.end.month * 10 +
-                a.end.year * 100 -
-                (b.end?.day + b.end?.month * 10 + b.end?.year * 100)
-            );
+            if (this.areDatesEqual(a.date, b.date)) {
+                return this.daysBeforeDate(b.end) - this.daysBeforeDate(a.end);
+            }
+            return this.daysBeforeDate(a.date) - this.daysBeforeDate(b.date);
         });
 
         return events;
@@ -483,6 +481,23 @@ export default class CalendarHelper extends Events {
         return filtered
             .slice(0, filtered.indexOf(index))
             .reduce((a, b) => a + b.length, 0);
+    }
+
+    areDatesEqual(date: CurrentCalendarData, date2: CurrentCalendarData) {
+        if (date.day != date2.day) return false;
+        if (
+            date.month != date2.month &&
+            date.month != undefined &&
+            date2.month != undefined
+        )
+            return false;
+        if (
+            date.year != date2.year &&
+            date.year != undefined &&
+            date2.year != undefined
+        )
+            return false;
+        return true;
     }
 
     daysBeforeDate(date: CurrentCalendarData) {
