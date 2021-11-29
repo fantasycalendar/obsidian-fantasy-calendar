@@ -1,9 +1,10 @@
 <script lang="ts">
     import type { DayHelper } from "src/helper";
+    import type { Event } from "src/@types";
     import Dots from "./Dots.svelte";
     import Moon from "./Moon.svelte";
 
-    import { createEventDispatcher, getContext, onMount } from "svelte";
+    import { createEventDispatcher, getContext } from "svelte";
     import Flags from "./Flags.svelte";
     import type { Writable } from "svelte/store";
 
@@ -13,10 +14,18 @@
 
     export let adjacent: boolean;
     export let fullView: boolean;
+    let events: Event[] = [];
 
+    $: {
+        if (!adjacent) {
+            events = day.events;
+        }
+    }
     $: moons = day.moons;
     $: categories = day.calendar.object.categories;
     $: date = day.date;
+    $: today = day.isCurrentDay;
+    $: displaying = day.isDisplaying;
 
     let dayView: boolean;
     const dayViewStore = getContext<Writable<boolean>>("dayView");
@@ -26,9 +35,6 @@
     let displayMoons: boolean;
     const moonStore = getContext<Writable<boolean>>("displayMoons");
     moonStore.subscribe((v) => (displayMoons = v));
-
-    $: today = day.isCurrentDay;
-    $: displaying = day.isDisplaying;
 
     day.calendar.on("month-update", () => {
         today = day.isCurrentDay;
@@ -65,7 +71,7 @@
             </div>
         {/if}
         <Flags
-            events={day.events}
+            {events}
             {categories}
             {date}
             calendar={day.calendar}
@@ -74,7 +80,7 @@
             on:event-context
         />
     {:else}
-        <Dots events={day.events} {categories} calendar={day.calendar} />
+        <Dots {events} {categories} calendar={day.calendar} />
     {/if}
 </div>
 

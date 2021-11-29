@@ -26,42 +26,44 @@
     {#if yearView}
         <h3 class="month-name">{month.name}</h3>
     {/if}
-    <div
-        class="fantasy-month"
-        class:full-view={fullView}
-        class:year-view={yearView}
-        style="--calendar-columns: {columns};--calendar-rows: {fullView
-            ? `${(1 / weeks) * 100}%`
-            : '1fr'}; "
-    >
-        {#each previous as day}
-            {#if showPad && day != null}
-                <Day {day} adjacent={true} {fullView} />
-            {:else}
-                <div />
-            {/if}
-        {/each}
-        {#each current as day}
-            <Day
-                {day}
-                adjacent={false}
-                {fullView}
-                on:day-click
-                on:day-doubleclick
-                on:day-context-menu
-                on:event-click
-                on:event-mouseover
-                on:event-context
-            />
-        {/each}
-        {#each next as day}
-            {#if showPad}
-                <Day {day} adjacent={true} {fullView} />
-            {:else}
-                <div />
-            {/if}
-        {/each}
-    </div>
+    {#key current}
+        <div
+            class="fantasy-month"
+            class:full-view={fullView}
+            class:year-view={yearView}
+            style="--calendar-columns: {columns};--calendar-rows: {fullView
+                ? `${(1 / weeks) * 100}%`
+                : '1fr'}; "
+        >
+            {#each previous as day}
+                {#if showPad && day != null}
+                    <Day {day} adjacent={true} {fullView} />
+                {:else}
+                    <div />
+                {/if}
+            {/each}
+            {#each current as day}
+                <Day
+                    {day}
+                    adjacent={false}
+                    {fullView}
+                    on:day-click
+                    on:day-doubleclick
+                    on:day-context-menu
+                    on:event-click
+                    on:event-mouseover
+                    on:event-context
+                />
+            {/each}
+            {#each next as day}
+                {#if showPad}
+                    <Day {day} adjacent={true} {fullView} />
+                {:else}
+                    <div />
+                {/if}
+            {/each}
+        </div>
+    {/key}
 </div>
 
 <style>
