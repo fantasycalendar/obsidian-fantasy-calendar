@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.8.2](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.8.1...1.8.2) (2021-11-29)
+
+
+### Bug Fixes
+
+* create event modal behavior improved (close [#16](https://github.com/valentine195/obsidian-fantasy-calendar/issues/16)) ([2593853](https://github.com/valentine195/obsidian-fantasy-calendar/commit/259385310069957bf1f1afa23813d066fa04debe))
+* different views with same calendar will sync state (close [#15](https://github.com/valentine195/obsidian-fantasy-calendar/issues/15)) ([ab0f07c](https://github.com/valentine195/obsidian-fantasy-calendar/commit/ab0f07ce6ceaf4c284d1e4190b2b4e5a2a818c91))
+* events now correctly displayed when switching months (close [#14](https://github.com/valentine195/obsidian-fantasy-calendar/issues/14)) (close [#15](https://github.com/valentine195/obsidian-fantasy-calendar/issues/15)) ([3f9ed81](https://github.com/valentine195/obsidian-fantasy-calendar/commit/3f9ed815a402a90857b19de66ecd6cfea141b436))
+* partial fix for multi-day event sorting ([b953283](https://github.com/valentine195/obsidian-fantasy-calendar/commit/b9532833745743a94aa715698eef8eeb0be0206b))
+
 ### [1.8.1](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.8.0...1.8.1) (2021-11-19)
 
 
