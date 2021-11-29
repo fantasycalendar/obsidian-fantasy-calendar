@@ -62,11 +62,13 @@
     class:day-view={dayView}
     aria-label={!dayView ? event.name : null}
     style="--hex-alpha: {color}40; --color:{color}"
-    on:click={(evt) =>
+    on:click={(evt) => {
+        evt.stopPropagation();
         dispatch("event-click", {
             event,
             modifier: evt.getModifierState(meta)
-        })}
+        });
+    }}
     on:mouseover={(evt) =>
         dispatch("event-mouseover", { target: evt.target, event })}
     on:focus={() => {}}
