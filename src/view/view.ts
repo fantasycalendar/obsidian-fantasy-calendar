@@ -56,6 +56,7 @@ export default class FantasyCalendarView extends ItemView {
     dropdownEl: HTMLDivElement;
     helper: CalendarHelper;
     noCalendarEl: HTMLDivElement;
+    updateMe: boolean = true;
     /* full =  false; */
     get root() {
         return this.leaf.getRoot();
@@ -92,6 +93,10 @@ export default class FantasyCalendarView extends ItemView {
         /* window.view = this; */
     }
     updateCalendars() {
+        if (!this.updateMe) {
+            this.updateMe = true;
+            return;
+        }
         if (!this.plugin.data.calendars.length) {
             this._app?.$destroy();
             this.contentEl.empty();
@@ -189,7 +194,7 @@ export default class FantasyCalendarView extends ItemView {
                 calendar: this.helper
             });
 
-            this.helper.trigger("day-update");
+            this.triggerHelperEvent("day-update");
         };
 
         modal.open();
@@ -229,7 +234,7 @@ export default class FantasyCalendarView extends ItemView {
 
             this._app.$set({ yearView: false });
             this._app.$set({ dayView: true });
-            this.helper.trigger("day-update");
+            this.triggerHelperEvent("day-update", false);
         });
 
         this._app.$on(
@@ -254,7 +259,7 @@ export default class FantasyCalendarView extends ItemView {
 
                             this._app.$set({ yearView: false });
                             this._app.$set({ dayView: true });
-                            this.helper.trigger("day-update");
+                            this.triggerHelperEvent("day-update", false);
                         });
                     });
                 }
@@ -264,7 +269,7 @@ export default class FantasyCalendarView extends ItemView {
 
                         this.helper.current.day = day.number;
 
-                        this.helper.trigger("day-update");
+                        this.triggerHelperEvent("day-update");
 
                         this.plugin.saveSettings();
                     });
@@ -507,7 +512,7 @@ export default class FantasyCalendarView extends ItemView {
                                 calendar: this.helper
                             });
 
-                            this.helper.trigger("day-update");
+                            this.triggerHelperEvent("day-update");
                         };
 
                         modal.open();
@@ -541,7 +546,7 @@ export default class FantasyCalendarView extends ItemView {
                                 calendar: this.helper
                             });
 
-                            this.helper.trigger("day-update");
+                            this.triggerHelperEvent("day-update");
                         }
                     });
                 });
@@ -562,7 +567,7 @@ export default class FantasyCalendarView extends ItemView {
 
             this._app.$set({ yearView: false });
             this._app.$set({ dayView: true });
-            this.helper.trigger("day-update");
+            this.triggerHelperEvent("day-update", false);
         });
     }
     toggleMoons() {
@@ -572,7 +577,7 @@ export default class FantasyCalendarView extends ItemView {
 
     async onClose() {}
     onResize() {
-        this.helper.trigger("view-resized");
+        this.triggerHelperEvent("view-resized", false);
     }
     getViewType() {
         return VIEW_TYPE;
@@ -582,6 +587,15 @@ export default class FantasyCalendarView extends ItemView {
     }
     getIcon() {
         return VIEW_TYPE;
+    }
+    triggerHelperEvent(event: string, full: boolean = true) {
+        if (!this.helper) return;
+        this.helper.trigger(event);
+
+        if (full) {
+            this.updateMe = false;
+            this.plugin.app.workspace.trigger("fantasy-calendars-updated");
+        }
     }
 
     async onunload() {}

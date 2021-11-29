@@ -146,6 +146,8 @@ export default class CalendarHelper extends Events {
     update(calendar?: Calendar) {
         this.object = calendar ?? this.object;
         this.maxDays = Math.max(...this.data.months.map((m) => m.length));
+        this.trigger("month-update");
+        this.trigger("day-update");
     }
     get data() {
         return this.object.static;
