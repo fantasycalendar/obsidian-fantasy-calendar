@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.9.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.8.2...1.9.0) (2021-12-03)
+
+
+### Features
+
+* added ability to specify alternative config directory (close [#18](https://github.com/valentine195/obsidian-fantasy-calendar/issues/18)) ([7e52db6](https://github.com/valentine195/obsidian-fantasy-calendar/commit/7e52db65091a2812b04239415339505db62d6600))
+
 ### [1.8.2](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.8.1...1.8.2) (2021-11-29)
 
 
