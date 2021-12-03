@@ -7,6 +7,7 @@ import {
     normalizePath,
     Notice,
     PluginSettingTab,
+    setIcon,
     Setting,
     TextAreaComponent,
     TextComponent,
@@ -55,6 +56,11 @@ export enum Recurring {
 addIcon(
     "fantasy-calendar-grip",
     `<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="grip-lines" class="svg-inline--fa fa-grip-lines fa-w-16" role="img" viewBox="0 0 512 512"><path fill="currentColor" d="M496 288H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm0-128H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16z"/></svg>`
+);
+
+addIcon(
+    "fantasy-calendar-warning",
+    `<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="exclamation-triangle" class="svg-inline--fa fa-exclamation-triangle fa-w-18" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="currentColor" d="M569.517 440.013C587.975 472.007 564.806 512 527.94 512H48.054c-36.937 0-59.999-40.055-41.577-71.987L246.423 23.985c18.467-32.009 64.72-31.951 83.154 0l239.94 416.028zM288 354c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"></path></svg>`
 );
 
 export default class FantasyCalendarSettings extends PluginSettingTab {
@@ -187,6 +193,81 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                         : "/";
                     this.plugin.data.path = normalizePath(v);
                 };
+            });
+
+        new Setting(this.infoEl)
+            .setClass("fantasy-calendar-config")
+            .setName(
+                createFragment((e) => {
+                    setIcon(e.createSpan(), "fantasy-calendar-warning");
+                    e.createSpan({ text: "Default Config Directory" });
+                })
+            )
+            .setDesc(
+                createFragment((e) => {
+                    e.createSpan({
+                        text: "Please back up your data before changing this setting. Hidden directories must be manually entered."
+                    });
+                    e.createEl("br");
+                    e.createSpan({
+                        text: `Current directory: `
+                    });
+                    const configDirectory =
+                        this.data.configDirectory ?? this.app.vault.configDir;
+                    e.createEl("code", {
+                        text: configDirectory
+                    });
+                })
+            )
+            .addText(async (text) => {
+                let folders = this.app.vault
+                    .getAllLoadedFiles()
+                    .filter((f) => f instanceof TFolder);
+
+                text.setPlaceholder(
+                    this.data.configDirectory ?? this.app.vault.configDir
+                );
+                const modal = new FolderSuggestionModal(this.app, text, [
+                    ...(folders as TFolder[])
+                ]);
+
+                modal.onClose = async () => {
+                    if (!text.inputEl.value) {
+                        this.data.configDirectory = null;
+                    } else {
+                        const exists = await this.app.vault.adapter.exists(
+                            text.inputEl.value
+                        );
+
+                        if (!exists) {
+                            this.data.configDirectory = text.inputEl.value;
+                            await this.plugin.saveSettings();
+                        }
+                    }
+                };
+
+                text.inputEl.onblur = async () => {
+                    if (!text.inputEl.value) {
+                        return;
+                    }
+                    const exists = await this.app.vault.adapter.exists(
+                        text.inputEl.value
+                    );
+
+                    this.data.configDirectory = text.inputEl.value;
+
+                    await this.plugin.saveSettings();
+                    this.display();
+                };
+            })
+            .addExtraButton((b) => {
+                b.setTooltip("Reset to Default")
+                    .setIcon("undo-glyph")
+                    .onClick(async () => {
+                        this.data.configDirectory = null;
+                        await this.plugin.saveSettings();
+                        this.display();
+                    });
             });
     }
     buildCalendarUI() {

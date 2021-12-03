@@ -18,6 +18,8 @@ export interface FantasyCalendarData {
     currentCalendar: string;
     defaultCalendar: string;
     eventPreview: boolean;
+    configDirectory: string;
+    
     path: string;
 }
 

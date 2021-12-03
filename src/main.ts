@@ -1,4 +1,11 @@
-import { Component, Platform, Plugin, Vault, WorkspaceLeaf } from "obsidian";
+import {
+    Component,
+    Notice,
+    Platform,
+    Plugin,
+    Vault,
+    WorkspaceLeaf
+} from "obsidian";
 
 import FantasyCalendarSettings from "./settings/settings";
 
@@ -51,6 +58,7 @@ export const DEFAULT_DATA: FantasyCalendarData = {
     currentCalendar: null,
     defaultCalendar: null,
     eventPreview: false,
+    configDirectory: null,
     path: "/"
 };
 
@@ -174,6 +182,18 @@ export default class FantasyCalendar extends Plugin {
             ...DEFAULT_DATA,
             ...(await this.loadData())
         };
+        if (
+            this.configDirectory &&
+            (await this.app.vault.adapter.exists(this.configFilePath))
+        ) {
+            this.data = Object.assign(
+                {},
+                this.data,
+                JSON.parse(
+                    await this.app.vault.adapter.read(this.configFilePath)
+                )
+            );
+        }
         if (!this.data.defaultCalendar && this.data.calendars.length) {
             this.data.defaultCalendar = this.data.calendars[0].id;
         }
@@ -183,8 +203,36 @@ export default class FantasyCalendar extends Plugin {
         await this.saveSettings();
         this.app.workspace.trigger("fantasy-calendars-updated");
     }
-
+    get configDirectory() {
+        if (!this.data || !this.data.configDirectory) return;
+        return `${this.data.configDirectory}/plugins/fantasy-calendar`;
+    }
+    get configFilePath() {
+        if (!this.data.configDirectory) return;
+        return `${this.configDirectory}/data.json`;
+    }
     async saveSettings() {
         this.saveData(this.data);
+    }
+    async saveData(data: FantasyCalendarData) {
+        if (this.configDirectory) {
+            try {
+                if (
+                    !(await this.app.vault.adapter.exists(this.configDirectory))
+                ) {
+                    await this.app.vault.adapter.mkdir(this.configDirectory);
+                }
+                await this.app.vault.adapter.write(
+                    this.configFilePath,
+                    JSON.stringify(data)
+                );
+            } catch (e) {
+                console.error(e);
+                new Notice(
+                    "There was an error saving into the configured directory."
+                );
+            }
+        }
+        await super.saveData(data);
     }
 }

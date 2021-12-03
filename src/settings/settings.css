@@ -28,6 +28,12 @@
     border: 0px;
 }
 
+.fantasy-calendar-settings .fantasy-calendar-config .setting-item-name {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+}
+
 /** Create Calendar Modal */
 .modal-container.fantasy-calendar-create-calendar > .modal {
     transition: width 0.5s ease-in-out, height 0.5s ease-in-out;
