@@ -41,6 +41,7 @@ export const DEFAULT_CALENDAR: Calendar = {
 
         moons: [],
         displayMoons: true,
+        displayDayNumber: false,
         leapDays: [],
         eras: []
     },

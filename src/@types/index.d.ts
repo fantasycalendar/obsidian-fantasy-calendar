@@ -19,7 +19,7 @@ export interface FantasyCalendarData {
     defaultCalendar: string;
     eventPreview: boolean;
     configDirectory: string;
-    
+
     path: string;
 }
 
@@ -136,6 +136,7 @@ export interface StaticCalendarData {
     leapDays: LeapDay[];
     moons: Moon[];
     displayMoons: boolean;
+    displayDayNumber: boolean;
     eras: Era[];
     offset?: number;
     incrementDay: boolean;

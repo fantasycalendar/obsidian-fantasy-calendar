@@ -57,6 +57,7 @@ export default class FantasyCalendarView extends ItemView {
     helper: CalendarHelper;
     noCalendarEl: HTMLDivElement;
     updateMe: boolean = true;
+    dayNumber: boolean;
     /* full =  false; */
     get root() {
         return this.leaf.getRoot();
@@ -175,6 +176,7 @@ export default class FantasyCalendarView extends ItemView {
         this.calendar = calendar;
 
         this.moons = this.calendar.static.displayMoons;
+        this.dayNumber = this.calendar.static.displayDayNumber;
         this.helper = new CalendarHelper(this.calendar, this.plugin);
 
         this.registerCalendarInterval();
@@ -212,7 +214,8 @@ export default class FantasyCalendarView extends ItemView {
                 fullView: this.full,
                 yearView: this.yearView,
                 moons: this.moons,
-                displayWeeks: this.helper.displayWeeks
+                displayWeeks: this.helper.displayWeeks,
+                displayDayNumber: this.dayNumber
             }
         });
         this._app.$on("day-click", (event: CustomEvent<DayHelper>) => {
@@ -313,6 +316,16 @@ export default class FantasyCalendarView extends ItemView {
                     this.moons ? "Hide Moons" : "Display Moons"
                 ).onClick(() => {
                     this.toggleMoons();
+                });
+            });
+            menu.addItem((item) => {
+                item.setTitle(
+                    this.dayNumber ? "Hide Day Number" : "Display Day Number"
+                ).onClick(() => {
+                    this.dayNumber = !this.dayNumber;
+                    this.calendar.static.displayDayNumber = this.dayNumber;
+                    this._app.$set({ displayDayNumber: this.dayNumber });
+                    this.plugin.saveSettings();
                 });
             });
             menu.addItem((item) => {

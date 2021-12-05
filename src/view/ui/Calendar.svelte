@@ -15,6 +15,7 @@
     export let yearView: boolean = false;
     export let calendar: CalendarHelper;
     export let moons: boolean;
+    export let displayDayNumber: boolean;
     export let displayWeeks: boolean;
 
     $: {
@@ -38,6 +39,11 @@
         month = calendar.currentMonth;
         weeks = calendar.weeksOfMonth(month);
         firstWeek = calendar.weekNumbersOfMonth(month);
+        dayNumber = calendar.dayNumberForDate(calendar.current);
+    });
+
+    calendar.on("day-update", () => {
+        dayNumber = calendar.dayNumberForDate(calendar.current);
     });
 
     $: weekdays = calendar.weekdays;
@@ -46,6 +52,7 @@
     $: month = calendar.currentMonth;
     $: firstWeek = calendar.weekNumbersOfMonth(month);
     $: weeks = calendar.weeksOfMonth(month);
+    $: dayNumber = calendar.dayNumberForDate(calendar.current);
 </script>
 
 <div
@@ -93,6 +100,8 @@
             month={month.name}
             year={yearDisplay}
             current={calendar.displayedDate}
+            {displayDayNumber}
+            {dayNumber}
             on:next={() => calendar.goToNext()}
             on:previous={() => calendar.goToPrevious()}
             on:reset
@@ -139,6 +148,7 @@
 {#if dayView && !fullView}
     <hr />
     <DayView
+        {displayDayNumber}
         on:close={() => (dayView = false)}
         on:event-click
         on:event-mouseover

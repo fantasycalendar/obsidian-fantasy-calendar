@@ -509,6 +509,13 @@ export default class CalendarHelper extends Events {
         return daysBeforeYear + daysBeforeMonth + date.day;
     }
 
+    dayNumberForDate(date: CurrentCalendarData) {
+        return (
+            this.daysBeforeMonth(this.getMonth(date.month, date.year), true) +
+            date.day
+        );
+    }
+
     get firstWeekday() {
         return this.data.firstWeekDay;
     }

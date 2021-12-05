@@ -1,5 +1,6 @@
 <script lang="ts">
     import { ExtraButtonComponent } from "obsidian";
+    import CalendarHelper from "src/helper";
 
     import { createEventDispatcher } from "svelte";
 
@@ -8,6 +9,8 @@
     export let month: string;
     export let year: string;
     export let current: string;
+    export let displayDayNumber: boolean;
+    export let dayNumber: number;
 
     const left = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("left-arrow");
@@ -21,10 +24,19 @@
 </script>
 
 <div class="fantasy-nav nav">
-    <h3 class="fantasy-title title">
-        <span class="fantasy-month month">{month}</span>
-        <span class="fantasy-year year">{year}</span>
-    </h3>
+    <div class="title-container">
+        <h3 class="fantasy-title title">
+            <span class="fantasy-month month">{month}</span>
+            <span class="fantasy-year year">{year}</span>
+        </h3>
+        {#if displayDayNumber}
+            <div class="day-number">
+                <em>
+                    Day {dayNumber}
+                </em>
+            </div>
+        {/if}
+    </div>
     <div class="right-nav fantasy-right-nav">
         <div class="container">
             <div
@@ -83,5 +95,13 @@
         cursor: pointer;
         display: flex;
         justify-content: center;
+    }
+    .title-container {
+        display: flex;
+        flex-flow: column nowrap;
+        align-items: flex-start;
+    }
+    .day-number {
+        font-size: x-small;
     }
 </style>

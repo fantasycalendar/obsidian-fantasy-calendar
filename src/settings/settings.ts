@@ -491,6 +491,16 @@ class CreateCalendarModal extends Modal {
             });
 
         new Setting(this.infoDetailEl)
+            .setName("Display Day Number")
+            .setDesc("Display the day of the year.")
+            .addToggle((t) => {
+                t.setValue(this.static.displayDayNumber).onChange((v) => {
+                    this.static.displayDayNumber = v;
+                    this.buildInfo();
+                });
+            });
+
+        new Setting(this.infoDetailEl)
             .setName("Auto Increment Day")
             .setDesc("Automatically increment the calendar day every real day.")
             .addToggle((t) => {
@@ -499,15 +509,20 @@ class CreateCalendarModal extends Modal {
                 });
             });
 
-        this.dateFieldEl = this.infoDetailEl.createDiv(
-            "fantasy-calendar-date-fields"
-        );
+        this.dateFieldEl = this.infoDetailEl.createDiv();
         this.buildDateFields();
     }
     tempCurrentDays = this.calendar.current.day;
     buildDateFields() {
         this.dateFieldEl.empty();
 
+        new Setting(this.dateFieldEl)
+            .setClass("fantasy-calendar-date-fields-heading")
+            .setHeading()
+            .setName("Current Date");
+        const dateFieldEl = this.dateFieldEl.createDiv(
+            "fantasy-calendar-date-fields"
+        );
         if (this.tempCurrentDays == null && this.calendar.current.day) {
             this.tempCurrentDays = this.calendar.current.day;
         }
@@ -523,7 +538,7 @@ class CreateCalendarModal extends Modal {
                     this.calendar.current.month
                 ]?.length;
         }
-        const dayEl = this.dateFieldEl.createDiv("fantasy-calendar-date-field");
+        const dayEl = dateFieldEl.createDiv("fantasy-calendar-date-field");
         dayEl.createEl("label", { text: "Day" });
         const day = new TextComponent(dayEl)
             .setPlaceholder("Day")
@@ -552,9 +567,7 @@ class CreateCalendarModal extends Modal {
             });
         day.inputEl.setAttr("type", "number");
 
-        const monthEl = this.dateFieldEl.createDiv(
-            "fantasy-calendar-date-field"
-        );
+        const monthEl = dateFieldEl.createDiv("fantasy-calendar-date-field");
         monthEl.createEl("label", { text: "Month" });
         new DropdownComponent(monthEl)
             .addOptions(
@@ -582,9 +595,7 @@ class CreateCalendarModal extends Modal {
                 this.buildDateFields();
             });
 
-        const yearEl = this.dateFieldEl.createDiv(
-            "fantasy-calendar-date-field"
-        );
+        const yearEl = dateFieldEl.createDiv("fantasy-calendar-date-field");
         yearEl.createEl("label", { text: "Year" });
         if (this.calendar.static.useCustomYears) {
             const yearDrop = new DropdownComponent(yearEl);

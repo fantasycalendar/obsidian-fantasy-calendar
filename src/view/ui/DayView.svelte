@@ -7,6 +7,8 @@
     import Flags from "./Flags.svelte";
     import Moon from "./Moon.svelte";
 
+    export let displayDayNumber: boolean;
+
     const calendarStore = getContext<Writable<CalendarHelper>>("calendar");
     let calendar: CalendarHelper;
     calendarStore.subscribe((c) => {
@@ -15,6 +17,7 @@
 
     $: currentDate = calendar.viewedDate;
     $: date = calendar.viewing;
+    $: dayNumber = calendar.dayNumberForDate(date);
     $: events = calendar.getEventsOnDate(calendar.viewing);
     $: moons = calendar.getMoonsForDate(calendar.viewing);
     $: categories = calendar.object.categories;
@@ -73,10 +76,17 @@
             aria-label="Previous"
             on:click={() => calendar.goToPreviousDay()}
         />
-        <div class="displayed">
+        <div class="title-container">
             <h3 class="fantasy-title title">
                 <span class="current">{currentDate}</span>
             </h3>
+            {#if displayDayNumber}
+                <div class="day-number">
+                    <em>
+                        Day {dayNumber}
+                    </em>
+                </div>
+            {/if}
         </div>
         <div
             class="arrow right calendar-clickable"
@@ -139,5 +149,13 @@
         padding-left: 0.5rem;
     }
 
-    
+    .title-container {
+        display: flex;
+        flex-flow: column nowrap;
+        align-items: center;
+        justify-content: center;
+    }
+    .day-number {
+        font-size: small;
+    }
 </style>
