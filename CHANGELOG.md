@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.10.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.9.0...1.10.0) (2021-12-05)
+
+
+### Features
+
+* added ability to display day number of year ([bb053a3](https://github.com/valentine195/obsidian-fantasy-calendar/commit/bb053a3cb0e9236c1db5d85cf650a6f0b152f5c5))
+
 ## [1.9.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.8.2...1.9.0) (2021-12-03)
 
 
