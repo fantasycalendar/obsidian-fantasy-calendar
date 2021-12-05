@@ -9,8 +9,6 @@
     export let month: string;
     export let year: string;
     export let current: string;
-    export let displayDayNumber: boolean;
-    export let dayNumber: number;
 
     const left = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("left-arrow");
@@ -29,13 +27,6 @@
             <span class="fantasy-month month">{month}</span>
             <span class="fantasy-year year">{year}</span>
         </h3>
-        {#if displayDayNumber}
-            <div class="day-number">
-                <em>
-                    Day {dayNumber}
-                </em>
-            </div>
-        {/if}
     </div>
     <div class="right-nav fantasy-right-nav">
         <div class="container">

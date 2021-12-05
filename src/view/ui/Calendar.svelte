@@ -100,8 +100,6 @@
             month={month.name}
             year={yearDisplay}
             current={calendar.displayedDate}
-            {displayDayNumber}
-            {dayNumber}
             on:next={() => calendar.goToNext()}
             on:previous={() => calendar.goToPrevious()}
             on:reset
