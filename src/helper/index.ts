@@ -549,12 +549,12 @@ export default class CalendarHelper extends Events {
         if (year < 1) return 0;
         return Math.abs(year - 1) * this.daysPerYear;
     }
-    totalDaysBeforeYear(year: number) {
+    totalDaysBeforeYear(year: number, all = false) {
         if (year < 1) return 0;
         return (
             Math.abs(year - 1) *
                 this.data.months
-                    .filter((m) => m.type == "month")
+                    .filter((m) => all || m.type == "month")
                     .reduce((a, b) => a + b.length, 0) +
             this.leapDaysBeforeYear(year)
         );
@@ -586,11 +586,10 @@ export default class CalendarHelper extends Events {
         const day = month.days[date.day - 1];
 
         const daysBefore =
-            this.totalDaysBeforeYear(date.year) +
+            this.totalDaysBeforeYear(date.year, true) +
             this.daysBeforeMonth(month, true) +
             day.number -
             1;
-
         for (let moon of this.moons) {
             const { offset, cycle } = moon;
             const granularity = 24;
