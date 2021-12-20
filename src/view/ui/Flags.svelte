@@ -18,9 +18,9 @@
     const dispatch = createEventDispatcher();
 
     const addEvents = async () => {
+        flags.empty();
         overflow = 0;
         if (events.length && container && flags) {
-            flags.empty();
             const height = container.getBoundingClientRect().height;
             let remaining = height;
 

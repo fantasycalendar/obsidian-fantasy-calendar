@@ -92,7 +92,4 @@
         flex-flow: column nowrap;
         align-items: flex-start;
     }
-    .day-number {
-        font-size: x-small;
-    }
 </style>

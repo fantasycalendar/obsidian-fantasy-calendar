@@ -30,6 +30,7 @@
         date = calendar.viewing;
         currentDate = calendar.viewedDate;
         events = calendar.getEventsOnDate(calendar.viewing);
+        console.log("🚀 ~ file: DayView.svelte ~ line 33 ~ events", events);
         moons = calendar.getMoonsForDate(calendar.viewing);
     });
 

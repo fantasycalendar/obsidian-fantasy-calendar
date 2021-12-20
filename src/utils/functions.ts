@@ -1,9 +1,8 @@
 import type { CurrentCalendarData, LeapDay, Month } from "../@types";
-import moment from "moment";
 
 export function daysBetween(date1: Date, date2: Date) {
-    const d1 = moment(date1);
-    const d2 = moment(date2);
+    const d1 = window.moment(date1);
+    const d2 = window.moment(date2);
 
     let days = d2.diff(d1, "days");
 
