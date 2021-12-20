@@ -135,7 +135,8 @@ export default class Import {
                 leapDays,
                 eras,
                 displayMoons: true,
-                incrementDay: false
+                incrementDay: false,
+                displayDayNumber: false
             };
 
             const dynamicData = {

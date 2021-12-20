@@ -6,6 +6,7 @@ export const PRESET_CALENDARS: Calendar[] = [
         description:
             "A calendar for the real world. Note: May not be 100% accurate.",
         static: {
+displayDayNumber:false,
             incrementDay: true,
             displayMoons: true,
             firstWeekDay: 6,
@@ -430,6 +431,7 @@ export const PRESET_CALENDARS: Calendar[] = [
         name: "Calendar of Greyhawk",
         description: "Calendar of the world of Greyhawk.",
         static: {
+displayDayNumber:false,
             incrementDay: false,
             displayMoons: true,
             firstWeekDay: 0,
@@ -836,6 +838,7 @@ export const PRESET_CALENDARS: Calendar[] = [
         name: "Calendar of Golarion",
         description: "Calendar for the world of Pathfinder.",
         static: {
+displayDayNumber:false,
             firstWeekDay: 0,
             incrementDay: false,
             displayMoons: true,
@@ -2133,6 +2136,7 @@ export const PRESET_CALENDARS: Calendar[] = [
         name: "Calendar of Galifar",
         description: "Calendar of the world of Eberron.",
         static: {
+displayDayNumber:false,
             firstWeekDay: 0,
             incrementDay: false,
             displayMoons: true,
@@ -2765,6 +2769,7 @@ export const PRESET_CALENDARS: Calendar[] = [
         name: "Barovian Calendar",
         description: "Calendar of the realm of Barovia, home of Strahd.",
         static: {
+displayDayNumber:false,
             firstWeekDay: 0,
             incrementDay: false,
             displayMoons: true,
@@ -3037,6 +3042,7 @@ export const PRESET_CALENDARS: Calendar[] = [
         name: "Exandrian Calendar",
         description: "Calendar of the world of Wildemount.",
         static: {
+displayDayNumber:false,
             firstWeekDay: 2,
             incrementDay: false,
             displayMoons: true,
@@ -3558,6 +3564,7 @@ export const PRESET_CALENDARS: Calendar[] = [
         name: "Calendar of Harptos",
         description: "Calendar of Faerûn of the Forgotten Realms.",
         static: {
+displayDayNumber:false,
             firstWeekDay: 0,
             incrementDay: false,
             displayMoons: true,

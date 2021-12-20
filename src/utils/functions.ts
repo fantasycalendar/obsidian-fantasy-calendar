@@ -1,21 +1,21 @@
 import type { CurrentCalendarData, LeapDay, Month } from "../@types";
+import moment from "moment";
 
 export function daysBetween(date1: Date, date2: Date) {
-    const d1 = window.moment(date1);
-    const d2 = window.moment(date2);
+    const d1 = moment(date1);
+    const d2 = moment(date2);
 
     let days = d2.diff(d1, "days");
 
     if (
         (d1.year() < d2.year() || d1.dayOfYear() < d2.dayOfYear()) &&
-        (d1.hour() >= d2.hour() ||
-            d1.minute() >= d2.minute() ||
-            d1.second() >= d2.second() ||
-            d1.millisecond() >= d2.millisecond())
+        (d1.hour() > d2.hour() ||
+            d1.minute() > d2.minute() ||
+            d1.second() > d2.second() ||
+            d1.millisecond() > d2.millisecond())
     ) {
         days += 1;
     }
-
     return days;
 }
 
