@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.10.2](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.10.1...1.10.2) (2021-12-20)
+
+
+### Bug Fixes
+
+* fc-calendar is no longer case sensitive ([3e81717](https://github.com/valentine195/obsidian-fantasy-calendar/commit/3e81717fe88c9e10f8aca457002b4d5f81a02aa6))
+* fixed issue with calculating days between dates ([f323cce](https://github.com/valentine195/obsidian-fantasy-calendar/commit/f323cce333685a9f13fbfbcd4a0188ca1731ccbd))
+* fixed issue with day view events not being removed (close [#23](https://github.com/valentine195/obsidian-fantasy-calendar/issues/23)) ([e64b1be](https://github.com/valentine195/obsidian-fantasy-calendar/commit/e64b1be67eeb76ef0f739af1d9d7a6bac7ae3db5))
+* fixed multi-year events (close [#22](https://github.com/valentine195/obsidian-fantasy-calendar/issues/22)) ([01a1fdc](https://github.com/valentine195/obsidian-fantasy-calendar/commit/01a1fdcdf74750b713989aa54aae9123f9bd86d7))
+* leap year offsets now work (close [#13](https://github.com/valentine195/obsidian-fantasy-calendar/issues/13)) ([368fa32](https://github.com/valentine195/obsidian-fantasy-calendar/commit/368fa32d0ee0547d5048822a95e1d54b8ef20cdb))
+
 ### [1.10.1](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.10.0...1.10.1) (2021-12-06)
 
 
