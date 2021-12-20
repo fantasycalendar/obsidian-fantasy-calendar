@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.10.1](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.10.0...1.10.1) (2021-12-06)
+
+
+### Bug Fixes
+
+* fixed moon phase drift in calendars with intercalary months (close [#20](https://github.com/valentine195/obsidian-fantasy-calendar/issues/20)) ([eefb6bb](https://github.com/valentine195/obsidian-fantasy-calendar/commit/eefb6bb5fb631ce6cdf94c40f67ccab0c1d5e7d3))
+
 ## [1.10.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.9.0...1.10.0) (2021-12-05)
 
 
