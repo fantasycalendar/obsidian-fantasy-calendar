@@ -40,9 +40,11 @@ ctx.addEventListener(
             let names = frontmatter["fc-calendar"] as string | string[];
             if (!Array.isArray(names)) names = [names];
 
+            names = names.map((n) => n.toLowerCase());
+
             const { start: startArray, end: endArray } = getDates(frontmatter);
             const calendars = sourceCalendars.filter((calendar) =>
-                names.includes(calendar.name)
+                names.includes(calendar.name.toLowerCase())
             );
             const fcCategory = frontmatter["fc-category"];
 
