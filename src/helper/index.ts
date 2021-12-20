@@ -333,18 +333,20 @@ export default class CalendarHelper extends Events {
                 .sort((a, b) => a.interval - b.interval)
                 .some(({ interval, exclusive }, index, array) => {
                     if (exclusive && index == 0) {
-                        return year % interval != 0;
+                        return (year - l.offset ?? 0) % interval != 0;
                     }
 
                     if (exclusive) return;
 
                     if (array[index + 1] && array[index + 1].exclusive) {
                         return (
-                            year % interval == 0 &&
-                            year % array[index + 1].interval != 0
+                            (year - l.offset ?? 0) % interval == 0 &&
+                            (year - l.offset ?? 0) %
+                                array[index + 1].interval !=
+                                0
                         );
                     }
-                    return year % interval == 0;
+                    return (year - l.offset ?? 0) % interval == 0;
                 });
         });
     }
@@ -357,18 +359,20 @@ export default class CalendarHelper extends Events {
                     .sort((a, b) => a.interval - b.interval)
                     .some(({ interval, exclusive }, index, array) => {
                         if (exclusive && index == 0) {
-                            return year % interval != 0;
+                            return (year - l.offset ?? 0) % interval != 0;
                         }
 
                         if (exclusive) return;
 
                         if (array[index + 1] && array[index + 1].exclusive) {
                             return (
-                                year % interval == 0 &&
-                                year % array[index + 1].interval != 0
+                                (year - l.offset ?? 0) % interval == 0 &&
+                                (year - l.offset ?? 0) %
+                                    array[index + 1].interval !=
+                                    0
                             );
                         }
-                        return year % interval == 0;
+                        return (year - l.offset ?? 0) % interval == 0;
                     });
             });
     }
