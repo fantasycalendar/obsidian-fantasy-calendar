@@ -179,11 +179,10 @@ export default class CalendarHelper extends Events {
                 e.end = { ...e.date };
             }
             const start = { ...e.date };
+            if (start.year > date.year) return false;
             const end = { ...e.end };
             if (start.month == undefined) end.month = start.month = date.month;
             if (start.year == undefined) end.year = start.year = date.year;
-
-            if (start.year != date.year && end.year != date.year) return false;
 
             const daysBeforeStart = this.daysBeforeDate(start);
             const daysBeforeDate = this.daysBeforeDate(date);

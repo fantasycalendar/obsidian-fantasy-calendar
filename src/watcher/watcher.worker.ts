@@ -49,13 +49,12 @@ ctx.addEventListener(
             const fcCategory = frontmatter["fc-category"];
 
             for (let calendar of calendars) {
-                let index = names.indexOf(calendar.name);
+                let index = names.indexOf(calendar.name.toLowerCase());
 
                 /** Clamp index to length of dates provided. */
-                if (index >= startArray.length) {
+                if (index >= startArray.length || index == -1) {
                     index = startArray.length - 1;
                 }
-
                 let date = (startArray[index] as CurrentCalendarData) ?? {
                     day: null,
                     month: null,
