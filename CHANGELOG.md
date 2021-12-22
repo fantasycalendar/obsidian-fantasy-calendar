@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.11.0...2.0.0) (2021-12-22)
+
+
+### Features
+
+* announce new features ([f646ad1](https://github.com/valentine195/obsidian-fantasy-calendar/commit/f646ad17e053fce27155de4360f5aa1f1b8b9b10))
+
 ## [1.11.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.10.2...1.11.0) (2021-12-22)
 
 
