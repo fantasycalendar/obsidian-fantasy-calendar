@@ -44,6 +44,7 @@ export class Watcher extends Component {
         );
         this.registerEvent(
             this.vault.on("rename", (abstractFile, oldPath) => {
+                if (!this.calendars.length) return;
                 if (!(abstractFile instanceof TFile)) return;
                 this.worker.postMessage<RenameCalendarMessage>({
                     type: "rename",
@@ -87,6 +88,7 @@ export class Watcher extends Component {
         };
     }
     recurseFiles() {
+        if (!this.calendars.length) return;
         const folder = this.vault.getAbstractFileByPath(this.plugin.data.path);
         if (!folder || !(folder instanceof TFolder)) return;
         this.recurseFolder(folder);
@@ -116,16 +118,19 @@ export class Watcher extends Component {
     }
 
     parseFileForEvents(file: TFile, calendar?: Calendar) {
+        if (!this.calendars.length) return;
         //if the file is not in a calendar watch path, return;
         if (!this.testPath(file.path)) return;
 
         const cache = this.metadataCache.getFileCache(file);
-        
+
         this.worker.postMessage<ParseCalendarMessage>({
             type: "parse",
             file: { path: file.path, basename: file.basename },
             cache,
-            sourceCalendars: calendar ? [calendar] : this.calendars
+            sourceCalendars: calendar ? [calendar] : this.calendars,
+            defaultCalendar: this.plugin.defaultCalendar.name,
+            format: this.plugin.format
         });
     }
     onunload() {
