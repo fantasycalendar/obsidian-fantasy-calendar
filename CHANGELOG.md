@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.11.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.10.2...1.11.0) (2021-12-22)
+
+
+### Features
+
+* can now specify date format ([5977b33](https://github.com/valentine195/obsidian-fantasy-calendar/commit/5977b33abe6645bc041b37a45acfd29282b38c4b))
+* parse title for dates setting respected ([85b999e](https://github.com/valentine195/obsidian-fantasy-calendar/commit/85b999eb3f278ccf8cb25dd73104401aa2eead24))
+* plugin will now parse note titles for dates if fc-date is not provided ([b99f2d2](https://github.com/valentine195/obsidian-fantasy-calendar/commit/b99f2d212dd6f1b61c4049ffb4bc9f18f3f77c45))
+
+
+### Bug Fixes
+
+* invalid months no longer break calendar ([659254a](https://github.com/valentine195/obsidian-fantasy-calendar/commit/659254a7f5f4c6efbfa75e6122b50b5189d1ce65))
+
 ### [1.10.2](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.10.1...1.10.2) (2021-12-20)
 
 
