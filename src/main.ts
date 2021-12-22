@@ -60,7 +60,15 @@ export const DEFAULT_DATA: FantasyCalendarData = {
     defaultCalendar: null,
     eventPreview: false,
     configDirectory: null,
-    path: "/"
+    path: "/",
+    parseDates: false,
+    dateFormat: "YYYY-MM-DD",
+    dailyNotes: false,
+    version: {
+        major: null,
+        minor: null,
+        patch: null
+    }
 };
 
 export default class FantasyCalendar extends Plugin {
@@ -77,6 +85,19 @@ export default class FantasyCalendar extends Plugin {
     get currentCalendar() {
         return this.data.calendars.find(
             (c) => c.id == this.data.currentCalendar
+        );
+    }
+    get canUseDailyNotes() {
+        return this.dailyNotes._loaded;
+    }
+    get dailyNotes() {
+        return this.app.internalPlugins.getPluginById("daily-notes");
+    }
+    get format() {
+        return (
+            (this.data.dailyNotes && this.canUseDailyNotes
+                ? this.dailyNotes.instance.options.format
+                : this.data.dateFormat) ?? "YYYY-MM-DD"
         );
     }
     get defaultCalendar() {
@@ -198,6 +219,17 @@ export default class FantasyCalendar extends Plugin {
         if (!this.data.defaultCalendar && this.data.calendars.length) {
             this.data.defaultCalendar = this.data.calendars[0].id;
         }
+        /* if ((this.data.version?.major ?? 0) < 2 && this.data.calendars.length) {
+            new Notice(
+                "Fantasy Calendar can now parse note titles for events. See the ReadMe for more info!"
+            );
+        }
+        const version = this.manifest.version.split(".").map((v) => Number(v));
+        this.data.version = {
+            major: version[0],
+            minor: version[1],
+            patch: version[2]
+        }; */
     }
 
     async saveCalendar() {

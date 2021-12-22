@@ -19,7 +19,14 @@ export interface FantasyCalendarData {
     defaultCalendar: string;
     eventPreview: boolean;
     configDirectory: string;
-
+    version: {
+        major: number;
+        minor: number;
+        patch: number;
+    };
+    parseDates: boolean;
+    dateFormat: string;
+    dailyNotes: boolean;
     path: string;
 }
 

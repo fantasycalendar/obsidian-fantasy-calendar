@@ -53,6 +53,21 @@ export enum Recurring {
     yearly = "Yearly"
 }
 
+declare module "obsidian" {
+    interface App {
+        internalPlugins: {
+            getPluginById(id: "daily-notes"): {
+                _loaded: boolean;
+                instance: {
+                    options: {
+                        format: string;
+                    };
+                };
+            };
+        };
+    }
+}
+
 addIcon(
     "fantasy-calendar-grip",
     `<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="grip-lines" class="svg-inline--fa fa-grip-lines fa-w-16" role="img" viewBox="0 0 512 512"><path fill="currentColor" d="M496 288H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm0-128H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16z"/></svg>`
@@ -165,6 +180,54 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                     this.data.eventPreview = v;
                     this.plugin.saveSettings();
                 });
+            });
+        new Setting(this.infoEl)
+            .setName("Parse Note Titles for Dates")
+            .setDesc("The plugin will parse note titles for event dates.")
+            .addToggle((t) => {
+                t.setValue(this.data.parseDates).onChange((v) => {
+                    this.data.parseDates = v;
+                    this.plugin.saveSettings();
+                });
+            });
+        new Setting(this.infoEl)
+            .setName("Date format")
+            .setClass(this.data.dailyNotes ? "daily-notes" : "no-daily-notes")
+            .setDesc(
+                createFragment((e) => {
+                    e.createSpan({
+                        text: "Dates will be parsed per this format."
+                    });
+                    e.createEl("br");
+                    e.createSpan({ text: "Dates must include the " });
+                    e.createEl("strong", { text: "full " });
+                    e.createSpan({ text: "year." });
+                })
+            )
+            .addText((t) => {
+                t.setDisabled(this.data.dailyNotes)
+                    .setValue(this.plugin.format)
+                    .onChange((v) => {
+                        this.data.dateFormat = v;
+                        this.plugin.saveSettings();
+                    });
+            })
+            .addExtraButton((b) => {
+                if (this.data.dailyNotes) {
+                    b.setIcon("checkmark")
+                        .setTooltip("Unlink from Daily Notes")
+                        .onClick(() => {
+                            this.data.dailyNotes = false;
+                            this.buildInfo();
+                        });
+                } else {
+                    b.setIcon("paper-plane-glyph")
+                        .setTooltip("Link with Daily Notes")
+                        .onClick(() => {
+                            this.data.dailyNotes = true;
+                            this.buildInfo();
+                        });
+                }
             });
 
         new Setting(this.infoEl)
