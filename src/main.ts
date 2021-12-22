@@ -219,7 +219,7 @@ export default class FantasyCalendar extends Plugin {
         if (!this.data.defaultCalendar && this.data.calendars.length) {
             this.data.defaultCalendar = this.data.calendars[0].id;
         }
-        if ((this.data.version?.major ?? 0) < 2 && this.data.calendars.length) {
+        /* if ((this.data.version?.major ?? 0) < 2 && this.data.calendars.length) {
             new Notice(
                 "Fantasy Calendar can now parse note titles for events. See the ReadMe for more info!"
             );
@@ -229,7 +229,7 @@ export default class FantasyCalendar extends Plugin {
             major: version[0],
             minor: version[1],
             patch: version[2]
-        };
+        }; */
     }
 
     async saveCalendar() {
