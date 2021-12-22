@@ -7,8 +7,7 @@
         "build": "webpack",
         "dev": "set NODE_OPTIONS=--openssl-legacy-provider && webpack --config webpack.dev.js -w --stats-children",
         "test": "jest",
-        "release": "standard-version",
-        "postrelease": "git push --follow-tags origin master"
+        "release": "standard-version"
     },
     "standard-version": {
         "t": ""
