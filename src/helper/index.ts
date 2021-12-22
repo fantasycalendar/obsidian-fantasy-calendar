@@ -474,6 +474,7 @@ export default class CalendarHelper extends Events {
             .reduce((a, b) => a + b.length, 0);
     }
     daysBeforeMonth(month: MonthHelper, all: boolean = false) {
+        if (!month) return 0;
         if (month.number == 0) {
             return 0;
         }
