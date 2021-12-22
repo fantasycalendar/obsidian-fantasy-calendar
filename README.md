@@ -203,22 +203,70 @@ Optionally, you can tell the plugin to only watch for new events in a specific f
 
 Automatic event creation uses `fc-date` and `fc-category`, as well as an additional property: `fc-calendar`.
 
-| Property      | Description                                                                               |
-| ------------- | ----------------------------------------------------------------------------------------- |
-| `fc-calendar` | Calendar name or array of calendar names to the event should be added to.                 |
-| `fc-date`     | UTC date, date object or array of date objects with `year`, `month` and `day` parameters. |
-| `fc-end`      | UTC date, date object or array of date objects with `year`, `month` and `day` parameters. |
-| `fc-category` | Name of the event category.                                                               |
+| Property                        | Description                                                                                  |
+| ------------------------------- | -------------------------------------------------------------------------------------------- |
+| [`fc-calendar`](#fc-calendar)   | Calendar name or array of calendar names to the event should be added to.                    |
+| [`fc-date`](#frontmatter-dates) | Date string, date object or array of date objects with `year`, `month` and `day` parameters. |
+| `fc-end`                        | Date string, date object or array of date objects with `year`, `month` and `day` parameters. |
+| `fc-category`                   | Name of the event category.                                                                  |
 
 Once this setting is turned on, the calendar will look through its specified folder for events it should add to itself. When it finds them, they will be added - **unless an event with that exact date linked to that note is already on the calendar.**
 
-The calendar will additionally watch for changes to notes and update itself accordingly. **Events will never be deleted. Once they are added, they must manually be removed.**
+The calendar will additionally watch for changes to notes and update itself accordingly. **The plugin should never automatically delete an event once created. Once they are added, they must manually be removed.**
+
+#### fc-calendar
+
+The `fc-calendar` field is used to specify **which** calendar the event will be added to.
+
+This field optional, and if not provided alongside an `fc-date`, the plugin will add the event to the **default calendar.**
+
+##### Single Calendar
+
+A note can be registered to a single calendar like so:
+
+```
+---
+fc-calendar: My Custom Calendar
+fc-date: 837-02-28                  # 28th day of the second month of the 837th year.
+fc-category: Event Category 1
+---
+```
+
+##### Multiple Calendars
+
+Additionally, you may specify multiple calendars for an event to be created on, like so:
+
+```md
+---
+fc-calendar: 
+  - My Custom Calendar
+  - My Custom Calendar 2
+fc-date:                        # Same date for both calendars.
+  year: 837          
+  month: Custom Month   
+  day: 17
+
+**OR**
+
+fc-date:                        # Different dates for each calendar.
+  - year: 837                   # Date for My Custom Calendar
+    month: Custom Month   
+    day: 17
+  - year: 92                    # Date for My Custom Calendar 2
+    month: Month of Calendar 2   
+    day: 3
+
+fc-category: Event Category 1
+---
+```
+
+The plugin will assign the dates _in the same order the calendars are specified in_.
 
 #### Frontmatter Dates
 
-Frontmatter dates can be supplied two ways - as a UTC-formatted date or as a date object.
+Frontmatter dates can be supplied two ways - as a date string or as a date object.
 
-UTC dates **must** be formatted as `YYYY-MM-DD`.
+Date strings **must** be formatted as specified in settings.
 
 If you need the event to repeat (such as every year or every month), a date object can be supplied instead. The only value that _must_ be supplied for a date object is the day, and the plugin will repeat the event for the unsupplied values. Please note that months may be supplied as the month _name_ or the month _number_ (ie, 2 for February).
 
@@ -249,47 +297,7 @@ fc-date:        # Event will repeat on the 3rd day of the month of February of t
 
 ```
 
-#### Single Calendar
-
-A note can be registered to a single calendar like so:
-
-```
----
-fc-calendar: My Custom Calendar
-fc-date: 837-02-28                  # 28th day of the second month of the 837th year.
-fc-category: Event Category 1
----
-```
-
-#### Multiple Calendars
-
-Additionally, you may specify multiple calendars for an event to be created on, like so:
-
-```md
----
-fc-calendar: 
-  - My Custom Calendar
-  - My Custom Calendar 2
-fc-date:                        # Same date for both calendars.
-  year: 837          
-  month: Custom Month   
-  day: 17
-
-**OR**
-
-fc-date:                        # Different dates for each calendar.
-  - year: 837                   # Date for My Custom Calendar
-    month: Custom Month   
-    day: 17
-  - year: 92                    # Date for My Custom Calendar 2
-    month: Month of Calendar 2   
-    day: 3
-
-fc-category: Event Category 1
----
-```
-
-The plugin will assign the dates _in the same order the calendars are specified in_.
+Turning on the [Parse Note Titles for Dates](#parse-note-titles-for-dates) will make this field optional, if a date matching the format specified in [the date format](#date-format) setting is in the title.
 
 ## Settings
 
@@ -301,9 +309,23 @@ Newly opened views will open to the specified calendar when opened.
 
 Events that link to notes will open a note preview (note: requires the core Page Preview plugin to be enabled).
 
+### Parse Note Titles for Dates
+
+Turn this setting on to allow the plugin to parse note titles for dates for an automatically created event, instead of just looking for `fc-date`.
+
+### Date Format
+
+This setting allows you to override the expected date format for date strings. The default date format is the UTC formatted date, `YYYY-MM-DD`.
+
+Please note that the number of characters provided does not allow you to specify less numbers. The plugin will add the event to the **exact date specified.**
+
 ### Folder to Watch
 
 The plugin will only watch the specified folder for automatic event creation. This setting applies to all calendars.
+
+### Default Config Directory
+
+This setting allows you to change the directory the plugin writes its data to.
 
 ### Import Calendar
 

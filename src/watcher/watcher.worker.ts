@@ -9,6 +9,7 @@ export type ParseCalendarMessage = {
     sourceCalendars: Calendar[];
     defaultCalendar: string;
     format: string;
+    parseTitle: boolean;
 };
 
 export type RenameCalendarMessage = {
@@ -30,8 +31,14 @@ ctx.addEventListener(
     "message",
     async (event: MessageEvent<ParseCalendarMessage>) => {
         if (event.data.type === "parse") {
-            const { file, cache, sourceCalendars, defaultCalendar, format } =
-                event.data;
+            const {
+                file,
+                cache,
+                sourceCalendars,
+                defaultCalendar,
+                format,
+                parseTitle
+            } = event.data;
 
             let { frontmatter } = cache ?? {};
 
@@ -52,7 +59,7 @@ ctx.addEventListener(
 
             const { start: startArray, end: endArray } = getDates(
                 frontmatter,
-                file.basename,
+                parseTitle ? file.basename : "",
                 format
             );
             if (!startArray.length) return;

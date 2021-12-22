@@ -130,7 +130,8 @@ export class Watcher extends Component {
             cache,
             sourceCalendars: calendar ? [calendar] : this.calendars,
             defaultCalendar: this.plugin.defaultCalendar.name,
-            format: this.plugin.format
+            format: this.plugin.format,
+            parseTitle: this.plugin.data.parseDates
         });
     }
     onunload() {
