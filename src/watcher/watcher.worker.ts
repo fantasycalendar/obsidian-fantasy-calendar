@@ -7,6 +7,8 @@ export type ParseCalendarMessage = {
     file: { path: string; basename: string };
     cache: CachedMetadata;
     sourceCalendars: Calendar[];
+    defaultCalendar: string;
+    format: string;
 };
 
 export type RenameCalendarMessage = {
@@ -28,26 +30,33 @@ ctx.addEventListener(
     "message",
     async (event: MessageEvent<ParseCalendarMessage>) => {
         if (event.data.type === "parse") {
-            const { file, cache, sourceCalendars } = event.data;
+            const { file, cache, sourceCalendars, defaultCalendar, format } =
+                event.data;
 
-            const { frontmatter } = cache ?? {};
-            if (!frontmatter) return;
-            if (
-                !("fc-calendar" in frontmatter) &&
-                !("fc-date" in frontmatter || "fc-start" in frontmatter)
-            )
-                return;
-            let names = frontmatter["fc-calendar"] as string | string[];
+            let { frontmatter } = cache ?? {};
+
+            let names: string[], fcCategory: string;
+            if (frontmatter) {
+                names = frontmatter?.["fc-calendar"];
+                fcCategory = frontmatter?.["fc-category"];
+            }
+            if (!names) {
+                names = [defaultCalendar];
+            }
             if (!Array.isArray(names)) names = [names];
 
             names = names.map((n) => n.toLowerCase());
-
-            const { start: startArray, end: endArray } = getDates(frontmatter);
             const calendars = sourceCalendars.filter((calendar) =>
                 names.includes(calendar.name.toLowerCase())
             );
-            const fcCategory = frontmatter["fc-category"];
 
+            const { start: startArray, end: endArray } = getDates(
+                frontmatter,
+                file.basename,
+                format
+            );
+            if (!startArray.length) return;
+            let save = false;
             for (let calendar of calendars) {
                 let index = names.indexOf(calendar.name.toLowerCase());
 
@@ -115,6 +124,7 @@ ctx.addEventListener(
                 ) {
                     continue;
                 }
+                save = true;
                 ctx.postMessage<OutgoingCalendarMessage>({
                     type: "update",
                     id: calendar.id,
@@ -130,12 +140,14 @@ ctx.addEventListener(
                     }
                 });
             }
-            ctx.postMessage<OutgoingCalendarMessage>({
-                type: "save",
-                id: null,
-                index: null,
-                event: null
-            });
+            if (save) {
+                ctx.postMessage<OutgoingCalendarMessage>({
+                    type: "save",
+                    id: null,
+                    index: null,
+                    event: null
+                });
+            }
         }
     }
 );
@@ -189,16 +201,23 @@ export type OutgoingCalendarMessage = {
 
 export default {} as typeof Worker & (new () => Worker);
 
-const getDates = (frontmatter: FrontMatterCache) => {
+const getDates = (
+    frontmatter: Partial<FrontMatterCache> = {},
+    basename: string,
+    format: string
+) => {
     const dateField = "fc-date" in frontmatter ? "fc-date" : "fc-start";
-    let dates = frontmatter[dateField] as
-        | string
-        | string[]
-        | CurrentCalendarData
-        | CurrentCalendarData[];
+    let dates: string | string[] | CurrentCalendarData | CurrentCalendarData[];
+    if (frontmatter && dateField in frontmatter) {
+        dates = frontmatter[dateField];
+    }
+    if (!dates) {
+        dates = basename;
+    }
     const dateArray: Array<CurrentCalendarData> = [dates]
         .flat(2)
-        .map((date) => parseDate(date));
+        .map((date) => parseDate(date, format))
+        .filter((d) => d);
     const ends =
         "fc-end" in frontmatter
             ? (frontmatter["fc-end"] as
@@ -209,19 +228,27 @@ const getDates = (frontmatter: FrontMatterCache) => {
             : [];
     const endArray: Array<CurrentCalendarData> = [ends]
         .flat(2)
-        .map((date) => parseDate(date));
+        .map((date) => parseDate(date, format))
+        .filter((d) => d);
     return { start: dateArray, end: endArray };
 };
 
-const parseDate = (date: string | CurrentCalendarData) => {
+const parseDate = (date: string | CurrentCalendarData, format: string) => {
     if (typeof date === "string") {
+        if (!/\d+[./-]\d+[./-]\d+/.test(date)) return;
         try {
-            const split = date.split(/[\-\/]/).map((d) => Number(d));
+            const [match] = date.match(/\d+[./-]\d+[./-]\d+/) ?? [];
+            if (!match) return;
+            const split = match.split(/[.\-\/]/).map((d) => Number(d));
+
+            const formatter = [
+                ...new Set(format.replace(/[^\w]/g, "").toUpperCase().split(""))
+            ];
 
             return {
-                year: split[0],
-                month: split[1],
-                day: split[2]
+                year: split[formatter.indexOf("Y")],
+                month: split[formatter.indexOf("M")],
+                day: split[formatter.indexOf("D")]
             };
         } catch (e) {
             return;
