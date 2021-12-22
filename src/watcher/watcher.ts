@@ -120,8 +120,7 @@ export class Watcher extends Component {
         if (!this.testPath(file.path)) return;
 
         const cache = this.metadataCache.getFileCache(file);
-        if (!cache) return;
-
+        
         this.worker.postMessage<ParseCalendarMessage>({
             type: "parse",
             file: { path: file.path, basename: file.basename },
