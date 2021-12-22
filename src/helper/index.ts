@@ -135,7 +135,7 @@ export default class CalendarHelper extends Events {
         this.displayed = { ...this.current };
         this.update(this.object);
 
-        /* window.calendar = this; */
+        window.calendar = this;
     }
 
     getMonthsForYear(year: number) {
@@ -143,11 +143,25 @@ export default class CalendarHelper extends Events {
             (m, i) => new MonthHelper(m, i, year, this)
         );
     }
+    hash(date: CurrentCalendarData) {
+        if (!date.year || !date.month || !date.day) return null;
+        return `${date.year}${date.month}${date.day}`;
+    }
+    map: { [key: string]: Set<Event> } = {};
     update(calendar?: Calendar) {
         this.object = calendar ?? this.object;
         this.maxDays = Math.max(...this.data.months.map((m) => m.length));
         this.trigger("month-update");
         this.trigger("day-update");
+
+        this.map = {};
+
+        for (const event of this.object.events) {
+            const hash = this.hash(event.date);
+            if (!hash) continue;
+            if (!(hash in this.map)) this.map[hash] = new Set();
+            this.map[hash].add(event);
+        }
     }
     get data() {
         return this.object.static;
