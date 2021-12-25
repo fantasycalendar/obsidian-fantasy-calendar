@@ -135,7 +135,7 @@ export default class CalendarHelper extends Events {
         this.displayed = { ...this.current };
         this.update(this.object);
 
-        window.calendar = this;
+        /* window.calendar = this; */
     }
 
     getMonthsForYear(year: number) {
@@ -143,57 +143,11 @@ export default class CalendarHelper extends Events {
             (m, i) => new MonthHelper(m, i, year, this)
         );
     }
-    hash(date: CurrentCalendarData) {
-        if (!date.year || !date.month || !date.day) return null;
-        return `${date.year}${date.month}${date.day}`;
-    }
-    map: Map<string, Set<Event>> = new Map();
-    isEqual(date: CurrentCalendarData, next: CurrentCalendarData) {
-        return (
-            date.year == next.year &&
-            date.month == next.month &&
-            date.day == next.day
-        );
-    }
-    incrementDate(inc: CurrentCalendarData) {
-        const date = { ...inc };
-        date.day++;
-        const year = this.getMonthsForYear(date.year);
-        if (date.day >= year[date.month].days.length) {
-            date.month++;
-            date.day = 1;
-        }
-        if (date.month >= year.length) {
-            date.year++;
-            date.month = 0;
-        }
-        return date;
-    }
     update(calendar?: Calendar) {
         this.object = calendar ?? this.object;
         this.maxDays = Math.max(...this.data.months.map((m) => m.length));
         this.trigger("month-update");
         this.trigger("day-update");
-
-        this.map = new Map();
-
-        for (const event of this.object.events) {
-            const hash = this.hash(event.date);
-            if (!hash) continue;
-            if (!this.map.has(hash)) this.map.set(hash, new Set());
-            this.map.get(hash)!.add(event);
-            if (event.end) {
-                let date = { ...event.date };
-                while (!this.isEqual(date, event.end)) {
-                    date = this.incrementDate(date);
-                    let intHash = this.hash(date);
-                    if (!intHash) continue;
-                    if (!this.map.has(intHash))
-                        this.map.set(intHash, new Set());
-                    this.map.get(intHash)!.add(event);
-                }
-            }
-        }
     }
     get data() {
         return this.object.static;
