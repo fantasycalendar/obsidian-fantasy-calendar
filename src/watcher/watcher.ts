@@ -1,5 +1,5 @@
 import { rename } from "fs";
-import { Component, TFile, TFolder, Vault } from "obsidian";
+import { Component, TAbstractFile, TFile, TFolder, Vault } from "obsidian";
 import type { Calendar, CurrentCalendarData } from "src/@types";
 import type FantasyCalendar from "src/main";
 
@@ -39,7 +39,7 @@ export class Watcher extends Component {
 
         this.registerEvent(
             this.metadataCache.on("changed", (file) => {
-                this.parseFileForEvents(file);
+                this.parsing.push(...this.getFiles(file));
             })
         );
         this.registerEvent(
@@ -86,30 +86,57 @@ export class Watcher extends Component {
 
             calendar.events.splice(index, index >= 0 ? 1 : 0, event);
         };
+        this.worker.addEventListener("message", (evt) => {});
     }
     recurseFiles() {
         if (!this.calendars.length) return;
         const folder = this.vault.getAbstractFileByPath(this.plugin.data.path);
         if (!folder || !(folder instanceof TFolder)) return;
-        this.recurseFolder(folder);
-        this.plugin.saveCalendar();
+
+        this.parsing = this.getFiles(folder);
+        this.startParsing();
+
+        /* this.recurseFolder(folder); */
+    }
+
+    getFile(path: string) {
+        const file = this.plugin.app.vault.getAbstractFileByPath(path);
+        if (!(file instanceof TFile)) return;
+
+        const cache = this.metadataCache.getFileCache(file);
     }
     registerCalendar(calendar: Calendar) {
         console.log("[Fantasy Calendar] Parsing files for events.");
         const folder = this.vault.getAbstractFileByPath(this.plugin.data.path);
         if (!folder || !(folder instanceof TFolder)) return;
-        this.recurseFolder(folder, calendar);
+        /* this.recurseFolder(folder, calendar); */
+        this.parsing = this.getFiles(folder);
         console.log("[Fantasy Calendar] Parsing complete.");
     }
-    recurseFolder(folder: TFolder, calendar?: Calendar) {
+    parsing: string[];
+    getFiles(folder: TAbstractFile): string[] {
+        let files = [];
+        if (folder instanceof TFolder) {
+            for (const child of folder.children) {
+                files.push(...this.getFiles(child));
+            }
+        }
+        if (folder instanceof TFile) {
+            return [folder.path];
+        }
+        return files;
+    }
+    /* recurseFolder(folder: TFolder, calendar?: Calendar) {
         Vault.recurseChildren(folder, (abstractFile) => {
             if (!abstractFile) return;
 
             if (abstractFile instanceof TFile) {
-                this.parseFileForEvents(abstractFile, calendar);
+                requestAnimationFrame(() =>
+                    this.parseFileForEvents(abstractFile, calendar)
+                );
             }
         });
-    }
+    } */
     testPath(filePath: string) {
         return (
             `/${filePath}`.match(new RegExp(`^${this.plugin.data.path}`)) !=
@@ -117,11 +144,12 @@ export class Watcher extends Component {
         );
     }
 
-    parseFileForEvents(file: TFile, calendar?: Calendar) {
+    parseFileForEvents(path: string, calendar?: Calendar) {
         if (!this.calendars.length) return;
         //if the file is not in a calendar watch path, return;
-        if (!this.testPath(file.path)) return;
-
+        if (!this.testPath(path)) return;
+        const file = this.plugin.app.vault.getAbstractFileByPath(path);
+        if (!(file instanceof TFile)) return;
         const cache = this.metadataCache.getFileCache(file);
 
         this.worker.postMessage<ParseCalendarMessage>({

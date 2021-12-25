@@ -18,7 +18,7 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.worker\.ts?$/,
+                test: /watcher\.worker\.ts?$/,
                 loader: "worker-loader",
                 options: {
                     inline: "no-fallback",
@@ -26,6 +26,20 @@ module.exports = {
                         type: "Worker",
                         options: {
                             name: "Fantasy Calendar Watcher",
+                            esModule: false
+                        }
+                    }
+                }
+            },
+            {
+                test: /helper\.worker\.ts?$/,
+                loader: "worker-loader",
+                options: {
+                    inline: "no-fallback",
+                    worker: {
+                        type: "Worker",
+                        options: {
+                            name: "Fantasy Calendar Events",
                             esModule: false
                         }
                     }

@@ -26,6 +26,11 @@ declare global {
 
 const ctx: Worker = self as any;
 
+interface GetFileMessage {
+    type: "file",
+    
+}
+
 // Respond to message from parent thread
 ctx.addEventListener(
     "message",

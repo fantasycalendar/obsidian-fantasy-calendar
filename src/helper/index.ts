@@ -176,7 +176,8 @@ export default class CalendarHelper extends Events {
         this.trigger("day-update");
 
         this.map = new Map();
-
+        const date = new Date();
+        console.log("Fantasy Calendar: Building Event Hash Map");
         for (const event of this.object.events) {
             const hash = this.hash(event.date);
             if (!hash) continue;
@@ -184,16 +185,24 @@ export default class CalendarHelper extends Events {
             this.map.get(hash)!.add(event);
             if (event.end) {
                 let date = { ...event.date };
-                while (!this.isEqual(date, event.end)) {
-                    date = this.incrementDate(date);
-                    let intHash = this.hash(date);
-                    if (!intHash) continue;
-                    if (!this.map.has(intHash))
-                        this.map.set(intHash, new Set());
-                    this.map.get(intHash)!.add(event);
-                }
+                setImmediate(() => {
+                    while (!this.isEqual(date, event.end)) {
+                        date = this.incrementDate(date);
+                        let intHash = this.hash(date);
+                        if (!intHash) continue;
+                        if (!this.map.has(intHash))
+                            this.map.set(intHash, new Set());
+                        this.map.get(intHash)!.add(event);
+                    }
+                });
             }
         }
+        console.log(
+            `Fantasy Calendar: Event Hash complete in ${
+                (Date.now() - date.valueOf()) / 1000
+            }s`,
+            this.map.size
+        );
     }
     get data() {
         return this.object.static;
