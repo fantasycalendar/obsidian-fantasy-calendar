@@ -6,7 +6,9 @@ import type FantasyCalendar from "src/main";
 import Worker, {
     ParseCalendarMessage,
     OutgoingCalendarMessage,
-    RenameCalendarMessage
+    RenameCalendarMessage,
+    GetFileMessage,
+    FileCacheMessage
 } from "./watcher.worker";
 
 declare global {
@@ -72,7 +74,6 @@ export class Watcher extends Component {
                 this.plugin.saveCalendar();
             })
         );
-
         this.worker.onmessage = async (
             evt: MessageEvent<OutgoingCalendarMessage>
         ) => {
@@ -86,7 +87,18 @@ export class Watcher extends Component {
 
             calendar.events.splice(index, index >= 0 ? 1 : 0, event);
         };
-        this.worker.addEventListener("message", (evt) => {});
+
+        /**
+         * The watcher will send this message to get details of a file path.
+         */
+        this.worker.addEventListener(
+            "message",
+            (evt: MessageEvent<GetFileMessage>) => {
+                if (evt.data.type == "file") {
+                    this.parseFileForEvents(evt.data.path);
+                }
+            }
+        );
     }
     recurseFiles() {
         if (!this.calendars.length) return;
@@ -98,12 +110,18 @@ export class Watcher extends Component {
 
         /* this.recurseFolder(folder); */
     }
+    startParsing(calendar?: Calendar) {
+        if (this.parsing.length) {
+            this.worker.postMessage({ type: "start", parsing: this.parsing });
+        }
+    }
 
     getFile(path: string) {
         const file = this.plugin.app.vault.getAbstractFileByPath(path);
         if (!(file instanceof TFile)) return;
 
         const cache = this.metadataCache.getFileCache(file);
+        return { cache, file };
     }
     registerCalendar(calendar: Calendar) {
         console.log("[Fantasy Calendar] Parsing files for events.");

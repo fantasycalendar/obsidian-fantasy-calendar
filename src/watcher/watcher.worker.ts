@@ -26,10 +26,49 @@ declare global {
 
 const ctx: Worker = self as any;
 
-interface GetFileMessage {
-    type: "file",
-    
+export interface GetFileMessage {
+    type: "file";
+    path: string;
 }
+export interface FileCacheMessage {
+    type: "file";
+    path: string;
+    file: { path: string; basename: string };
+    cache: CachedMetadata;
+    sourceCalendars: Calendar[];
+    defaultCalendar: string;
+    format: string;
+    parseTitle: boolean;
+}
+
+const getFileCache = (path: string): Promise<FileCacheMessage> => {
+    return new Promise((resolve) => {
+        ctx.addEventListener(
+            "message",
+            (evt: MessageEvent<FileCacheMessage>) => {
+                if (evt.data.path == path) {
+                    resolve(evt.data);
+                }
+            }
+        );
+    });
+};
+
+export interface StartParsing {
+    type: "start";
+    parsing: string[];
+}
+
+ctx.addEventListener("message", async (evt: MessageEvent<StartParsing>) => {
+    if (evt.data.type == "start") {
+        const { parsing } = evt.data;
+        if (!parsing || !parsing.length) return;
+
+        for (const path of parsing) {
+            ctx.postMessage<GetFileMessage>({ path, type: "file" });
+        }
+    }
+});
 
 // Respond to message from parent thread
 ctx.addEventListener(
@@ -70,6 +109,10 @@ ctx.addEventListener(
             if (!startArray.length) return;
             let save = false;
             for (let calendar of calendars) {
+                console.log(
+                    "🚀 ~ file: watcher.worker.ts ~ line 112 ~ calendar",
+                    calendar
+                );
                 let index = names.indexOf(calendar.name.toLowerCase());
 
                 /** Clamp index to length of dates provided. */
@@ -140,7 +183,7 @@ ctx.addEventListener(
                 ctx.postMessage<OutgoingCalendarMessage>({
                     type: "update",
                     id: calendar.id,
-                    index: calendar.events.indexOf(existing),
+                    index: calendar?.events.indexOf(existing),
                     event: {
                         id: existing?.id ?? nanoid(6),
                         name: existing?.name ?? file.basename,
@@ -164,7 +207,7 @@ ctx.addEventListener(
     }
 );
 
-ctx.addEventListener(
+/* ctx.addEventListener(
     "message",
     async (event: MessageEvent<RenameCalendarMessage>) => {
         if (event.data.type === "rename") {
@@ -202,7 +245,7 @@ ctx.addEventListener(
             });
         }
     }
-);
+); */
 
 export type OutgoingCalendarMessage = {
     type: "save" | "update";
