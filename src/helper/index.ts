@@ -133,8 +133,37 @@ export default class CalendarHelper extends Events {
     constructor(public object: Calendar, public plugin: FantasyCalendar) {
         super();
         this.displayed = { ...this.current };
-        this.update(this.object);
 
+        this.map = new Map();
+        const date = new Date();
+        console.log("Fantasy Calendar: Building Event Hash Map");
+        for (const event of this.object.events) {
+            const hash = this.hash(event.date);
+            if (!hash) continue;
+            if (!this.map.has(hash)) this.map.set(hash, new Set());
+            this.map.get(hash)!.add(event);
+            if (event.end) {
+                let date = { ...event.date };
+                setImmediate(() => {
+                    while (!this.isEqual(date, event.end)) {
+                        date = this.incrementDate(date);
+                        let intHash = this.hash(date);
+                        if (!intHash) continue;
+                        if (!this.map.has(intHash))
+                            this.map.set(intHash, new Set());
+                        this.map.get(intHash)!.add(event);
+                    }
+                });
+            }
+        }
+        console.log(
+            `Fantasy Calendar: Event Hash complete in ${
+                (Date.now() - date.valueOf()) / 1000
+            }s`,
+            this.map.size
+        );
+
+        this.update(this.object);
         window.calendar = this;
     }
 
@@ -174,35 +203,6 @@ export default class CalendarHelper extends Events {
         this.maxDays = Math.max(...this.data.months.map((m) => m.length));
         this.trigger("month-update");
         this.trigger("day-update");
-
-        this.map = new Map();
-        const date = new Date();
-        console.log("Fantasy Calendar: Building Event Hash Map");
-        for (const event of this.object.events) {
-            const hash = this.hash(event.date);
-            if (!hash) continue;
-            if (!this.map.has(hash)) this.map.set(hash, new Set());
-            this.map.get(hash)!.add(event);
-            if (event.end) {
-                let date = { ...event.date };
-                setImmediate(() => {
-                    while (!this.isEqual(date, event.end)) {
-                        date = this.incrementDate(date);
-                        let intHash = this.hash(date);
-                        if (!intHash) continue;
-                        if (!this.map.has(intHash))
-                            this.map.set(intHash, new Set());
-                        this.map.get(intHash)!.add(event);
-                    }
-                });
-            }
-        }
-        console.log(
-            `Fantasy Calendar: Event Hash complete in ${
-                (Date.now() - date.valueOf()) / 1000
-            }s`,
-            this.map.size
-        );
     }
     get data() {
         return this.object.static;
@@ -228,7 +228,11 @@ export default class CalendarHelper extends Events {
     };
 
     getEventsOnDate(date: CurrentCalendarData) {
-        return [];
+        if (this.map && this.map.size) {
+            const hash = this.hash(date);
+            const events = this.map.get(hash) ?? new Set();
+            return [...events];
+        }
         const events = this.object.events.filter((e) => {
             if (!e.date.day) return false;
             if (!e.end) {

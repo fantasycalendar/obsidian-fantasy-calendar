@@ -78,7 +78,7 @@ export default class FantasyCalendar extends Plugin {
             this.data.defaultCalendar = calendar.id;
         }
         await this.saveCalendar();
-        this.watcher.registerCalendar(calendar);
+        /* this.watcher.registerCalendar(calendar); */
     }
     data: FantasyCalendarData;
     watcher = new Watcher(this);

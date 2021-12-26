@@ -177,7 +177,11 @@ export default class FantasyCalendarView extends ItemView {
 
         this.moons = this.calendar.static.displayMoons;
         this.dayNumber = this.calendar.static.displayDayNumber;
-        this.helper = new CalendarHelper(this.calendar, this.plugin);
+        if (!this.helper) {
+            this.helper = new CalendarHelper(this.calendar, this.plugin);
+        } else {
+            this.helper.update(this.calendar);
+        }
 
         this.registerCalendarInterval();
 
