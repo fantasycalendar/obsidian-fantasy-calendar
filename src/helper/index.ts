@@ -173,7 +173,6 @@ export default class CalendarHelper extends Events {
     };
 
     getEventsOnDate(date: CurrentCalendarData) {
-        return [];
         const events = this.object.events.filter((e) => {
             if (!e.date.day) return false;
             if (!e.end) {
