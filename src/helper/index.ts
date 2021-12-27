@@ -173,7 +173,8 @@ export default class CalendarHelper extends Events {
         );
     }
     hash(date: CurrentCalendarData) {
-        if (!date.year || !date.month || !date.day) return null;
+        if (!("year" in date) || !("month" in date) || !("day" in date))
+            return null;
         return `${date.year}${date.month}${date.day}`;
     }
     map: Map<string, Set<Event>> = new Map();
@@ -188,7 +189,7 @@ export default class CalendarHelper extends Events {
         const date = { ...inc };
         date.day++;
         const year = this.getMonthsForYear(date.year);
-        if (date.day >= year[date.month].days.length) {
+        if (date.day > year[date.month].days.length) {
             date.month++;
             date.day = 1;
         }
@@ -226,12 +227,23 @@ export default class CalendarHelper extends Events {
         month: null,
         day: null
     };
-
     getEventsOnDate(date: CurrentCalendarData) {
+        //this is being called multiple times why
         if (this.map && this.map.size) {
             const hash = this.hash(date);
             const events = this.map.get(hash) ?? new Set();
-            return [...events];
+            return [...events].sort((a, b) => {
+                if (!a.end) return 0;
+                if (!b.end) return -1;
+                if (this.areDatesEqual(a.date, b.date)) {
+                    return (
+                        this.daysBeforeDate(b.end) - this.daysBeforeDate(a.end)
+                    );
+                }
+                return (
+                    this.daysBeforeDate(a.date) - this.daysBeforeDate(b.date)
+                );
+            });
         }
         const events = this.object.events.filter((e) => {
             if (!e.date.day) return false;

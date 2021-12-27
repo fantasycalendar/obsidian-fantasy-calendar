@@ -9,7 +9,7 @@ import {
 
 import FantasyCalendarSettings from "./settings/settings";
 
-import type { Calendar, FantasyCalendarData } from "./@types";
+import type { Calendar, Event, FantasyCalendarData } from "./@types";
 
 import FantasyCalendarView, {
     VIEW_TYPE,
@@ -23,6 +23,14 @@ import { Watcher } from "./watcher/watcher";
 declare module "obsidian" {
     interface Workspace {
         on(name: "fantasy-calendars-updated", callback: () => any): EventRef;
+        on(
+            name: "fantasy-calendars-event-update",
+            callback: (calendar: string, event: Event) => any
+        ): EventRef;
+        on(
+            name: "fantasy-calendar-settings-change",
+            callback: () => any
+        ): EventRef;
     }
 }
 
@@ -245,7 +253,8 @@ export default class FantasyCalendar extends Plugin {
         return `${this.configDirectory}/data.json`;
     }
     async saveSettings() {
-        this.saveData(this.data);
+        await this.saveData(this.data);
+        this.app.workspace.trigger("fantasy-calendar-settings-change");
     }
     async saveData(data: FantasyCalendarData) {
         if (this.configDirectory) {

@@ -26,7 +26,7 @@ declare global {
 }
 
 export class Watcher extends Component {
-    parsing: string[];
+    parsing: Set<string> = new Set();
     get calendars() {
         return this.plugin.data.calendars;
     }
@@ -41,10 +41,20 @@ export class Watcher extends Component {
     }
     worker = new Worker();
     onload() {
+        /** Send the worker the calendars so I don't have to with every message. */
         this.worker.postMessage<CalendarsMessage>({
             type: "calendars",
             calendars: this.calendars
         });
+        this.registerEvent(
+            this.plugin.app.workspace.on("fantasy-calendars-updated", () => {
+                this.worker.postMessage<CalendarsMessage>({
+                    type: "calendars",
+                    calendars: this.calendars
+                });
+            })
+        );
+        /** Send the workers the options so I don't have to with every message. */
         this.worker.postMessage<OptionsMessage>({
             type: "options",
             parseTitle: this.plugin.data.parseDates,
@@ -52,10 +62,30 @@ export class Watcher extends Component {
             defaultCalendar: this.plugin.defaultCalendar?.name
         });
         this.registerEvent(
+            this.plugin.app.workspace.on(
+                "fantasy-calendar-settings-change",
+                () => {
+                    this.worker.postMessage<OptionsMessage>({
+                        type: "options",
+                        parseTitle: this.plugin.data.parseDates,
+                        format: this.plugin.format,
+                        defaultCalendar: this.plugin.defaultCalendar?.name
+                    });
+                }
+            )
+        );
+
+        /** Metadata for a file has changed and the file should be checked. */
+        this.registerEvent(
             this.metadataCache.on("changed", (file) => {
-                this.parsing.push(...this.getFiles(file));
+                const parsing: Set<string> = new Set();
+                for (const path of this.getFiles(file)) parsing.add(path);
+                this.startParsing([...parsing]);
             })
         );
+        /** A file has been renamed and should be checked for events.
+         * Could this be hashed?
+         */
         this.registerEvent(
             this.vault.on("rename", (abstractFile, oldPath) => {
                 if (!this.calendars.length) return;
@@ -71,6 +101,7 @@ export class Watcher extends Component {
                 });
             })
         );
+        /** A file has been deleted and should be checked for events to unlink. */
         this.registerEvent(
             this.vault.on("delete", (abstractFile) => {
                 if (!(abstractFile instanceof TFile)) return;
@@ -88,7 +119,7 @@ export class Watcher extends Component {
         );
 
         //worker messages
-
+        /** The worker will ask for file information from files in its queue here */
         this.worker.addEventListener(
             "message",
             async (event: MessageEvent<GetFileCacheMessage>) => {
@@ -104,17 +135,23 @@ export class Watcher extends Component {
             }
         );
 
+        /** The worker has found an event that should be updated. */
         this.worker.addEventListener(
             "message",
             async (evt: MessageEvent<UpdateEventMessage>) => {
-                const { id, index, event } = evt.data;
+                if (evt.data.type == "update") {
+                    const { id, index, event } = evt.data;
 
-                const calendar = this.calendars.find((c) => c.id == id);
-                if (!calendar) return;
+                    const calendar = this.calendars.find((c) => c.id == id);
+                    if (!calendar) return;
 
-                calendar.events.splice(index, index >= 0 ? 1 : 0, event);
+                    calendar.events.splice(index, index >= 0 ? 1 : 0, event);
+                    //should fire (fantasy-calendar-event-update) here to update CalendarHelper hash
+                }
             }
         );
+
+        /** The worker has parsed all files in its queue. */
         this.worker.addEventListener(
             "message",
             async (evt: MessageEvent<SaveMessage>) => {
@@ -127,14 +164,15 @@ export class Watcher extends Component {
         const folder = this.vault.getAbstractFileByPath(this.plugin.data.path);
         if (!folder || !(folder instanceof TFolder)) return;
 
-        this.parsing = this.getFiles(folder);
-        this.startParsing();
+        const parsing: Set<string> = new Set();
+        for (const path of this.getFiles(folder)) parsing.add(path);
+        this.startParsing([...parsing]);
     }
-    startParsing() {
-        if (this.parsing.length) {
+    startParsing(paths: string[]) {
+        if (paths.length) {
             this.worker.postMessage<QueueMessage>({
                 type: "queue",
-                paths: this.parsing
+                paths
             });
         }
     }
@@ -161,6 +199,11 @@ export class Watcher extends Component {
             files.push(folder.path);
         }
         return files;
+    }
+    
+    onunload() {
+        this.worker.terminate();
+        this.worker = null;
     }
 }
 

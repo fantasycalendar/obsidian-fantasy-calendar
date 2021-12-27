@@ -32,6 +32,7 @@ export interface UpdateEventMessage {
     id: string;
     index: number;
     event: Event;
+    original: Event;
 }
 
 export interface SaveMessage {
@@ -205,7 +206,8 @@ class Parser {
                     ...(end ? { end } : {}),
                     category: category?.id,
                     description: existing?.description
-                }
+                },
+                original: existing
             });
         }
     }
