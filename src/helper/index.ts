@@ -133,28 +133,37 @@ export default class CalendarHelper extends Events {
     constructor(public object: Calendar, public plugin: FantasyCalendar) {
         super();
         this.displayed = { ...this.current };
+        this.buildHash();
+        this.update(this.object);
 
+        this.plugin.registerEvent(
+            this.plugin.app.workspace.on(
+                "fantasy-calendars-event-update",
+                (calendar, event, original) => {
+                    
+                    if (calendar != this.object.id) return;
+                    if (
+                        this.isEqual(event.date, original.date) &&
+                        this.isEqual(event.end, original.end)
+                    )
+                        return;
+                    for (const hash of this.invMap.get(event.id)) {
+                        this.map.get(hash).delete(event.id);
+                    }
+                    this.invMap.set(event.id, new Set());
+                    this.mapEvent(event);
+                }
+            )
+        );
+
+        /* window.calendar = this; */
+    }
+    buildHash() {
         this.map = new Map();
         const date = new Date();
         console.log("Fantasy Calendar: Building Event Hash Map");
         for (const event of this.object.events) {
-            const hash = this.hash(event.date);
-            if (!hash) continue;
-            if (!this.map.has(hash)) this.map.set(hash, new Set());
-            this.map.get(hash)!.add(event);
-            if (event.end) {
-                let date = { ...event.date };
-                setImmediate(() => {
-                    while (!this.isEqual(date, event.end)) {
-                        date = this.incrementDate(date);
-                        let intHash = this.hash(date);
-                        if (!intHash) continue;
-                        if (!this.map.has(intHash))
-                            this.map.set(intHash, new Set());
-                        this.map.get(intHash)!.add(event);
-                    }
-                });
-            }
+            this.mapEvent(event);
         }
         console.log(
             `Fantasy Calendar: Event Hash complete in ${
@@ -162,27 +171,46 @@ export default class CalendarHelper extends Events {
             }s`,
             this.map.size
         );
-
-        this.update(this.object);
-        window.calendar = this;
     }
-
+    mapEvent(event: Event) {
+        const hash = this.hash(event.date);
+        if (!hash) return;
+        if (!this.map.has(hash)) this.map.set(hash, new Set());
+        if (!this.invMap.has(event.id)) this.invMap.set(event.id, new Set());
+        this.map.get(hash)!.add(event.id);
+        this.invMap.get(event.id)!.add(hash);
+        if (event.end) {
+            let date = { ...event.date };
+            setImmediate(() => {
+                while (!this.isEqual(date, event.end)) {
+                    date = this.incrementDate(date);
+                    let intHash = this.hash(date);
+                    if (!intHash) continue;
+                    this.invMap.get(event.id)!.add(intHash);
+                    if (!this.map.has(intHash))
+                        this.map.set(intHash, new Set());
+                    this.map.get(intHash)!.add(event.id);
+                }
+            });
+        }
+    }
     getMonthsForYear(year: number) {
         return this.data.months.map(
             (m, i) => new MonthHelper(m, i, year, this)
         );
     }
     hash(date: CurrentCalendarData) {
-        if (!("year" in date) || !("month" in date) || !("day" in date))
+        if (date.year == null || date.month == null || date.day == null)
             return null;
         return `${date.year}${date.month}${date.day}`;
     }
-    map: Map<string, Set<Event>> = new Map();
+    map: Map<string, Set<string>> = new Map();
+    invMap: Map<string, Set<string>> = new Map();
     isEqual(date: CurrentCalendarData, next: CurrentCalendarData) {
         return (
-            date.year == next.year &&
-            date.month == next.month &&
-            date.day == next.day
+            date?.year == next?.year &&
+            date?.month == next?.month &&
+            date?.day == next?.day
         );
     }
     incrementDate(inc: CurrentCalendarData) {
@@ -202,6 +230,7 @@ export default class CalendarHelper extends Events {
     update(calendar?: Calendar) {
         this.object = calendar ?? this.object;
         this.maxDays = Math.max(...this.data.months.map((m) => m.length));
+
         this.trigger("month-update");
         this.trigger("day-update");
     }
@@ -231,7 +260,9 @@ export default class CalendarHelper extends Events {
         //this is being called multiple times why
         if (this.map && this.map.size) {
             const hash = this.hash(date);
-            const events = this.map.get(hash) ?? new Set();
+            const set = this.map.get(hash) ?? new Set();
+            if (!set.size) return [];
+            const events = this.object.events.filter((e) => set.has(e.id));
             return [...events].sort((a, b) => {
                 if (!a.end) return 0;
                 if (!b.end) return -1;
