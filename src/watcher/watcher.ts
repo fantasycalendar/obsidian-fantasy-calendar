@@ -140,13 +140,19 @@ export class Watcher extends Component {
             "message",
             async (evt: MessageEvent<UpdateEventMessage>) => {
                 if (evt.data.type == "update") {
-                    const { id, index, event } = evt.data;
+                    const { id, index, event, original } = evt.data;
 
                     const calendar = this.calendars.find((c) => c.id == id);
                     if (!calendar) return;
 
                     calendar.events.splice(index, index >= 0 ? 1 : 0, event);
                     //should fire (fantasy-calendar-event-update) here to update CalendarHelper hash
+                    this.plugin.app.workspace.trigger(
+                        "fantasy-calendars-event-update",
+                        calendar.id,
+                        event,
+                        original
+                    );
                 }
             }
         );
@@ -200,7 +206,7 @@ export class Watcher extends Component {
         }
         return files;
     }
-    
+
     onunload() {
         this.worker.terminate();
         this.worker = null;
