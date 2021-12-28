@@ -38,6 +38,12 @@ export interface UpdateEventMessage {
 export interface SaveMessage {
     type: "save";
 }
+
+export type RenameMessage = {
+    type: "rename";
+    sourceCalendars: Calendar[];
+    file: { path: string; basename: string; oldPath: string };
+};
 const ctx: Worker = self as any;
 class Parser {
     queue: string[] = [];

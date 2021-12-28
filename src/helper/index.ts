@@ -136,11 +136,11 @@ export default class CalendarHelper extends Events {
         this.buildHash();
         this.update(this.object);
 
+        //TODO: Add in recurring events.
         this.plugin.registerEvent(
             this.plugin.app.workspace.on(
                 "fantasy-calendars-event-update",
                 (calendar, event, original) => {
-                    
                     if (calendar != this.object.id) return;
                     if (
                         this.isEqual(event.date, original.date) &&
@@ -158,6 +158,7 @@ export default class CalendarHelper extends Events {
 
         /* window.calendar = this; */
     }
+    //TODO: Should the hash creation be pushed to a web worker?
     buildHash() {
         this.map = new Map();
         const date = new Date();
