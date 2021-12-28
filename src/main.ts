@@ -25,12 +25,27 @@ declare module "obsidian" {
         on(name: "fantasy-calendars-updated", callback: () => any): EventRef;
         on(
             name: "fantasy-calendars-event-update",
-            callback: (calendar: string, event: Event) => any
+            callback: (calendar: string, event: Event, original: Event) => any
         ): EventRef;
         on(
             name: "fantasy-calendar-settings-change",
             callback: () => any
         ): EventRef;
+        trigger(name: "fantasy-calendars-updated"): void;
+        trigger(name: "fantasy-calendar-settings-change"): void;
+        trigger(
+            name: "fantasy-calendars-event-update",
+            calendar: string,
+            event: Event,
+            original: Event
+        ): void;
+        trigger(
+            name: "link-hover",
+            popover: any, //hover popover, but don't need
+            target: HTMLElement, //targetEl
+            note: string, //linkText
+            source: string //source
+        ): void;
     }
 }
 
