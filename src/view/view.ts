@@ -1,7 +1,6 @@
 import {
     addIcon,
     ButtonComponent,
-    debounce,
     DropdownComponent,
     FileView,
     ItemView,
@@ -11,14 +10,11 @@ import {
     Modal,
     normalizePath,
     Notice,
-    Platform,
     Setting,
     stringifyYaml,
     TextComponent,
     TFile,
-    WorkspaceLeaf,
-    WorkspaceMobileDrawer,
-    WorkspaceSidedock
+    WorkspaceLeaf
 } from "obsidian";
 import type { Calendar, CurrentCalendarData, Event } from "src/@types";
 import type { DayHelper } from "src/helper";

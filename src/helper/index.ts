@@ -203,7 +203,11 @@ export default class CalendarHelper extends Events {
     hash(date: CurrentCalendarData) {
         if (date.year == null || date.month == null || date.day == null)
             return null;
-        return `${date.year}${date.month}${date.day}`;
+        const months = `${this.data.months.length}`.length;
+        const month = `${date.month}`.padStart(months, "0");
+        const days = `${this.maxDays}`.length;
+        const day = `${date.day}`.padStart(days, "0");
+        return `${date.year}${month}${day}`;
     }
     map: Map<string, Set<string>> = new Map();
     invMap: Map<string, Set<string>> = new Map();
