@@ -40,6 +40,7 @@ export class Watcher extends Component {
             type: "calendars",
             calendars: this.calendars
         });
+        //TODO: Move events into separate function and allow them to be turned off.
         this.registerEvent(
             this.plugin.app.workspace.on("fantasy-calendars-updated", () => {
                 this.worker.postMessage<CalendarsMessage>({
@@ -165,6 +166,7 @@ export class Watcher extends Component {
             }
         );
         if (!this.calendars.length) return;
+        //TODO: Add per-calendar root path.
         const folder = this.vault.getAbstractFileByPath(this.plugin.data.path);
         if (!folder || !(folder instanceof TFolder)) return;
 
