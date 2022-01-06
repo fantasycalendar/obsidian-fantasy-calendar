@@ -72,7 +72,8 @@ export default class FantasyCalendarView extends ItemView {
         public options: { calendar?: Calendar; full?: boolean } = {}
     ) {
         super(leaf);
-
+        this.containerEl.addClass("fantasy-calendar-view");
+        this.contentEl.addClass("fantasy-calendar-view-content");
         this.registerEvent(
             this.plugin.app.workspace.on("fantasy-calendars-updated", () => {
                 this.updateCalendars();
