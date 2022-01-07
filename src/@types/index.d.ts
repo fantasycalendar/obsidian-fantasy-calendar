@@ -118,7 +118,7 @@ export interface Event {
     id: string;
     note: string;
     category: string;
-    timestamp: number;
+    timestamp?: number;
 }
 
 export interface Era {

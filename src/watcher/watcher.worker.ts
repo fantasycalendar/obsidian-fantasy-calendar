@@ -1,7 +1,7 @@
 import { CachedMetadata, FrontMatterCache } from "obsidian";
 import { Calendar, CurrentCalendarData, Event } from "src/@types";
 import { nanoid, wrap } from "src/utils/functions";
-const { DOMParser } = require('xmldom')
+const { DOMParser } = require("xmldom");
 
 export interface QueueMessage {
     type: "queue";
@@ -24,7 +24,7 @@ export interface FileCacheMessage {
     path: string;
     file: { path: string; basename: string };
     cache: CachedMetadata;
-    allTags: String[],
+    allTags: string[];
     data: string;
 }
 export interface GetFileCacheMessage {
@@ -60,14 +60,20 @@ class Parser {
     parseTitle: boolean = false;
     supportsTimelines: boolean;
     timelineTag: string;
-    
+
     constructor() {
         //Register Options Changer
         ctx.addEventListener(
             "message",
             (event: MessageEvent<OptionsMessage>) => {
                 if (event.data.type == "options") {
-                    const { defaultCalendar, format, parseTitle, supportsTimelines, timelineTag } = event.data;
+                    const {
+                        defaultCalendar,
+                        format,
+                        parseTitle,
+                        supportsTimelines,
+                        timelineTag
+                    } = event.data;
                     this.defaultCalendar = defaultCalendar;
                     this.format = format;
                     this.parseTitle = parseTitle;
@@ -119,103 +125,69 @@ class Parser {
             ctx.postMessage<GetFileCacheMessage>({ path, type: "get" });
         });
     }
+    getDataFromFrontmatter(frontmatter: FrontMatterCache) {
+        let name: string, fcCategory: string;
+        if (frontmatter) {
+            name = frontmatter?.["fc-calendar"];
+            fcCategory = frontmatter?.["fc-category"];
+        }
+        if (!name || !name.length) {
+            name = this.defaultCalendar;
+        }
+        name = name.toLowerCase();
+        const calendar = this.calendars.find(
+            (calendar) => name == calendar.name.toLowerCase()
+        );
+        return { calendar, fcCategory };
+    }
     parseFileForEvents(
         data: string,
         cache: CachedMetadata,
-        allTags: String[],
+        allTags: string[],
         file: { path: string; basename: string }
     ) {
-        let { frontmatter } = cache ?? {};
+        const events = [];
+        const { frontmatter } = cache ?? {};
+        if (!frontmatter) return;
 
-        let names: string[], fcCategory: string;
-        if (frontmatter) {
-            names = frontmatter?.["fc-calendar"];
-            fcCategory = frontmatter?.["fc-category"];
-        }
-        if (!names) {
-            names = [this.defaultCalendar];
-        }
-        if (!Array.isArray(names)) names = [names];
+        const { calendar, fcCategory } =
+            this.getDataFromFrontmatter(frontmatter);
+        if (!calendar) return;
 
-        names = names.map((n) => n.toLowerCase());
-        const calendars = this.calendars.filter((calendar) =>
-            names.includes(calendar.name.toLowerCase())
-        );
-
-        if ( this.supportsTimelines && allTags && allTags.includes(this.timelineTag) ) {
-            this.parseTimelineEvents(data, cache, file, names, calendars, fcCategory);
-        }
-
-        const { start: startArray, end: endArray } = this.getDates(
-            frontmatter,
-            this.parseTitle ? file.basename : ""
-        );
-        if (!startArray.length) return;
-        let save = false;
-        for (let calendar of calendars) {
-            if (!calendar) continue;
-            let index = names.indexOf(calendar.name.toLowerCase());
-
-            /** Clamp index to length of dates provided. */
-            if (index >= startArray.length || index == -1) {
-                index = startArray.length - 1;
-            }
-            let date = (startArray[index] as CurrentCalendarData) ?? {
-                day: null,
-                month: null,
-                year: null
-            };
-
-            let end: CurrentCalendarData = endArray.length
-                ? endArray[index] ?? endArray[endArray.length - 1]
-                : null;
-
-            if (date?.month && typeof date?.month == "string") {
-                let month = calendar.static.months.find(
-                    (m) => m.name == (date.month as unknown as string)
-                );
-                if (!month) {
-                    date.month = null;
-                } else {
-                    date.month = calendar.static.months.indexOf(month);
-                }
-            } else if (date?.month && typeof date?.month == "number") {
-                date.month = wrap(
-                    date.month - 1,
-                    calendar.static.months.length
-                );
-            }
-            if (end?.month && typeof end?.month == "string") {
-                let month = calendar.static.months.find(
-                    (m) => m.name == (end.month as unknown as string)
-                );
-                if (!month) {
-                    end.month = null;
-                } else {
-                    end.month = calendar.static.months.indexOf(month);
-                }
-            } else if (end?.month && typeof end?.month == "number") {
-                end.month = wrap(end.month - 1, calendar.static.months.length);
-            }
-            
-            const timestamp = Number(`${date.year}${date.month}${date.day}00`);
-
-            const category = calendar.categories.find(
-                (cat) => cat?.name == fcCategory
+        if (
+            this.supportsTimelines &&
+            allTags &&
+            allTags.includes(this.timelineTag)
+        ) {
+            events.push(
+                ...this.parseTimelineEvents(calendar, data, file, fcCategory)
             );
+        }
 
+        events.push(
+            ...this.parseFrontmatterEvents(
+                calendar,
+                fcCategory,
+                frontmatter,
+                file
+            )
+        );
+
+        for (const event of events) {
             const existing = calendar?.events.find(
                 (event) => event.note == file.path
             );
 
             if (
-                existing?.date.day == date.day &&
-                existing?.date.month == date.month &&
-                existing?.date.year == date.year &&
-                existing?.end?.day == end?.day &&
-                existing?.end?.month == end?.month &&
-                existing?.end?.year == end?.year &&
-                existing?.category == category?.id
+                existing?.date.day == event.date.day &&
+                existing?.date.month == event.date.month &&
+                existing?.date.year == event.date.year &&
+                existing?.end?.day == event.end?.day &&
+                existing?.end?.month == event.end?.month &&
+                existing?.end?.year == event.end?.year &&
+                existing?.category == event.category &&
+                ((!event.timestamp && !existing?.timestamp) ||
+                    existing?.timestamp == event.timestamp)
             ) {
                 continue;
             }
@@ -223,42 +195,89 @@ class Parser {
                 type: "update",
                 id: calendar.id,
                 index: calendar?.events.indexOf(existing),
-                event: {
-                    id: existing?.id ?? nanoid(6),
-                    name: existing?.name ?? file.basename,
-                    note: file.path,
-                    date,
-                    ...(end ? { end } : {}),
-                    timestamp,
-                    category: category?.id,
-                    description: existing?.description
-                },
+                event,
                 original: existing
             });
         }
     }
+    parseFrontmatterEvents(
+        calendar: Calendar,
+        fcCategory: string,
+        frontmatter: FrontMatterCache,
+        file: { path: string; basename: string }
+    ): Event[] {
+        const events: Event[] = [];
+        const { date, end } = this.getDates(
+            frontmatter,
+            this.parseTitle ? file.basename : ""
+        );
+        if (!date) return events;
+
+        if (date?.month && typeof date?.month == "string") {
+            let month = calendar.static.months.find(
+                (m) => m.name == (date.month as unknown as string)
+            );
+            if (!month) {
+                date.month = null;
+            } else {
+                date.month = calendar.static.months.indexOf(month);
+            }
+        } else if (date?.month && typeof date?.month == "number") {
+            date.month = wrap(date.month - 1, calendar.static.months.length);
+        }
+        if (end?.month && typeof end?.month == "string") {
+            let month = calendar.static.months.find(
+                (m) => m.name == (end.month as unknown as string)
+            );
+            if (!month) {
+                end.month = null;
+            } else {
+                end.month = calendar.static.months.indexOf(month);
+            }
+        } else if (end?.month && typeof end?.month == "number") {
+            end.month = wrap(end.month - 1, calendar.static.months.length);
+        }
+
+        const timestamp = Number(`${date.year}${date.month}${date.day}00`);
+
+        const category = calendar.categories.find(
+            (cat) => cat?.name == fcCategory
+        );
+
+        return [
+            {
+                id: nanoid(6),
+                name: file.basename,
+                note: file.path,
+                date,
+                end,
+                timestamp,
+                category: category?.id,
+                description: ""
+            }
+        ];
+    }
     parseTimelineEvents(
+        calendar: Calendar,
         contents: string,
-        cache: CachedMetadata,
         file: { path: string; basename: string },
-        names: string[], 
-        calendars: Calendar[],
         fcCategory: string
     ) {
+        const events: Event[] = [];
         const domparser = new DOMParser();
         // span or div with attributes:
-        // <span 
-        //     class='ob-timelines' 
-        //     data-date='144-43-49-00' 
-        //     data-title='Another Event' 
-        //     data-class='orange' 
-        //     data-img = 'Timeline Example/Timeline_2.jpg' 
-        //     data-type='range' 
-        //     data-end="2000-10-20-00"> 
+        // <span
+        //     class='ob-timelines'
+        //     data-date='144-43-49-00'
+        //     data-title='Another Event'
+        //     data-class='orange'
+        //     data-img = 'Timeline Example/Timeline_2.jpg'
+        //     data-type='range'
+        //     data-end="2000-10-20-00">
         //     A second event!
         // </span>
         for (const match of contents.matchAll(timelineData)) {
-            const doc = domparser.parseFromString(match[0], 'text/html');
+            const doc = domparser.parseFromString(match[0], "text/html");
             const element = {
                 class: doc.documentElement.getAttribute("class"),
                 dataset: {
@@ -268,90 +287,53 @@ class Parser {
                     end: doc.documentElement.getAttribute("data-end")
                 },
                 content: doc.documentElement.textContent
-            }
-            
-            if ( element.class !== 'ob-timelines' || !element.dataset.date ) {
+            };
+
+            if (element.class !== "ob-timelines" || !element.dataset.date) {
                 continue; // only look at elements with a date and class='ob-timelines'
             }
-            
+
             // smash together the yyyy-mm-dd-hh string (accounting for negative years) to use as an id
-            const timestamp = Number(element.dataset.date[0] == '-'
-                    ?  +element.dataset.date.substring(1, element.dataset.date.length).split('-').join('') * -1
-                    :  +element.dataset.date.split('-').join(''));
-                
-            let datebits = element.dataset.date.split('-');
-            const event: Event = {
-                name: element.dataset.title ?? file.basename,
-                description: element.content,
-                id: '',
-                date: {
-                    year: parseInt(datebits[0]),
-                    month: parseInt(datebits[1]),
-                    day: parseInt(datebits[2])
-                },
-                category: element.dataset.class ?? fcCategory,
-                timestamp,
-                note: file.path
+            const timestamp = Number(
+                element.dataset.date[0] == "-"
+                    ? +element.dataset.date
+                          .substring(1, element.dataset.date.length)
+                          .split("-")
+                          .join("") * -1
+                    : +element.dataset.date.split("-").join("")
+            );
+
+            let datebits = element.dataset.date.split(/(?<!^)-/);
+            const date = {
+                year: parseInt(datebits[0]),
+                month: parseInt(datebits[1]),
+                day: parseInt(datebits[2])
             };
-            
-            if ( element.dataset.end ) {
-                datebits = element.dataset.end.split('-');
-                event.end = {
+            let end;
+            if (element.dataset.end) {
+                datebits = element.dataset.end.split(/(?<!^)-/);
+                end = {
                     year: parseInt(datebits[0]),
                     month: parseInt(datebits[1]),
                     day: parseInt(datebits[2])
-                }
+                };
             }
-            
-            for (let calendar of calendars) {
-                const existing = calendar.events.find(
-                    (e) => e.note == file.path && e.timestamp  == event.timestamp
-                );
-                const category = calendar.categories.find(
-                    (cat) => cat?.name == event.category
-                );
-                if ( event.category && !category ) {
-                    console.log("Unable to find category for %o", event.category);
-                }
-                if (
-                    existing?.name == event.name &&
-                    existing?.description == event.description &&
-                    existing?.date.day == event.date.day &&
-                    existing?.date.month == event.date.month &&
-                    existing?.date.year == event.date.year &&
-                    existing?.end?.day == event.end?.day &&
-                    existing?.end?.month == event.end?.month &&
-                    existing?.end?.year == event.end?.year &&
-                    existing?.category == category?.id
-                ) {
-                    continue;
-                }
-                ctx.postMessage<UpdateEventMessage>({
-                    type: "update",
-                    id: calendar.id,
-                    index: calendar?.events.indexOf(existing),
-                    event: {
-                        id: existing?.id ?? nanoid(6),
-                        name: existing?.name ?? file.basename,
-                        note: file.path,
-                        date: {
-                            year: event.date.year,
-                            month: wrap(event.date.month - 1, calendar.static.months.length),
-                            day: event.date.day
-                        },
-                        ...(event.end ? {
-                            year: event.end.year,
-                            month: wrap(event.end.month - 1, calendar.static.months.length),
-                            day: event.end.day
-                        } : {}),
-                        timestamp: timestamp,
-                        category: category?.id,
-                        description: existing?.description
-                    },
-                    original: existing
-                });
-            }
+            const category = calendar.categories.find(
+                (cat) => cat?.name == fcCategory
+            );
+
+            events.push({
+                id: nanoid(6),
+                name: element.dataset.title ?? file.basename,
+                note: file.path,
+                date,
+                end,
+                timestamp,
+                category: category?.id,
+                description: element.content
+            });
         }
+        return events;
     }
     parseDate(date: string | CurrentCalendarData) {
         if (typeof date === "string") {
@@ -384,34 +366,23 @@ class Parser {
     }
     getDates(frontmatter: Partial<FrontMatterCache> = {}, basename: string) {
         const dateField = "fc-date" in frontmatter ? "fc-date" : "fc-start";
-        let dates:
-            | string
-            | string[]
-            | CurrentCalendarData
-            | CurrentCalendarData[];
+        let startDate: string | CurrentCalendarData;
         if (frontmatter && dateField in frontmatter) {
-            dates = frontmatter[dateField];
+            startDate = frontmatter[dateField];
         }
-        if (!dates) {
-            dates = basename;
+        if (!startDate) {
+            startDate = basename;
         }
-        const dateArray: Array<CurrentCalendarData> = [dates]
-            .flat(2)
-            .map((date) => this.parseDate(date))
-            .filter((d) => d);
-        const ends =
+
+        const date = this.parseDate(startDate);
+
+        const endDate =
             "fc-end" in frontmatter
-                ? (frontmatter["fc-end"] as
-                      | string
-                      | string[]
-                      | CurrentCalendarData
-                      | CurrentCalendarData[])
-                : [];
-        const endArray: Array<CurrentCalendarData> = [ends]
-            .flat(2)
-            .map((date) => this.parseDate(date))
-            .filter((d) => d);
-        return { start: dateArray, end: endArray };
+                ? (frontmatter["fc-end"] as string | CurrentCalendarData)
+                : null;
+        const end = this.parseDate(endDate);
+
+        return { date, end };
     }
 }
 
