@@ -1,6 +1,7 @@
 import { CachedMetadata, FrontMatterCache } from "obsidian";
 import { Calendar, CurrentCalendarData, Event } from "src/@types";
 import { nanoid, wrap } from "src/utils/functions";
+const { DOMParser } = require('xmldom')
 
 export interface QueueMessage {
     type: "queue";
@@ -11,6 +12,8 @@ export interface OptionsMessage {
     defaultCalendar: string;
     format: string;
     parseTitle: boolean;
+    supportsTimelines: boolean;
+    timelineTag: string;
 }
 export interface CalendarsMessage {
     type: "calendars";
@@ -21,6 +24,7 @@ export interface FileCacheMessage {
     path: string;
     file: { path: string; basename: string };
     cache: CachedMetadata;
+    allTags: String[],
     data: string;
 }
 export interface GetFileCacheMessage {
@@ -44,6 +48,8 @@ export type RenameMessage = {
     sourceCalendars: Calendar[];
     file: { path: string; basename: string; oldPath: string };
 };
+
+const timelineData: RegExp = /(<(span|div).*?<\/(span|div)>)/g;
 const ctx: Worker = self as any;
 class Parser {
     queue: string[] = [];
@@ -52,16 +58,21 @@ class Parser {
     calendars: Calendar[];
     format: string;
     parseTitle: boolean = false;
+    supportsTimelines: boolean;
+    timelineTag: string;
+    
     constructor() {
         //Register Options Changer
         ctx.addEventListener(
             "message",
             (event: MessageEvent<OptionsMessage>) => {
                 if (event.data.type == "options") {
-                    const { defaultCalendar, format, parseTitle } = event.data;
+                    const { defaultCalendar, format, parseTitle, supportsTimelines, timelineTag } = event.data;
                     this.defaultCalendar = defaultCalendar;
                     this.format = format;
                     this.parseTitle = parseTitle;
+                    this.supportsTimelines = supportsTimelines;
+                    this.timelineTag = timelineTag;
                 }
             }
         );
@@ -91,8 +102,8 @@ class Parser {
         this.parsing = true;
         while (this.queue.length) {
             const path = this.queue.shift();
-            const { data, file, cache } = await this.getFileData(path);
-            this.parseFileForEvents(cache, file);
+            const { data, file, cache, allTags } = await this.getFileData(path);
+            this.parseFileForEvents(data, cache, allTags, file);
         }
         this.parsing = false;
         ctx.postMessage<SaveMessage>({ type: "save" });
@@ -109,7 +120,9 @@ class Parser {
         });
     }
     parseFileForEvents(
+        data: string,
         cache: CachedMetadata,
+        allTags: String[],
         file: { path: string; basename: string }
     ) {
         let { frontmatter } = cache ?? {};
@@ -128,6 +141,10 @@ class Parser {
         const calendars = this.calendars.filter((calendar) =>
             names.includes(calendar.name.toLowerCase())
         );
+
+        if ( this.supportsTimelines && allTags && allTags.includes(this.timelineTag) ) {
+            this.parseTimelineEvents(data, cache, file, names, calendars, fcCategory);
+        }
 
         const { start: startArray, end: endArray } = this.getDates(
             frontmatter,
@@ -180,6 +197,8 @@ class Parser {
             } else if (end?.month && typeof end?.month == "number") {
                 end.month = wrap(end.month - 1, calendar.static.months.length);
             }
+            
+            const timestamp = Number(`${date.year}${date.month}${date.day}00`);
 
             const category = calendar.categories.find(
                 (cat) => cat?.name == fcCategory
@@ -210,6 +229,7 @@ class Parser {
                     note: file.path,
                     date,
                     ...(end ? { end } : {}),
+                    timestamp,
                     category: category?.id,
                     description: existing?.description
                 },
@@ -217,7 +237,122 @@ class Parser {
             });
         }
     }
-
+    parseTimelineEvents(
+        contents: string,
+        cache: CachedMetadata,
+        file: { path: string; basename: string },
+        names: string[], 
+        calendars: Calendar[],
+        fcCategory: string
+    ) {
+        const domparser = new DOMParser();
+        // span or div with attributes:
+        // <span 
+        //     class='ob-timelines' 
+        //     data-date='144-43-49-00' 
+        //     data-title='Another Event' 
+        //     data-class='orange' 
+        //     data-img = 'Timeline Example/Timeline_2.jpg' 
+        //     data-type='range' 
+        //     data-end="2000-10-20-00"> 
+        //     A second event!
+        // </span>
+        for (const match of contents.matchAll(timelineData)) {
+            const doc = domparser.parseFromString(match[0], 'text/html');
+            const element = {
+                class: doc.documentElement.getAttribute("class"),
+                dataset: {
+                    date: doc.documentElement.getAttribute("data-date"),
+                    title: doc.documentElement.getAttribute("data-title"),
+                    class: doc.documentElement.getAttribute("data-class"),
+                    end: doc.documentElement.getAttribute("data-end")
+                },
+                content: doc.documentElement.textContent
+            }
+            
+            if ( element.class !== 'ob-timelines' || !element.dataset.date ) {
+                continue; // only look at elements with a date and class='ob-timelines'
+            }
+            
+            // smash together the yyyy-mm-dd-hh string (accounting for negative years) to use as an id
+            const timestamp = Number(element.dataset.date[0] == '-'
+                    ?  +element.dataset.date.substring(1, element.dataset.date.length).split('-').join('') * -1
+                    :  +element.dataset.date.split('-').join(''));
+                
+            let datebits = element.dataset.date.split('-');
+            const event: Event = {
+                name: element.dataset.title ?? file.basename,
+                description: element.content,
+                id: '',
+                date: {
+                    year: parseInt(datebits[0]),
+                    month: parseInt(datebits[1]),
+                    day: parseInt(datebits[2])
+                },
+                category: element.dataset.class ?? fcCategory,
+                timestamp,
+                note: file.path
+            };
+            
+            if ( element.dataset.end ) {
+                datebits = element.dataset.end.split('-');
+                event.end = {
+                    year: parseInt(datebits[0]),
+                    month: parseInt(datebits[1]),
+                    day: parseInt(datebits[2])
+                }
+            }
+            
+            for (let calendar of calendars) {
+                const existing = calendar.events.find(
+                    (e) => e.note == file.path && e.timestamp  == event.timestamp
+                );
+                const category = calendar.categories.find(
+                    (cat) => cat?.name == event.category
+                );
+                if ( event.category && !category ) {
+                    console.log("Unable to find category for %o", event.category);
+                }
+                if (
+                    existing?.name == event.name &&
+                    existing?.description == event.description &&
+                    existing?.date.day == event.date.day &&
+                    existing?.date.month == event.date.month &&
+                    existing?.date.year == event.date.year &&
+                    existing?.end?.day == event.end?.day &&
+                    existing?.end?.month == event.end?.month &&
+                    existing?.end?.year == event.end?.year &&
+                    existing?.category == category?.id
+                ) {
+                    continue;
+                }
+                ctx.postMessage<UpdateEventMessage>({
+                    type: "update",
+                    id: calendar.id,
+                    index: calendar?.events.indexOf(existing),
+                    event: {
+                        id: existing?.id ?? nanoid(6),
+                        name: existing?.name ?? file.basename,
+                        note: file.path,
+                        date: {
+                            year: event.date.year,
+                            month: wrap(event.date.month - 1, calendar.static.months.length),
+                            day: event.date.day
+                        },
+                        ...(event.end ? {
+                            year: event.end.year,
+                            month: wrap(event.end.month - 1, calendar.static.months.length),
+                            day: event.end.day
+                        } : {}),
+                        timestamp: timestamp,
+                        category: category?.id,
+                        description: existing?.description
+                    },
+                    original: existing
+                });
+            }
+        }
+    }
     parseDate(date: string | CurrentCalendarData) {
         if (typeof date === "string") {
             if (!/\d+[./-]\d+[./-]\d+/.test(date)) return;

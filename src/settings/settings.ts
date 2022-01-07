@@ -332,6 +332,29 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                         this.display();
                     });
             });
+        
+        new Setting(this.infoEl)
+            .setName("Support Timelines data")
+            .setDesc(
+                "Support <span> elements used by the Obsidian Timelines plugin (by Darakah)."
+            )
+            .addToggle((t) => {
+                t.setValue(this.data.supportTimelines).onChange((v) => {
+                    this.data.supportTimelines = v;
+                    this.plugin.saveSettings();
+                });
+            });
+            
+        new Setting(this.infoEl)
+            .setName('Default tag marking pages containing Timelines data')
+            .setDesc("Tag to specify which notes to include in created timelines e.g. timeline to use the #timeline tag")
+            .addText(text => text
+                .setPlaceholder('timeline')
+                .setValue(this.data.timelineTag.replace('#', ''))
+                .onChange((v) => {
+                    this.data.timelineTag = v.startsWith('#') ? v : `#${v}`;
+                    this.plugin.saveSettings();
+                }));
     }
     buildCalendarUI() {
         this.calendarUI.empty();

@@ -91,7 +91,9 @@ export const DEFAULT_DATA: FantasyCalendarData = {
         major: null,
         minor: null,
         patch: null
-    }
+    },
+    supportTimelines: false,
+    timelineTag: '#timeline'
 };
 
 export default class FantasyCalendar extends Plugin {

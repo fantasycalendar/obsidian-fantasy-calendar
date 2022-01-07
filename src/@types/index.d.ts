@@ -28,6 +28,8 @@ export interface FantasyCalendarData {
     dateFormat: string;
     dailyNotes: boolean;
     path: string;
+    supportTimelines: boolean;
+    timelineTag: string;
 }
 
 export interface TimeSpan {
@@ -116,6 +118,7 @@ export interface Event {
     id: string;
     note: string;
     category: string;
+    timestamp: number;
 }
 
 export interface Era {
