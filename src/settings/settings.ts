@@ -182,6 +182,17 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                 });
             });
         new Setting(this.infoEl)
+            .setName("Automatically Parse for Events")
+            .setDesc(
+                "The plugin will automatically parse files in the vault for events."
+            )
+            .addToggle((t) => {
+                t.setValue(this.data.autoParse).onChange((v) => {
+                    this.data.autoParse = v;
+                    this.plugin.saveSettings();
+                });
+            });
+        new Setting(this.infoEl)
             .setName("Parse Note Titles for Dates")
             .setDesc("The plugin will parse note titles for event dates.")
             .addToggle((t) => {

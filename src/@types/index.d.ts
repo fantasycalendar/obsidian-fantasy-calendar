@@ -11,6 +11,8 @@ export interface Calendar {
     categories: EventCategory[];
     date?: number;
     displayWeeks?: boolean;
+    autoParse?: boolean;
+    path?: boolean;
 }
 
 export interface FantasyCalendarData {
@@ -30,6 +32,7 @@ export interface FantasyCalendarData {
     path: string;
     supportTimelines: boolean;
     timelineTag: string;
+    autoParse: boolean;
 }
 
 export interface TimeSpan {

@@ -93,7 +93,8 @@ export const DEFAULT_DATA: FantasyCalendarData = {
         patch: null
     },
     supportTimelines: false,
-    timelineTag: '#timeline'
+    timelineTag: "#timeline",
+    autoParse: true
 };
 
 export default class FantasyCalendar extends Plugin {

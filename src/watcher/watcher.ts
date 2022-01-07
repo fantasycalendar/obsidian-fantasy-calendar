@@ -1,5 +1,12 @@
 import { rename } from "fs";
-import { Component, TAbstractFile, TFile, TFolder, Vault, getAllTags } from "obsidian";
+import {
+    Component,
+    TAbstractFile,
+    TFile,
+    TFolder,
+    Vault,
+    getAllTags
+} from "obsidian";
 import type { Calendar, CurrentCalendarData } from "src/@types";
 import type FantasyCalendar from "src/main";
 import Worker, {
@@ -40,7 +47,6 @@ export class Watcher extends Component {
             type: "calendars",
             calendars: this.calendars
         });
-        //TODO: Move events into separate function and allow them to be turned off.
         this.registerEvent(
             this.plugin.app.workspace.on("fantasy-calendars-updated", () => {
                 this.worker.postMessage<CalendarsMessage>({
@@ -201,6 +207,7 @@ export class Watcher extends Component {
         };
     }
     getFiles(folder: TAbstractFile): string[] {
+        if (!this.plugin.data.autoParse) return [];
         let files = [];
         if (folder instanceof TFolder) {
             for (const child of folder.children) {

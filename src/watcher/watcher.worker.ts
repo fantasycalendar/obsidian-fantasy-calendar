@@ -174,6 +174,7 @@ class Parser {
         );
 
         for (const event of events) {
+            //TODO: Remove event existing check.
             const existing = calendar.events.find(
                 (exist) =>
                     exist.note == file.path &&
