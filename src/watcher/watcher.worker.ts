@@ -174,8 +174,10 @@ class Parser {
         );
 
         for (const event of events) {
-            const existing = calendar?.events.find(
-                (event) => event.note == file.path
+            const existing = calendar.events.find(
+                (exist) =>
+                    exist.note == file.path &&
+                    (!event.timestamp || exist.timestamp == event.timestamp)
             );
 
             if (
@@ -194,7 +196,7 @@ class Parser {
             ctx.postMessage<UpdateEventMessage>({
                 type: "update",
                 id: calendar.id,
-                index: calendar?.events.indexOf(existing),
+                index: calendar.events.indexOf(existing),
                 event,
                 original: existing
             });
@@ -206,12 +208,11 @@ class Parser {
         frontmatter: FrontMatterCache,
         file: { path: string; basename: string }
     ): Event[] {
-        const events: Event[] = [];
         const { date, end } = this.getDates(
             frontmatter,
             this.parseTitle ? file.basename : ""
         );
-        if (!date) return events;
+        if (!date) return [];
 
         if (date?.month && typeof date?.month == "string") {
             let month = calendar.static.months.find(
