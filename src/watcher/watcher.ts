@@ -1,5 +1,5 @@
 import { rename } from "fs";
-import { Component, TAbstractFile, TFile, TFolder, Vault } from "obsidian";
+import { Component, TAbstractFile, TFile, TFolder, Vault, getAllTags } from "obsidian";
 import type { Calendar, CurrentCalendarData } from "src/@types";
 import type FantasyCalendar from "src/main";
 import Worker, {
@@ -54,7 +54,9 @@ export class Watcher extends Component {
             type: "options",
             parseTitle: this.plugin.data.parseDates,
             format: this.plugin.format,
-            defaultCalendar: this.plugin.defaultCalendar?.name
+            defaultCalendar: this.plugin.defaultCalendar?.name,
+            supportsTimelines: this.plugin.data.supportTimelines,
+            timelineTag: this.plugin.data.timelineTag
         });
         this.registerEvent(
             this.plugin.app.workspace.on(
@@ -64,7 +66,9 @@ export class Watcher extends Component {
                         type: "options",
                         parseTitle: this.plugin.data.parseDates,
                         format: this.plugin.format,
-                        defaultCalendar: this.plugin.defaultCalendar?.name
+                        defaultCalendar: this.plugin.defaultCalendar?.name,
+                        supportsTimelines: this.plugin.data.supportTimelines,
+                        timelineTag: this.plugin.data.timelineTag
                     });
                 }
             )
@@ -187,10 +191,12 @@ export class Watcher extends Component {
         if (!(file instanceof TFile)) return;
 
         const cache = this.metadataCache.getFileCache(file);
+        const allTags = getAllTags(cache);
         const data = await this.vault.cachedRead(file);
         return {
             cache,
             file: { path: file.path, basename: file.basename },
+            allTags,
             data
         };
     }
