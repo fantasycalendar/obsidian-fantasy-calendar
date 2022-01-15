@@ -43,7 +43,7 @@ export class MonthHelper {
     get type() {
         return this.data.type;
     }
-
+    events: Event[];
     constructor(
         public data: Month,
         public number: number,
@@ -51,6 +51,7 @@ export class MonthHelper {
         public calendar: CalendarHelper
     ) {
         this.leapDays = this.calendar.leapDaysForMonth(this, year);
+        this.events = this.calendar.eventsForMonth(this);
         this.days = [
             ...new Array(data.length + this.leapDays.length).keys()
         ].map((k) => new DayHelper(this, k + 1));
@@ -116,6 +117,24 @@ export class DayHelper {
 }
 
 export default class CalendarHelper extends Events {
+    eventsForMonth(helper: MonthHelper): Event[] {
+        //get from cache first
+
+        //else
+        const { year, number: month } = helper;
+        const events = this.object.events.filter((event) => {
+            if (event.date.year > year) return false;
+            if (!event.end && event.date.month > month) return false;
+            if (event.date.month == month && event.date.year == year)
+                return true;
+            const start = event.date;
+            const end = event.end ?? event.date;
+            if (start.month == undefined) end.month = start.month = month;
+            if (start.year == undefined) end.year = start.year = year;
+        });
+
+        return events;
+    }
     getNameForYear(year: number): string {
         if (!this.data.useCustomYears) return `${year}`;
         if (
