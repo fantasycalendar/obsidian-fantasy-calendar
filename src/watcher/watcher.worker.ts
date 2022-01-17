@@ -148,7 +148,6 @@ class Parser {
     ) {
         const events = [];
         const { frontmatter } = cache ?? {};
-        if (!frontmatter) return;
 
         const { calendar, fcCategory } =
             this.getDataFromFrontmatter(frontmatter);
@@ -194,6 +193,7 @@ class Parser {
             ) {
                 continue;
             }
+
             ctx.postMessage<UpdateEventMessage>({
                 type: "update",
                 id: calendar.id,
@@ -227,6 +227,7 @@ class Parser {
         } else if (date?.month && typeof date?.month == "number") {
             date.month = wrap(date.month - 1, calendar.static.months.length);
         }
+
         if (end?.month && typeof end?.month == "string") {
             let month = calendar.static.months.find(
                 (m) => m.name == (end.month as unknown as string)
