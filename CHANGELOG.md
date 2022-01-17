@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.3](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.12.2...1.12.3) (2022-01-17)
+
+
+### Bug Fixes
+
+* partially improves calendar performance with a large number of events ([d0028c5](https://github.com/valentine195/obsidian-fantasy-calendar/commit/d0028c5eb46a921f4bf7418e6571083907ed86c1))
+
 ### [1.12.2](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.12.1...1.12.2) (2022-01-15)
 
 
