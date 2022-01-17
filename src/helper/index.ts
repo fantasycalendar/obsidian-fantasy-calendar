@@ -44,9 +44,21 @@ export class MonthHelper {
         return this.data.type;
     }
     events: Event[];
-    getEventsOnDay(day: number) {
-        return this.events.filter((e) => {
-            if (e.date.day == day) return true;
+    getEventsOnDay(day: CurrentCalendarData) {
+        return this.events.filter((event) => {
+            if (event.date.day == day.day) return true;
+            if (!event.end) return false;
+            const start = { ...event.date };
+            const end = { ...event.end };
+
+            if (!start.year) start.year = end.year = this.year;
+            if (!start.month) start.month = end.month = this.number;
+            const hash = Number(this.calendar.hash(day));
+            if (
+                Number(this.calendar.hash(start)) <= hash &&
+                hash <= Number(this.calendar.hash(end))
+            )
+                return true;
         });
     }
     constructor(
@@ -57,6 +69,7 @@ export class MonthHelper {
     ) {
         this.leapDays = this.calendar.leapDaysForMonth(this, year);
         this.events = this.calendar.eventsForMonth(this);
+
         this.days = [
             ...new Array(data.length + this.leapDays.length).keys()
         ].map((k) => new DayHelper(this, k + 1));
@@ -120,7 +133,7 @@ export class DayHelper {
     }
 
     constructor(public month: MonthHelper, public number: number) {
-        this.events = this.month.getEventsOnDay(this.number);
+        this.events = this.month.getEventsOnDay(this.date);
     }
 }
 
@@ -131,7 +144,8 @@ export default class CalendarHelper extends Events {
         //else
         const { year, number: month } = helper;
         const events = this.object.events.filter((event) => {
-            const { date, end } = event;
+            const date = { ...event.date };
+            const end = { ...event.end };
             //No-month events are on every month.
             if (date.month == undefined) return true;
             //Year and Month match
@@ -176,7 +190,6 @@ export default class CalendarHelper extends Events {
     constructor(public object: Calendar, public plugin: FantasyCalendar) {
         super();
         this.displayed = { ...this.current };
-        this.buildHash();
         this.update(this.object);
 
         //TODO: Add in recurring events.
@@ -184,61 +197,21 @@ export default class CalendarHelper extends Events {
             this.plugin.app.workspace.on(
                 "fantasy-calendars-event-update",
                 (calendar, event, original) => {
+                    console.log(
+                        "🚀 ~ file: index.ts ~ line 200 ~ event",
+                        event
+                    );
+
                     if (calendar != this.object.id) return;
                     if (!event) return;
-                    if (
-                        this.isEqual(event.date, original.date) &&
-                        this.isEqual(event.end, original.end)
-                    )
-                        return;
-                    for (const hash of this.invMap.get(event.id)) {
-                        this.map.get(hash).delete(event.id);
-                    }
-                    this.invMap.set(event.id, new Set());
-                    this.mapEvent(event);
+                    if (!event.date) return;
                 }
             )
         );
 
         /* window.calendar = this; */
     }
-    //TODO: Should the hash creation be pushed to a web worker?
-    buildHash() {
-        this.map = new Map();
-        const date = new Date();
-        console.log("Fantasy Calendar: Building Event Hash Map");
-        for (const event of this.object.events) {
-            this.mapEvent(event);
-        }
-        console.log(
-            `Fantasy Calendar: Event Hash complete in ${
-                (Date.now() - date.valueOf()) / 1000
-            }s`,
-            this.map.size
-        );
-    }
-    mapEvent(event: Event) {
-        const hash = this.hash(event.date);
-        if (!hash) return;
-        if (!this.map.has(hash)) this.map.set(hash, new Set());
-        if (!this.invMap.has(event.id)) this.invMap.set(event.id, new Set());
-        this.map.get(hash)!.add(event.id);
-        this.invMap.get(event.id)!.add(hash);
-        if (event.end) {
-            let date = { ...event.date };
-            setImmediate(() => {
-                while (!this.isEqual(date, event.end)) {
-                    date = this.incrementDate(date);
-                    let intHash = this.hash(date);
-                    if (!intHash) continue;
-                    this.invMap.get(event.id)!.add(intHash);
-                    if (!this.map.has(intHash))
-                        this.map.set(intHash, new Set());
-                    this.map.get(intHash)!.add(event.id);
-                }
-            });
-        }
-    }
+
     getMonthsForYear(year: number) {
         return this.data.months.map(
             (m, i) => new MonthHelper(m, i, year, this)
