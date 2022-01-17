@@ -52,8 +52,8 @@
     class:active={today && !adjacent}
     class:viewing={dayView && displaying && !adjacent}
     class={adjacent ? "adjacent-month fantasy-adjacent-month" : ""}
-    aria-label={!fullView && day.events.length
-        ? `${day.events.length} event${day.events.length == 1 ? "" : "s"}`
+    aria-label={!fullView && events.length
+        ? `${events.length} event${events.length == 1 ? "" : "s"}`
         : undefined}
     on:click={() => dispatch("day-click", day)}
     on:dblclick={() => dispatch("day-doubleclick", day)}
