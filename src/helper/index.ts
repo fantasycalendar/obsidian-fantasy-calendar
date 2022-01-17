@@ -14,6 +14,7 @@ import type {
 export class MonthHelper {
     days: DayHelper[] = [];
     leapDays: LeapDay[] = [];
+    shouldUpdateEvents: boolean;
     get id() {
         return this.data.id;
     }
@@ -45,6 +46,9 @@ export class MonthHelper {
     }
     events: Event[];
     getEventsOnDay(day: CurrentCalendarData) {
+        if (!this.events || !this.events.length || this.shouldUpdateEvents) {
+            this.events = this.calendar.eventsForMonth(this);
+        }
         return this.events.filter((event) => {
             if (event.date.day == day.day) return true;
             if (!event.end) return false;
@@ -68,7 +72,6 @@ export class MonthHelper {
         public calendar: CalendarHelper
     ) {
         this.leapDays = this.calendar.leapDaysForMonth(this, year);
-        this.events = this.calendar.eventsForMonth(this);
 
         this.days = [
             ...new Array(data.length + this.leapDays.length).keys()
@@ -77,7 +80,8 @@ export class MonthHelper {
 }
 
 export class DayHelper {
-    events: Event[];
+    private _events: Event[];
+    shouldUpdateEvents: boolean;
     get calendar() {
         return this.month.calendar;
     }
@@ -88,9 +92,12 @@ export class DayHelper {
             year: this.year
         };
     }
-    /* get events(): Event[] {
-        return this.month.getEventsOnDay(this.number);
-    } */
+    get events(): Event[] {
+        if (!this._events || !this._events.length || this.shouldUpdateEvents) {
+            this._events = this.month.getEventsOnDay(this.date);
+        }
+        return this._events;
+    }
     get longDate() {
         return {
             day: this.number,
@@ -132,9 +139,7 @@ export class DayHelper {
         return this.calendar.getMoonsForDate(this.date);
     }
 
-    constructor(public month: MonthHelper, public number: number) {
-        this.events = this.month.getEventsOnDay(this.date);
-    }
+    constructor(public month: MonthHelper, public number: number) {}
 }
 
 export default class CalendarHelper extends Events {
@@ -193,6 +198,8 @@ export default class CalendarHelper extends Events {
         this.update(this.object);
 
         //TODO: Add in recurring events.
+        //TODO: Tell existing months / days to update.
+        //TODO: Add in caching.
         this.plugin.registerEvent(
             this.plugin.app.workspace.on(
                 "fantasy-calendars-event-update",
@@ -212,10 +219,19 @@ export default class CalendarHelper extends Events {
         /* window.calendar = this; */
     }
 
+    _cache: Map<number, MonthHelper[]> = new Map();
+
     getMonthsForYear(year: number) {
-        return this.data.months.map(
-            (m, i) => new MonthHelper(m, i, year, this)
-        );
+        //TODO: Cache month helpers so you aren't constantly recreating them.
+        if (!this._cache.has(year)) {
+            this._cache.set(
+                year,
+                this.data.months.map(
+                    (m, i) => new MonthHelper(m, i, year, this)
+                )
+            );
+        }
+        return this._cache.get(year);
     }
     hash(date: CurrentCalendarData) {
         if (date.year == null || date.month == null || date.day == null)
@@ -452,56 +468,40 @@ export default class CalendarHelper extends Events {
         return this.getMonth(this.displayed.month, this.displayed.year);
     }
 
+    testLeapDay(leapday: LeapDay, year: number) {
+        return leapday.interval
+            .sort((a, b) => a.interval - b.interval)
+            .some(({ interval, exclusive }, index, array) => {
+                if (exclusive && index == 0) {
+                    return (year - leapday.offset ?? 0) % interval != 0;
+                }
+
+                if (exclusive) return;
+
+                if (array[index + 1] && array[index + 1].exclusive) {
+                    return (
+                        (year - leapday.offset ?? 0) % interval == 0 &&
+                        (year - leapday.offset ?? 0) %
+                            array[index + 1].interval !=
+                            0
+                    );
+                }
+                return (year - leapday.offset ?? 0) % interval == 0;
+            });
+    }
     leapDaysForYear(year: number) {
         return this.leapdays.filter((l) => {
-            return l.interval
-                .sort((a, b) => a.interval - b.interval)
-                .some(({ interval, exclusive }, index, array) => {
-                    if (exclusive && index == 0) {
-                        return (year - l.offset ?? 0) % interval != 0;
-                    }
-
-                    if (exclusive) return;
-
-                    if (array[index + 1] && array[index + 1].exclusive) {
-                        return (
-                            (year - l.offset ?? 0) % interval == 0 &&
-                            (year - l.offset ?? 0) %
-                                array[index + 1].interval !=
-                                0
-                        );
-                    }
-                    return (year - l.offset ?? 0) % interval == 0;
-                });
+            return this.testLeapDay(l, year);
         });
     }
 
     leapDaysForMonth(month: MonthHelper, year = this.displayed.year) {
-        return this.leapdays
-            .filter((l) => l.timespan == month.number)
-            .filter((l) => {
-                return l.interval
-                    .sort((a, b) => a.interval - b.interval)
-                    .some(({ interval, exclusive }, index, array) => {
-                        if (exclusive && index == 0) {
-                            return (year - l.offset ?? 0) % interval != 0;
-                        }
-
-                        if (exclusive) return;
-
-                        if (array[index + 1] && array[index + 1].exclusive) {
-                            return (
-                                (year - l.offset ?? 0) % interval == 0 &&
-                                (year - l.offset ?? 0) %
-                                    array[index + 1].interval !=
-                                    0
-                            );
-                        }
-                        return (year - l.offset ?? 0) % interval == 0;
-                    });
-            });
+        return this.leapdays.filter((l) => {
+            if (l.timespan != month.number) return false;
+            return this.testLeapDay(l, year);
+        });
     }
-
+    //TODO: This is called WAY TOO MUCH
     getMonth(number: number, year: number, direction: number = 0): MonthHelper {
         const months = this.data.months;
         let index = wrap(number, months.length);
@@ -510,6 +510,13 @@ export default class CalendarHelper extends Events {
         if (year == 0) return null;
 
         if (number >= months.length) year += 1;
+        if (this._cache.has(year)) {
+            console.trace();
+            const month = this._cache.get(year)[number];
+            if (month) {
+                return this._cache.get(year)![number];
+            }
+        }
 
         if (months[index].type == "intercalary" && direction != 0) {
             return this.getMonth(number + direction, year, direction);
