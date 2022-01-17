@@ -18,7 +18,7 @@
     $: currentDate = calendar.viewedDate;
     $: date = calendar.viewing;
     $: dayNumber = calendar.dayNumberForDate(date);
-    $: events = calendar.getEventsOnDate(calendar.viewing);
+    $: events = /* calendar.getEventsOnDate(calendar.viewing) */ [];
     $: moons = calendar.getMoonsForDate(calendar.viewing);
     $: categories = calendar.object.categories;
 
@@ -29,7 +29,7 @@
     calendar.on("day-update", () => {
         date = calendar.viewing;
         currentDate = calendar.viewedDate;
-        events = calendar.getEventsOnDate(calendar.viewing);
+        /* events = calendar.getEventsOnDate(calendar.viewing); */
         moons = calendar.getMoonsForDate(calendar.viewing);
     });
 
