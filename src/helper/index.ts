@@ -44,6 +44,11 @@ export class MonthHelper {
         return this.data.type;
     }
     events: Event[];
+    getEventsOnDay(day: number) {
+        return this.events.filter((e) => {
+            if (e.date.day == day) return true;
+        });
+    }
     constructor(
         public data: Month,
         public number: number,
@@ -59,6 +64,7 @@ export class MonthHelper {
 }
 
 export class DayHelper {
+    events: Event[];
     get calendar() {
         return this.month.calendar;
     }
@@ -69,9 +75,9 @@ export class DayHelper {
             year: this.year
         };
     }
-    get events(): Event[] {
-        return this.calendar.getEventsOnDate(this.date);
-    }
+    /* get events(): Event[] {
+        return this.month.getEventsOnDay(this.number);
+    } */
     get longDate() {
         return {
             day: this.number,
@@ -113,7 +119,9 @@ export class DayHelper {
         return this.calendar.getMoonsForDate(this.date);
     }
 
-    constructor(public month: MonthHelper, public number: number) {}
+    constructor(public month: MonthHelper, public number: number) {
+        this.events = this.month.getEventsOnDay(this.number);
+    }
 }
 
 export default class CalendarHelper extends Events {
@@ -123,14 +131,30 @@ export default class CalendarHelper extends Events {
         //else
         const { year, number: month } = helper;
         const events = this.object.events.filter((event) => {
-            if (event.date.year > year) return false;
-            if (!event.end && event.date.month > month) return false;
-            if (event.date.month == month && event.date.year == year)
+            const { date, end } = event;
+            //No-month events are on every month.
+            if (date.month == undefined) return true;
+            //Year and Month match
+            if (
+                (date.year == year || date.year == undefined) &&
+                date.month == month
+            )
                 return true;
-            const start = event.date;
-            const end = event.end ?? event.date;
-            if (start.month == undefined) end.month = start.month = month;
-            if (start.year == undefined) end.year = start.year = year;
+            //Event is after the month
+            if (date.year > year || (date.year == year && date.month > month))
+                return false;
+            //No end date and event is before the month
+            if (!end && (date.month != month || date.year < year)) return false;
+
+            if (date.year == undefined) end.year = date.year = year;
+            if (
+                (date.year <= year || date.month <= month) &&
+                end.year >= year &&
+                end.month >= month
+            )
+                return true;
+
+            return false;
         });
 
         return events;
@@ -161,6 +185,7 @@ export default class CalendarHelper extends Events {
                 "fantasy-calendars-event-update",
                 (calendar, event, original) => {
                     if (calendar != this.object.id) return;
+                    if (!event) return;
                     if (
                         this.isEqual(event.date, original.date) &&
                         this.isEqual(event.end, original.end)
