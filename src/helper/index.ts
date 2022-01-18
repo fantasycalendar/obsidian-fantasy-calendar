@@ -79,7 +79,7 @@ export class MonthHelper {
         public year: number,
         public calendar: CalendarHelper
     ) {
-        this.leapDays = this.calendar.leapDaysForMonth(this, year);
+        this.leapDays = this.calendar.leapDaysForMonth(this.number, year);
 
         this.days = [
             ...new Array(data.length + this.leapDays.length).keys()
@@ -508,9 +508,9 @@ export default class CalendarHelper extends Events {
         });
     }
 
-    leapDaysForMonth(month: MonthHelper, year = this.displayed.year) {
+    leapDaysForMonth(month: number, year = this.displayed.year) {
         return this.leapdays.filter((l) => {
-            if (l.timespan != month.number) return false;
+            if (l.timespan != month) return false;
             return this.testLeapDay(l, year);
         });
     }
@@ -619,17 +619,15 @@ export default class CalendarHelper extends Events {
             .reduce((a, b) => a + b.length, 0);
     }
     daysBeforeMonth(month: MonthHelper, all: boolean = false) {
-        if (!month) return 0;
-        if (month.number == 0) {
-            return 0;
-        }
-        const months = this.getMonthsForYear(month.year);
-        const filtered = all ? months : months.filter((m) => m.type == "month");
-        const index = filtered.find((m) => m.data.id == month.data.id);
+        if (!month || month.number == 0) return 0;
 
-        return filtered
-            .slice(0, filtered.indexOf(index))
-            .reduce((a, b) => a + b.length, 0);
+        return this.data.months
+            .slice(0, month.number)
+            .filter((m) => (all ? true : m.type == "month"))
+            .map(
+                (m, i) => m.length + this.leapDaysForMonth(i, month.year).length
+            )
+            .reduce((a, b) => a + b, 0);
     }
 
     areDatesEqual(date: CurrentCalendarData, date2: CurrentCalendarData) {
