@@ -15,6 +15,7 @@ export class MonthHelper {
     days: DayHelper[] = [];
     leapDays: LeapDay[] = [];
     shouldUpdateEvents: boolean;
+    daysBefore: number;
     get id() {
         return this.data.id;
     }
@@ -26,11 +27,6 @@ export class MonthHelper {
     }
     get length() {
         return this.days.length;
-    }
-
-    /** Days before this month in the year.  */
-    get daysBefore() {
-        return this.calendar.daysBeforeMonth(this.number, this.year);
     }
 
     get firstWeekday() {
@@ -80,6 +76,7 @@ export class MonthHelper {
         public calendar: CalendarHelper
     ) {
         this.leapDays = this.calendar.leapDaysForMonth(this.number, year);
+        this.daysBefore = this.calendar.daysBeforeMonth(this.number, this.year);
 
         this.days = [
             ...new Array(data.length + this.leapDays.length).keys()
