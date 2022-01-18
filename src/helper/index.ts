@@ -208,9 +208,7 @@ export default class CalendarHelper extends Events {
         this.displayed = { ...this.current };
         this.update(this.object);
 
-        //TODO: Add in recurring events.
         //TODO: Tell existing months / days to update.
-        //TODO: Add in caching.
         this.plugin.registerEvent(
             this.plugin.app.workspace.on(
                 "fantasy-calendars-event-update",
@@ -233,7 +231,6 @@ export default class CalendarHelper extends Events {
     _cache: Map<number, Map<number, MonthHelper>> = new Map();
 
     getMonthsForYear(year: number) {
-        //TODO: Cache month helpers so you aren't constantly recreating them.
         if (!this._cache.has(year)) {
             this._cache.set(
                 year,
@@ -501,7 +498,7 @@ export default class CalendarHelper extends Events {
             return this.testLeapDay(l, year);
         });
     }
-    //TODO: This is called WAY TOO MUCH
+
     getMonth(number: number, year: number, direction: number = 0): MonthHelper {
         const months = this.data.months;
         let index = wrap(number, months.length);
