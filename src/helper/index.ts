@@ -13,9 +13,10 @@ import type {
 
 export class MonthHelper {
     days: DayHelper[] = [];
-    leapDays: LeapDay[] = [];
-    shouldUpdateEvents: boolean;
     daysBefore: number;
+    leapDays: LeapDay[] = [];
+    shouldUpdateEvents: boolean = false;
+
     get id() {
         return this.data.id;
     }
@@ -264,20 +265,6 @@ export default class CalendarHelper extends Events {
             date?.day == next?.day
         );
     }
-    incrementDate(inc: CurrentCalendarData) {
-        const date = { ...inc };
-        date.day++;
-        const year = this.getMonthsForYear(date.year);
-        if (date.day > year[date.month].days.length) {
-            date.month++;
-            date.day = 1;
-        }
-        if (date.month >= year.length) {
-            date.year++;
-            date.month = 0;
-        }
-        return date;
-    }
     update(calendar?: Calendar) {
         this.object = calendar ?? this.object;
         this.maxDays = Math.max(...this.data.months.map((m) => m.length));
@@ -525,12 +512,8 @@ export default class CalendarHelper extends Events {
         if (number >= months.length) year += 1;
 
         if (this._cache.has(year)) {
-            if (this._cache.get(year)!.has(number)) {
-                console.log(
-                    "🚀 ~ file: index.ts ~ line 534 ~ this._cache.get(year)!.has(number)",
-                    this._cache.get(year)!.has(number)
-                );
-                return this._cache.get(year)!.get(number);
+            if (this._cache.get(year)!.has(index)) {
+                return this._cache.get(year)!.get(index);
             }
         } else {
             this._cache.set(year, new Map());
@@ -541,7 +524,7 @@ export default class CalendarHelper extends Events {
         }
 
         const helper = new MonthHelper(months[index], index, year, this);
-        this._cache.set(year, this._cache.get(year).set(number, helper));
+        this._cache.set(year, this._cache.get(year).set(index, helper));
         return helper;
     }
 
@@ -551,12 +534,12 @@ export default class CalendarHelper extends Events {
         /** Get Days of Previous Month */
         let previous: DayHelper[] = [];
 
-        const previousMonth = this.getMonth(
-            month.index - 1,
-            this.displayed.year,
-            -1
-        );
         if (month.firstWeekday > 0 && month.type == "month") {
+            const previousMonth = this.getMonth(
+                month.index - 1,
+                this.displayed.year,
+                -1
+            );
             previous =
                 previousMonth != null
                     ? previousMonth.days.slice(-month.firstWeekday)
@@ -565,17 +548,15 @@ export default class CalendarHelper extends Events {
 
         /** Get Days of Next Month */
         let next: DayHelper[] = [];
-
-        const nextMonth = this.getMonth(
-            month.index + 1,
-            this.displayed.year,
-            1
-        );
-
         if (
             month.lastWeekday < this.weekdays.length - 1 &&
             month.type == "month"
         ) {
+            const nextMonth = this.getMonth(
+                month.index + 1,
+                this.displayed.year,
+                1
+            );
             next = nextMonth.days.slice(
                 0,
                 this.weekdays.length - month.lastWeekday - 1
