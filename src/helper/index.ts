@@ -65,6 +65,14 @@ export class MonthHelper {
                 return true;
         });
     }
+    shouldUpdateMoons = false;
+    moons: Array<[Moon, Phase]>;
+    getMoonsForDay(day: CurrentCalendarData) {
+        if (!this.moons || !this.moons.length || this.shouldUpdateMoons) {
+            this.moons = this.calendar.getMoonsForMonth(this);
+        }
+        return this.moons;
+    }
     constructor(
         public data: Month,
         public number: number,
@@ -135,8 +143,13 @@ export class DayHelper {
         );
     }
 
+    shouldUpdateMoons = false;
+    private _moons: Array<[Moon, Phase]>;
     get moons() {
-        return this.calendar.getMoonsForDate(this.date);
+        if (!this._moons || !this._moons.length || this.shouldUpdateMoons) {
+            this._moons = this.month.getMoonsForDay(this.date);
+        }
+        return this._moons;
     }
 
     constructor(public month: MonthHelper, public number: number) {}
@@ -741,6 +754,35 @@ export default class CalendarHelper extends Events {
                 moon,
                 options[wrap(Math.round(phase), options.length)]
             ]);
+        }
+
+        return phases;
+    }
+    getMoonsForMonth(month: MonthHelper): [Moon, Phase][] {
+        const phases: Array<[Moon, Phase]> = [];
+
+        for (const day of month.days) {
+            const daysBefore =
+                this.totalDaysBeforeYear(month.year, true) +
+                this.daysBeforeMonth(month, true) +
+                day.number -
+                1;
+            for (let moon of this.moons) {
+                const { offset, cycle } = moon;
+                const granularity = 24;
+
+                let data = (daysBefore - offset) / cycle;
+                let position = data - Math.floor(data);
+
+                const phase = (position * granularity) % granularity;
+
+                const options = MOON_PHASES[granularity];
+
+                phases.push([
+                    moon,
+                    options[wrap(Math.round(phase), options.length)]
+                ]);
+            }
         }
 
         return phases;
