@@ -19,7 +19,7 @@
     $: date = calendar.viewing;
     $: dayNumber = calendar.dayNumberForDate(date);
     $: events = /* calendar.getEventsOnDate(calendar.viewing) */ [];
-    $: moons = calendar.getMoonsForDate(calendar.viewing);
+    $: moons = /* calendar.getMoonsForDate(calendar.viewing); */ [];
     $: categories = calendar.object.categories;
 
     let displayMoons: boolean;
@@ -30,7 +30,7 @@
         date = calendar.viewing;
         currentDate = calendar.viewedDate;
         /* events = calendar.getEventsOnDate(calendar.viewing); */
-        moons = calendar.getMoonsForDate(calendar.viewing);
+        /* moons = calendar.getMoonsForDate(calendar.viewing); */
     });
 
     const dispatch = createEventDispatcher();

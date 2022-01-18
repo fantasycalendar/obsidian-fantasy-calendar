@@ -1,4 +1,4 @@
-import { Events, Notice } from "obsidian";
+import { Events } from "obsidian";
 import type FantasyCalendar from "src/main";
 import { MOON_PHASES, Phase } from "src/utils/constants";
 import { dateString, wrap } from "src/utils/functions";
@@ -15,6 +15,7 @@ export class MonthHelper {
     days: DayHelper[] = [];
     leapDays: LeapDay[] = [];
     shouldUpdateEvents: boolean;
+    shouldUpdateMoons: boolean;
     get id() {
         return this.data.id;
     }
@@ -65,7 +66,6 @@ export class MonthHelper {
                 return true;
         });
     }
-    shouldUpdateMoons = false;
     moons: Array<[Moon, Phase]>;
     getMoonsForDay(day: CurrentCalendarData) {
         if (!this.moons || !this.moons.length || this.shouldUpdateMoons) {
@@ -79,7 +79,7 @@ export class MonthHelper {
         public year: number,
         public calendar: CalendarHelper
     ) {
-        this.leapDays = this.calendar.leapDaysForMonth(this, year);
+        this.leapDays = this.calendar.leapDaysForMonth(this.number, year);
 
         this.days = [
             ...new Array(data.length + this.leapDays.length).keys()
@@ -90,6 +90,7 @@ export class MonthHelper {
 export class DayHelper {
     private _events: Event[];
     shouldUpdateEvents: boolean;
+    shouldUpdateMoons: boolean;
     get calendar() {
         return this.month.calendar;
     }
@@ -142,8 +143,6 @@ export class DayHelper {
             this.calendar.displayed.month == this.calendar.viewing.month
         );
     }
-
-    shouldUpdateMoons = false;
     private _moons: Array<[Moon, Phase]>;
     get moons() {
         if (!this._moons || !this._moons.length || this.shouldUpdateMoons) {
@@ -229,22 +228,25 @@ export default class CalendarHelper extends Events {
             )
         );
 
-        /* window.calendar = this; */
+        window.calendar = this;
     }
 
-    _cache: Map<number, MonthHelper[]> = new Map();
+    _cache: Map<number, Map<number, MonthHelper>> = new Map();
 
     getMonthsForYear(year: number) {
         //TODO: Cache month helpers so you aren't constantly recreating them.
         if (!this._cache.has(year)) {
             this._cache.set(
                 year,
-                this.data.months.map(
-                    (m, i) => new MonthHelper(m, i, year, this)
+                new Map(
+                    this.data.months.map((m, i) => [
+                        i,
+                        new MonthHelper(m, i, year, this)
+                    ])
                 )
             );
         }
-        return this._cache.get(year);
+        return Array.from(this._cache.get(year).values());
     }
     hash(date: CurrentCalendarData) {
         if (date.year == null || date.month == null || date.day == null)
@@ -431,14 +433,12 @@ export default class CalendarHelper extends Events {
     goToNext() {
         if (this.nextMonthIndex < this.displayed.month) {
             if (!this.canGoToNextYear()) {
-                new Notice(
-                    "This is the last year. Additional years can be created in settings."
-                );
-                return;
+                return false;
             }
             this.goToNextYear();
         }
         this.setCurrentMonth(this.nextMonthIndex);
+        return true;
     }
     goToNextYear() {
         this.displayed.year += 1;
@@ -453,12 +453,12 @@ export default class CalendarHelper extends Events {
     goToPrevious() {
         if (this.prevMonthIndex > this.displayed.month) {
             if (this.displayed.year == 1) {
-                new Notice("This is the earliest year.");
-                return;
+                return false;
             }
             this.goToPreviousYear();
         }
         this.setCurrentMonth(this.prevMonthIndex);
+        return true;
     }
     goToPreviousDay() {
         this.viewing.day -= 1;
@@ -508,9 +508,9 @@ export default class CalendarHelper extends Events {
         });
     }
 
-    leapDaysForMonth(month: MonthHelper, year = this.displayed.year) {
+    leapDaysForMonth(month: number, year = this.displayed.year) {
         return this.leapdays.filter((l) => {
-            if (l.timespan != month.number) return false;
+            if (l.timespan != month) return false;
             return this.testLeapDay(l, year);
         });
     }
@@ -523,19 +523,23 @@ export default class CalendarHelper extends Events {
         if (year == 0) return null;
 
         if (number >= months.length) year += 1;
+
         if (this._cache.has(year)) {
-            console.trace();
-            const month = this._cache.get(year)[number];
-            if (month) {
-                return this._cache.get(year)![number];
+            const months = this._cache.get(year);
+            if (months.has(number)) {
+                return this._cache.get(year)!.get(number);
             }
         }
 
         if (months[index].type == "intercalary" && direction != 0) {
             return this.getMonth(number + direction, year, direction);
         }
-
-        return new MonthHelper(months[index], index, year, this);
+        const helper = new MonthHelper(months[index], index, year, this);
+        this._cache.set(
+            year,
+            (this._cache.get(year) ?? new Map()).set(number, helper)
+        );
+        return helper;
     }
 
     getPaddedDaysForMonth(month: MonthHelper) {
@@ -623,13 +627,12 @@ export default class CalendarHelper extends Events {
         if (month.number == 0) {
             return 0;
         }
-        const months = this.getMonthsForYear(month.year);
-        const filtered = all ? months : months.filter((m) => m.type == "month");
-        const index = filtered.find((m) => m.data.id == month.data.id);
-
-        return filtered
-            .slice(0, filtered.indexOf(index))
-            .reduce((a, b) => a + b.length, 0);
+        let days = 0;
+        for (let i = 0; i < month.number; i++) {
+            if (!all && this.data.months[i]?.type != "month") continue;
+            days += this.getMonth(i, month.year).length;
+        }
+        return days;
     }
 
     areDatesEqual(date: CurrentCalendarData, date2: CurrentCalendarData) {
@@ -725,6 +728,13 @@ export default class CalendarHelper extends Events {
             total += leapdays;
         }
         return total;
+    }
+    leapDaysBeforeYearOld(year: number) {
+        if (year == 1) return 0;
+        const days = [...Array(year - 1).keys()]
+            .map((k) => this.leapDaysForYear(k + 1))
+            .reduce((a, b) => a + b.length, 0);
+        return days;
     }
     get daysBefore() {
         return this.daysBeforeYear(this.displayed.year);
