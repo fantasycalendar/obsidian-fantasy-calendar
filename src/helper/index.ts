@@ -232,19 +232,22 @@ export default class CalendarHelper extends Events {
         /* window.calendar = this; */
     }
 
-    _cache: Map<number, MonthHelper[]> = new Map();
+    _cache: Map<number, Map<number, MonthHelper>> = new Map();
 
     getMonthsForYear(year: number) {
         //TODO: Cache month helpers so you aren't constantly recreating them.
         if (!this._cache.has(year)) {
             this._cache.set(
                 year,
-                this.data.months.map(
-                    (m, i) => new MonthHelper(m, i, year, this)
+                new Map(
+                    this.data.months.map((m, i) => [
+                        i,
+                        new MonthHelper(m, i, year, this)
+                    ])
                 )
             );
         }
-        return this._cache.get(year);
+        return Array.from(this._cache.get(year).values());
     }
     hash(date: CurrentCalendarData) {
         if (date.year == null || date.month == null || date.day == null)
@@ -523,22 +526,26 @@ export default class CalendarHelper extends Events {
         if (year == 0) return null;
 
         if (number >= months.length) year += 1;
+
         if (this._cache.has(year)) {
-            console.trace();
-            const month = this._cache.get(year)[number];
-            if (month) {
-                return this._cache.get(year)![number];
+            if (this._cache.get(year)!.has(number)) {
+                console.log(
+                    "🚀 ~ file: index.ts ~ line 534 ~ this._cache.get(year)!.has(number)",
+                    this._cache.get(year)!.has(number)
+                );
+                return this._cache.get(year)!.get(number);
             }
+        } else {
+            this._cache.set(year, new Map());
         }
 
         if (months[index].type == "intercalary" && direction != 0) {
             return this.getMonth(number + direction, year, direction);
         }
 
-        console.trace();
-        console.log("building new month helper", index, year);
-
-        return new MonthHelper(months[index], index, year, this);
+        const helper = new MonthHelper(months[index], index, year, this);
+        this._cache.set(year, this._cache.get(year).set(number, helper));
+        return helper;
     }
 
     getPaddedDaysForMonth(month: MonthHelper) {
