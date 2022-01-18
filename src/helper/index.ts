@@ -30,7 +30,7 @@ export class MonthHelper {
 
     /** Days before this month in the year.  */
     get daysBefore() {
-        return this.calendar.daysBeforeMonth(this);
+        return this.calendar.daysBeforeMonth(this.number, this.year);
     }
 
     get firstWeekday() {
@@ -535,6 +535,9 @@ export default class CalendarHelper extends Events {
             return this.getMonth(number + direction, year, direction);
         }
 
+        console.trace();
+        console.log("building new month helper", index, year);
+
         return new MonthHelper(months[index], index, year, this);
     }
 
@@ -618,15 +621,13 @@ export default class CalendarHelper extends Events {
             .filter((m) => m.type === "month")
             .reduce((a, b) => a + b.length, 0);
     }
-    daysBeforeMonth(month: MonthHelper, all: boolean = false) {
-        if (!month || month.number == 0) return 0;
+    daysBeforeMonth(month: number, year: number, all: boolean = false) {
+        if (!month || month == 0) return 0;
 
         return this.data.months
-            .slice(0, month.number)
+            .slice(0, month)
             .filter((m) => (all ? true : m.type == "month"))
-            .map(
-                (m, i) => m.length + this.leapDaysForMonth(i, month.year).length
-            )
+            .map((m, i) => m.length + this.leapDaysForMonth(i, year).length)
             .reduce((a, b) => a + b, 0);
     }
 
@@ -650,17 +651,15 @@ export default class CalendarHelper extends Events {
     daysBeforeDate(date: CurrentCalendarData) {
         const daysBeforeYear = this.daysBeforeYear(date.year);
         const daysBeforeMonth = this.daysBeforeMonth(
-            this.getMonth(date.month, date.year),
+            date.month,
+            date.year,
             true
         );
         return daysBeforeYear + daysBeforeMonth + date.day;
     }
 
     dayNumberForDate(date: CurrentCalendarData) {
-        return (
-            this.daysBeforeMonth(this.getMonth(date.month, date.year), true) +
-            date.day
-        );
+        return this.daysBeforeMonth(date.month, date.year, true) + date.day;
     }
 
     get firstWeekday() {
@@ -773,7 +772,7 @@ export default class CalendarHelper extends Events {
 
         const daysBefore =
             this.totalDaysBeforeYear(date.year, true) +
-            this.daysBeforeMonth(month, true) +
+            this.daysBeforeMonth(date.month, date.year, true) +
             day.number -
             1;
         for (let moon of this.moons) {
@@ -801,7 +800,7 @@ export default class CalendarHelper extends Events {
         for (const day of month.days) {
             const daysBefore =
                 this.totalDaysBeforeYear(month.year, true) +
-                this.daysBeforeMonth(month, true) +
+                this.daysBeforeMonth(month.number, month.year, true) +
                 day.number -
                 1;
             for (let moon of this.moons) {
