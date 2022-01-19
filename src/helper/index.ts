@@ -87,7 +87,6 @@ export class MonthHelper {
 
 export class DayHelper {
     private _events: Event[];
-    shouldUpdateEvents: boolean;
     get calendar() {
         return this.month.calendar;
     }
@@ -99,7 +98,11 @@ export class DayHelper {
         };
     }
     get events(): Event[] {
-        if (!this._events || !this._events.length || this.shouldUpdateEvents) {
+        if (
+            !this._events ||
+            !this._events.length ||
+            this.month.shouldUpdateEvents
+        ) {
             this._events = this.month.getEventsOnDay(this.date);
         }
         return this._events;
@@ -236,15 +239,29 @@ export default class CalendarHelper extends Events {
         this.plugin.registerEvent(
             this.plugin.app.workspace.on(
                 "fantasy-calendars-event-update",
-                (calendar, event, original) => {
-                    console.log(
-                        "🚀 ~ file: index.ts ~ line 200 ~ event",
-                        event
-                    );
+                (tree) => {
+                    if (!tree.has(this.calendar.id)) return;
+                    console.log(tree);
 
-                    if (calendar != this.calendar.id) return;
-                    if (!event) return;
-                    if (!event.date) return;
+                    const years = tree.get(this.calendar.id);
+
+                    for (const [year, months] of years) {
+                        if (!this._cache.has(year)) continue;
+                        for (const month of months) {
+                            if (!this._cache.get(year).has(month)) continue;
+                            this._cache
+                                .get(year)
+                                .get(month).shouldUpdateEvents = true;
+                            if (
+                                (year == this.displayed.year &&
+                                    month == this.displayed.month) ||
+                                (year == this.viewing.year &&
+                                    month == this.viewing.month)
+                            ) {
+                                this.trigger("month-update");
+                            }
+                        }
+                    }
                 }
             )
         );
@@ -255,7 +272,7 @@ export default class CalendarHelper extends Events {
     /**
      * Cache used to store built month helpers.
      */
-    _cache: Map<number, Map<number, MonthHelper>> = new Map();
+    private _cache: Map<number, Map<number, MonthHelper>> = new Map();
 
     /**
      * Get an array of month helpers for an entire year.

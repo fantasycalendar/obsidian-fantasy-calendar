@@ -39,6 +39,7 @@
     day.calendar.on("month-update", () => {
         today = day.isCurrentDay;
         displaying = day.isDisplaying;
+        events = day.events;
     });
     day.calendar.on("day-update", () => {
         today = day.isCurrentDay;

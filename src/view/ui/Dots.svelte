@@ -7,9 +7,7 @@
     export let events: Event[] = [];
     export let categories: EventCategory[];
     export let calendar: CalendarHelper;
-
-    let container: HTMLDivElement;
-    let dots: HTMLDivElement;
+    
     let overflow: number = 0;
 
     let dotContainer: HTMLDivElement;

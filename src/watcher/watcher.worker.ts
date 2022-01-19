@@ -193,11 +193,19 @@ class Parser {
             ) {
                 continue;
             }
+            console.log(
+                "🚀 ~ file: watcher.worker.ts ~ line 182 ~ existing",
+                existing,
+                event,
+                calendar.events.findIndex((e) => e.id == existing?.id)
+            );
 
             ctx.postMessage<UpdateEventMessage>({
                 type: "update",
                 id: calendar.id,
-                index: calendar.events.indexOf(existing),
+                index: existing
+                    ? calendar.events.findIndex((e) => e.id == existing?.id)
+                    : -1,
                 event,
                 original: existing
             });
@@ -254,7 +262,6 @@ class Parser {
                 note: file.path,
                 date,
                 end,
-                timestamp,
                 category: category?.id,
                 description: ""
             }

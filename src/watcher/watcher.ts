@@ -7,8 +7,10 @@ import {
     Vault,
     getAllTags
 } from "obsidian";
-import type { Calendar, CurrentCalendarData } from "src/@types";
+import type { Calendar, Event } from "src/@types";
 import type FantasyCalendar from "src/main";
+//have to ignore until i fix typing issue
+//@ts-expect-error
 import Worker, {
     CalendarsMessage,
     GetFileCacheMessage,
@@ -26,6 +28,8 @@ declare global {
     }
 }
 
+export type CalendarEventTree = Map<string, Map<number, Set<number>>>;
+
 export class Watcher extends Component {
     parsing: Set<string> = new Set();
     get calendars() {
@@ -40,6 +44,9 @@ export class Watcher extends Component {
     constructor(public plugin: FantasyCalendar) {
         super();
     }
+
+    tree: CalendarEventTree = new Map();
+
     worker = new Worker();
     onload() {
         /** Send the worker the calendars so I don't have to with every message. */
@@ -153,15 +160,13 @@ export class Watcher extends Component {
 
                     const calendar = this.calendars.find((c) => c.id == id);
                     if (!calendar) return;
-
+                    console.log(index);
                     calendar.events.splice(index, index >= 0 ? 1 : 0, event);
-                    //should fire (fantasy-calendar-event-update) here to update CalendarHelper hash
-                    this.plugin.app.workspace.trigger(
-                        "fantasy-calendars-event-update",
-                        calendar.id,
-                        event,
-                        original
-                    );
+
+                    this.addToTree(calendar, event);
+                    if (original) {
+                        this.addToTree(calendar, original);
+                    }
                 }
             }
         );
@@ -171,6 +176,12 @@ export class Watcher extends Component {
             "message",
             async (evt: MessageEvent<SaveMessage>) => {
                 if (evt.data.type == "save") {
+                    this.plugin.app.workspace.trigger(
+                        "fantasy-calendars-event-update",
+                        this.tree
+                    );
+                    console.log(this.tree);
+                    this.tree = new Map();
                     await this.plugin.saveCalendar();
                 }
             }
@@ -183,6 +194,23 @@ export class Watcher extends Component {
         const parsing: Set<string> = new Set();
         for (const path of this.getFiles(folder)) parsing.add(path);
         this.startParsing([...parsing]);
+    }
+    addToTree(calendar: Calendar, event: Event) {
+        if (!this.tree.has(calendar.id)) {
+            this.tree.set(calendar.id, new Map());
+        }
+        const calendarTree = this.tree.get(calendar.id);
+
+        if (!calendarTree.has(event.date.year)) {
+            calendarTree.set(event.date.year, new Set());
+        }
+
+        const yearSet = calendarTree.get(event.date.year);
+
+        this.tree.set(
+            calendar.id,
+            calendarTree.set(event.date.year, yearSet.add(event.date.month))
+        );
     }
     startParsing(paths: string[]) {
         if (paths.length) {
