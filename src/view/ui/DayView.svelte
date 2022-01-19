@@ -17,9 +17,9 @@
 
     $: currentDate = calendar.viewedDate;
     $: date = calendar.viewing;
+    $: day = calendar.getDayForDate(date);
     $: dayNumber = calendar.dayNumberForDate(date);
-    $: events = /* calendar.getEventsOnDate(calendar.viewing) */ [];
-    $: moons = /* calendar.getMoonsForDate(calendar.viewing); */ [];
+    $: moons = day.moons;
     $: categories = calendar.object.categories;
 
     let displayMoons: boolean;
@@ -29,8 +29,8 @@
     calendar.on("day-update", () => {
         date = calendar.viewing;
         currentDate = calendar.viewedDate;
-        /* events = calendar.getEventsOnDate(calendar.viewing); */
-        /* moons = calendar.getMoonsForDate(calendar.viewing); */
+        day = calendar.getDayForDate(date);
+        moons = day.moons;
     });
 
     const dispatch = createEventDispatcher();
@@ -103,7 +103,7 @@
         </div>
     {/if}
     <Flags
-        {events}
+        events={day.events}
         {categories}
         {date}
         dayView={true}

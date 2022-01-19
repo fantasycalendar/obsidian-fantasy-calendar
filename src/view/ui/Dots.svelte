@@ -1,7 +1,7 @@
 <script lang="ts">
     import Dot from "./Dot.svelte";
     import type { Event, EventCategory } from "src/@types";
-    import { createEventDispatcher, onMount } from "svelte";
+    import { onMount } from "svelte";
     import CalendarHelper from "src/helper";
 
     export let events: Event[] = [];
@@ -11,13 +11,15 @@
     let container: HTMLDivElement;
     let dots: HTMLDivElement;
     let overflow: number = 0;
-    const dispatch = createEventDispatcher();
 
-    const addEvents = async () => {
+    let dotContainer: HTMLDivElement;
+    const addEvents = (dots: HTMLDivElement) => {
+        dotContainer = dots;
         overflow = 0;
         if (events.length) {
             dots.empty();
-            const width = container.getBoundingClientRect().width;
+            const width =
+                dotContainer.parentElement.getBoundingClientRect().width;
 
             let remaining = width;
 
@@ -42,25 +44,20 @@
         }
     };
 
-    $: {
-        if (events && container && dots) {
-            addEvents();
-        }
-    }
-
     calendar.on("view-resized", () => {
-        if (!container || !dots) return;
-        addEvents();
+        if (!dotContainer) return;
+        addEvents(dotContainer);
     });
 
-    onMount(addEvents);
     const color = (event: Event) => {
         return categories.find((c) => c.id == event.category)?.color;
     };
 </script>
 
-<div class="dots-container" bind:this={container}>
-    <div class="dot-container centered" bind:this={dots} />
+<div class="dots-container">
+    {#key events}
+        <div class="dot-container centered" use:addEvents />
+    {/key}
     <div class="overflow">
         {#if overflow > 0}
             <span>+{overflow}</span>
@@ -90,5 +87,6 @@
         display: flex;
         justify-content: flex-end;
         width: 100%;
+        line-height: 1.25;
     }
 </style>

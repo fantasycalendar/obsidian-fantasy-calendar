@@ -119,6 +119,3 @@ export function dateString(
     }
     return `${ordinal(day)} of every month`;
 }
-function LeapDay(leapday: any, LeapDay: any) {
-    throw new Error("Function not implemented.");
-}

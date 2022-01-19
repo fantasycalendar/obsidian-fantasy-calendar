@@ -63,12 +63,12 @@ export class MonthHelper {
         });
     }
     shouldUpdateMoons = false;
-    moons: Array<[Moon, Phase]>;
+    moons: Array<[Moon, Phase]>[];
     getMoonsForDay(day: CurrentCalendarData) {
         if (!this.moons || !this.moons.length || this.shouldUpdateMoons) {
             this.moons = this.calendar.getMoonsForMonth(this);
         }
-        return this.moons;
+        return this.moons[day.day];
     }
     constructor(
         public data: Month,
@@ -140,11 +140,9 @@ export class DayHelper {
             this.calendar.displayed.month == this.calendar.viewing.month
         );
     }
-
-    shouldUpdateMoons = false;
     private _moons: Array<[Moon, Phase]>;
     get moons() {
-        if (!this._moons || !this._moons.length || this.shouldUpdateMoons) {
+        if (!this._moons || !this._moons.length) {
             this._moons = this.month.getMoonsForDay(this.date);
         }
         return this._moons;
@@ -154,6 +152,11 @@ export class DayHelper {
 }
 
 export default class CalendarHelper extends Events {
+    getDayForDate(date: CurrentCalendarData): DayHelper {
+        const month = this.getMonth(date.month, date.year);
+        const day = month.days[date.day - 1];
+        return day;
+    }
     eventsForMonth(helper: MonthHelper): Event[] {
         //get from cache first
 
@@ -776,8 +779,8 @@ export default class CalendarHelper extends Events {
 
         return phases;
     }
-    getMoonsForMonth(month: MonthHelper): [Moon, Phase][] {
-        const phases: Array<[Moon, Phase]> = [];
+    getMoonsForMonth(month: MonthHelper): Array<[Moon, Phase]>[] {
+        const phases: Array<[Moon, Phase]>[] = [];
 
         for (const day of month.days) {
             const daysBefore =
@@ -785,6 +788,7 @@ export default class CalendarHelper extends Events {
                 this.daysBeforeMonth(month.number, month.year, true) +
                 day.number -
                 1;
+            const moons: Array<[Moon, Phase]> = [];
             for (let moon of this.moons) {
                 const { offset, cycle } = moon;
                 const granularity = 24;
@@ -796,11 +800,12 @@ export default class CalendarHelper extends Events {
 
                 const options = MOON_PHASES[granularity];
 
-                phases.push([
+                moons.push([
                     moon,
                     options[wrap(Math.round(phase), options.length)]
                 ]);
             }
+            phases.push(moons);
         }
 
         return phases;

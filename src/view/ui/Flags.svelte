@@ -10,21 +10,23 @@
     export let date: CurrentCalendarData;
     export let calendar: CalendarHelper;
 
-    $: events = events;
+    $: events = [...events];
 
-    let container: HTMLDivElement;
-    let flags: HTMLDivElement;
     let overflow: number = 0;
     const dispatch = createEventDispatcher();
-
-    const addEvents = async () => {
-        flags?.empty();
+    let flagContainer: HTMLElement;
+    const addEvents = (flags: HTMLElement) => {
+        flagContainer = flags;
+        flags.empty();
         overflow = 0;
-        if (events.length && container && flags) {
-            const height = container.getBoundingClientRect().height;
+        if (events.length) {
+            flags.empty();
+            const height = flags.parentElement.getBoundingClientRect().height;
             let remaining = height;
 
+            console.log("🚀 ~ file: Flags.svelte ~ line 28 ~ events", events);
             for (const event of events) {
+                console.log("🚀 ~ file: Flags.svelte ~ line 30 ~ event", event);
                 const flag = new Flag({
                     target: flags,
                     props: {
@@ -43,8 +45,8 @@
                 flag.$on("event-context", (e) =>
                     dispatch("event-context", e.detail)
                 );
-                remaining = height - flags.getBoundingClientRect().height;
                 if (!dayView) {
+                    remaining = height - flags.getBoundingClientRect().height;
                     if (remaining < 0) {
                         flags.lastElementChild.detach();
                         overflow = events.length - events.indexOf(event);
@@ -58,23 +60,24 @@
         }
     };
 
-    $: {
+    /* $: {
         if (events && container && flags) {
             addEvents();
         }
-    }
+    } */
 
     calendar.on("view-resized", () => {
         if (dayView) return;
-        addEvents();
+        addEvents(flagContainer);
     });
 
-    onMount(addEvents);
+    /* onMount(addEvents); */
 </script>
 
-<div class="flags-container" bind:this={container}>
-    <div class="flag-container" bind:this={flags}>
-        <!-- {#each events.slice(0, MAX_EVENTS) as event}
+<div class="flags-container">
+    {#key events}
+        <div class="flag-container" use:addEvents>
+            <!-- {#each events.slice(0, MAX_EVENTS) as event}
             <Flag
                 {event}
                 {categories}
@@ -85,7 +88,8 @@
                 on:event-context
             />
         {/each} -->
-    </div>
+        </div>
+    {/key}
     <div class="overflow">
         {#if overflow > 0}
             <span>+{overflow}</span>
