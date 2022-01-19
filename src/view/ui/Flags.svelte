@@ -18,8 +18,13 @@
     let previousHeight = 0;
     const addEvents = (flags: HTMLElement) => {
         if (events.length) {
-            const height = flags.parentElement?.getBoundingClientRect()?.height;
-            if (!height || Math.floor(height) == Math.floor(previousHeight))
+            const height =
+                flags?.parentElement?.getBoundingClientRect()?.height;
+            if (
+                !dayView &&
+                (height == null ||
+                    Math.floor(height) == Math.floor(previousHeight))
+            )
                 return;
             previousHeight = height;
             flagContainer = flags;
