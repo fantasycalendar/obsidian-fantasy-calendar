@@ -13,15 +13,17 @@
     let overflow: number = 0;
 
     let dotContainer: HTMLDivElement;
+    let previousWidth = 0;
     const addEvents = (dots: HTMLDivElement) => {
         dotContainer = dots;
-        overflow = 0;
         if (events.length) {
-            dots.empty();
-            const width =
-                dotContainer.parentElement.getBoundingClientRect().width;
-
+            const width = dots.parentElement?.getBoundingClientRect()?.width;
+            if (!width || Math.floor(width) == Math.floor(previousWidth))
+                return;
+            previousWidth = width;
             let remaining = width;
+            dots.empty();
+            overflow = 0;
 
             for (const event of events) {
                 new Dot({

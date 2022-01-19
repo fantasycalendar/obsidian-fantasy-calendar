@@ -15,18 +15,19 @@
     let overflow: number = 0;
     const dispatch = createEventDispatcher();
     let flagContainer: HTMLElement;
+    let previousHeight = 0;
     const addEvents = (flags: HTMLElement) => {
-        flagContainer = flags;
-        flags.empty();
-        overflow = 0;
         if (events.length) {
+            const height = flags.parentElement?.getBoundingClientRect()?.height;
+            if (!height || Math.floor(height) == Math.floor(previousHeight))
+                return;
+            previousHeight = height;
+            flagContainer = flags;
             flags.empty();
-            const height = flags.parentElement.getBoundingClientRect().height;
+            overflow = 0;
             let remaining = height;
 
-            console.log("🚀 ~ file: Flags.svelte ~ line 28 ~ events", events);
             for (const event of events) {
-                console.log("🚀 ~ file: Flags.svelte ~ line 30 ~ event", event);
                 const flag = new Flag({
                     target: flags,
                     props: {
@@ -60,18 +61,10 @@
         }
     };
 
-    /* $: {
-        if (events && container && flags) {
-            addEvents();
-        }
-    } */
-
     calendar.on("view-resized", () => {
         if (dayView) return;
         addEvents(flagContainer);
     });
-
-    /* onMount(addEvents); */
 </script>
 
 <div class="flags-container">
