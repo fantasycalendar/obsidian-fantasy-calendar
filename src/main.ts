@@ -18,14 +18,14 @@ import FantasyCalendarView, {
 } from "./view/view";
 
 import "./main.css";
-import { Watcher } from "./watcher/watcher";
+import { CalendarEventTree, Watcher } from "./watcher/watcher";
 
 declare module "obsidian" {
     interface Workspace {
         on(name: "fantasy-calendars-updated", callback: () => any): EventRef;
         on(
             name: "fantasy-calendars-event-update",
-            callback: (calendar: string, event: Event, original: Event) => any
+            callback: (tree: CalendarEventTree) => any
         ): EventRef;
         on(
             name: "fantasy-calendar-settings-change",
@@ -35,9 +35,7 @@ declare module "obsidian" {
         trigger(name: "fantasy-calendar-settings-change"): void;
         trigger(
             name: "fantasy-calendars-event-update",
-            calendar: string,
-            event: Event,
-            original: Event
+            tree: CalendarEventTree
         ): void;
         trigger(
             name: "link-hover",
