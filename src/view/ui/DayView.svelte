@@ -19,7 +19,6 @@
     $: date = calendar.viewing;
     $: day = calendar.getDayForDate(date);
     $: dayNumber = calendar.dayNumberForDate(date);
-    $: events = day.events;
     $: moons = day.moons;
     $: categories = calendar.object.categories;
 
@@ -31,6 +30,7 @@
         date = calendar.viewing;
         currentDate = calendar.viewedDate;
         day = calendar.getDayForDate(date);
+        moons = day.moons;
     });
 
     const dispatch = createEventDispatcher();
@@ -103,7 +103,7 @@
         </div>
     {/if}
     <Flags
-        {events}
+        events={day.events}
         {categories}
         {date}
         dayView={true}

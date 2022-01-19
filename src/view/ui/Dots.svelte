@@ -17,10 +17,6 @@
         dotContainer = dots;
         overflow = 0;
         if (events.length) {
-            console.log(
-                "🚀 ~ file: Dots.svelte ~ line 18 ~ events.length",
-                events.length
-            );
             dots.empty();
             const width =
                 dotContainer.parentElement.getBoundingClientRect().width;
