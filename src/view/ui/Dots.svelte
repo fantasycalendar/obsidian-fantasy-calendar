@@ -90,5 +90,6 @@
         display: flex;
         justify-content: flex-end;
         width: 100%;
+        line-height: 1.25;
     }
 </style>
