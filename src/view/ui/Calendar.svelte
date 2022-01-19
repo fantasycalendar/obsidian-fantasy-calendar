@@ -39,11 +39,6 @@
         month = calendar.currentMonth;
         weeks = calendar.weeksOfMonth(month);
         firstWeek = calendar.weekNumbersOfMonth(month);
-        dayNumber = calendar.dayNumberForDate(calendar.current);
-    });
-
-    calendar.on("day-update", () => {
-        dayNumber = calendar.dayNumberForDate(calendar.current);
     });
 
     $: weekdays = calendar.weekdays;
@@ -52,7 +47,6 @@
     $: month = calendar.currentMonth;
     $: firstWeek = calendar.weekNumbersOfMonth(month);
     $: weeks = calendar.weeksOfMonth(month);
-    $: dayNumber = calendar.dayNumberForDate(calendar.current);
 </script>
 
 <div
