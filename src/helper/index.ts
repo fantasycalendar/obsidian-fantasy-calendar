@@ -288,25 +288,7 @@ export default class CalendarHelper extends Events {
         const day = `${date.day}`.padStart(days, "0");
         return `${date.year}${month}${day}`;
     }
-    /**
-     * @deprecated
-     */
-    map: Map<string, Set<string>> = new Map();
-    /**
-     * @deprecated
-     */
-    invMap: Map<string, Set<string>> = new Map();
 
-    /**
-     * @deprecated
-     */
-    isEqual(date: CurrentCalendarData, next: CurrentCalendarData) {
-        return (
-            date?.year == next?.year &&
-            date?.month == next?.month &&
-            date?.day == next?.day
-        );
-    }
     /**
      * Update the calendar object to a new calendar.
      */
@@ -360,65 +342,6 @@ export default class CalendarHelper extends Events {
         month: null,
         day: null
     };
-    /**
-     * @deprecated MonthHelpers should use CalendarHelper.eventsForMonth and DayHelpers should use MonthHelper.getEventsOnDay
-     */
-    getEventsOnDate(date: CurrentCalendarData) {
-        //this is being called multiple times why
-        if (this.map && this.map.size) {
-            const hash = this.hash(date);
-            const set = this.map.get(hash) ?? new Set();
-            if (!set.size) return [];
-            const events = this.calendar.events.filter((e) => set.has(e.id));
-            return [...events].sort((a, b) => {
-                if (!a.end) return 0;
-                if (!b.end) return -1;
-                if (this.areDatesEqual(a.date, b.date)) {
-                    return (
-                        this.daysBeforeDate(b.end) - this.daysBeforeDate(a.end)
-                    );
-                }
-                return (
-                    this.daysBeforeDate(a.date) - this.daysBeforeDate(b.date)
-                );
-            });
-        }
-        const events = this.calendar.events.filter((e) => {
-            if (!e.date.day) return false;
-            if (!e.end) {
-                e.end = { ...e.date };
-            }
-            const start = { ...e.date };
-            if (start.year > date.year) return false;
-            const end = { ...e.end };
-            if (start.month == undefined) end.month = start.month = date.month;
-            if (start.year == undefined) end.year = start.year = date.year;
-
-            const daysBeforeStart = this.daysBeforeDate(start);
-            const daysBeforeDate = this.daysBeforeDate(date);
-            if (end.year > date.year) {
-                return daysBeforeDate >= daysBeforeStart;
-            }
-
-            const daysBeforeEnd = this.daysBeforeDate(end);
-            return (
-                daysBeforeDate >= daysBeforeStart &&
-                daysBeforeEnd >= daysBeforeDate
-            );
-        });
-
-        events.sort((a, b) => {
-            if (!a.end) return 0;
-            if (!b.end) return -1;
-            if (this.areDatesEqual(a.date, b.date)) {
-                return this.daysBeforeDate(b.end) - this.daysBeforeDate(a.end);
-            }
-            return this.daysBeforeDate(a.date) - this.daysBeforeDate(b.date);
-        });
-
-        return events;
-    }
-
     /**
      * Display string for current date.
      */
@@ -788,16 +711,6 @@ export default class CalendarHelper extends Events {
         return true;
     }
 
-    daysBeforeDate(date: CurrentCalendarData) {
-        const daysBeforeYear = this.daysBeforeYear(date.year);
-        const daysBeforeMonth = this.daysBeforeMonth(
-            date.month,
-            date.year,
-            true
-        );
-        return daysBeforeYear + daysBeforeMonth + date.day;
-    }
-
     dayNumberForDate(date: CurrentCalendarData) {
         return this.daysBeforeMonth(date.month, date.year, true) + date.day;
     }
@@ -861,27 +774,10 @@ export default class CalendarHelper extends Events {
         return total;
     }
     /**
-     * Alias to get the number of days before the currently displayed year, not including leap days.
-     *
-     * @deprecated
-     */
-    get daysBefore() {
-        return this.daysBeforeYear(this.displayed.year);
-    }
-    /**
      * Alias to get the total number of days before the currently displayed year.
      */
     get totalDaysBefore() {
         return this.totalDaysBeforeYear(this.displayed.year);
-    }
-    /**
-     * Alias to get the number of days before the a given year, not including leap days.
-     *
-     * @deprecated
-     */
-    daysBeforeYear(year: number) {
-        if (year < 1) return 0;
-        return Math.abs(year - 1) * this.daysPerYear;
     }
     /**
      * Get the total number of days before a given year.
@@ -917,43 +813,6 @@ export default class CalendarHelper extends Events {
      */
     get moons() {
         return this.data.moons;
-    }
-
-    /**
-     * Get the moons and their phases for a given date.
-     *
-     * @deprecated MonthHelpers should use getMoonsForMonth, and DayHelpers should get moons from MonthHelpers.
-     */
-    getMoonsForDate(date: CurrentCalendarData): Array<[Moon, Phase]> {
-        const phases: Array<[Moon, Phase]> = [];
-
-        const month = this.getMonth(date.month, date.year);
-
-        const day = month.days[date.day - 1];
-
-        const daysBefore =
-            this.totalDaysBeforeYear(date.year, true) +
-            this.daysBeforeMonth(date.month, date.year, true) +
-            day.number -
-            1;
-        for (let moon of this.moons) {
-            const { offset, cycle } = moon;
-            const granularity = 24;
-
-            let data = (daysBefore - offset) / cycle;
-            let position = data - Math.floor(data);
-
-            const phase = (position * granularity) % granularity;
-
-            const options = MOON_PHASES[granularity];
-
-            phases.push([
-                moon,
-                options[wrap(Math.round(phase), options.length)]
-            ]);
-        }
-
-        return phases;
     }
     /**
      * Get the moons and their phases for a given month.
