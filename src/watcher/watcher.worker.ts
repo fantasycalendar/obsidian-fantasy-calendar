@@ -1,5 +1,5 @@
-import { CachedMetadata, FrontMatterCache } from "obsidian";
-import { Calendar, CurrentCalendarData, Event } from "src/@types";
+import type { CachedMetadata, FrontMatterCache } from "obsidian";
+import type { Calendar, CurrentCalendarData, Event } from "src/@types";
 import { nanoid, wrap } from "src/utils/functions";
 const { DOMParser } = require("xmldom");
 
@@ -388,7 +388,4 @@ class Parser {
         return { date, end };
     }
 }
-
-export default {} as typeof Worker & (new () => Worker);
-
-const parser = new Parser();
+new Parser();

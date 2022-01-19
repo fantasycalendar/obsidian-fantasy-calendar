@@ -17,3 +17,5 @@ data.json
 rollup.config-dev.js
 webpack.dev.js
 main.js.LICENSE.txt
+
+.env
