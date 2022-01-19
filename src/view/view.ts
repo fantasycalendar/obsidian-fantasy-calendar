@@ -110,7 +110,7 @@ export default class FantasyCalendarView extends ItemView {
             this.plugin.defaultCalendar ??
             this.plugin.data.calendars[0];
 
-        if (this.helper && this.helper.object.id == calendar.id) {
+        if (this.helper && this.helper.calendar.id == calendar.id) {
             this.update(calendar);
         } else {
             this.setCurrentCalendar(calendar);

@@ -152,17 +152,23 @@ export class DayHelper {
 }
 
 export default class CalendarHelper extends Events {
+    /**
+     * Get a day helper from cache for a given date calendar.
+     */
     getDayForDate(date: CurrentCalendarData): DayHelper {
         const month = this.getMonth(date.month, date.year);
         const day = month.days[date.day - 1];
         return day;
     }
+    /**
+     * Get all the events that occur in a given month.
+     */
     eventsForMonth(helper: MonthHelper): Event[] {
         //get from cache first
 
         //else
         const { year, number: month } = helper;
-        const events = this.object.events.filter((event) => {
+        const events = this.calendar.events.filter((event) => {
             const date = { ...event.date };
             const end = { ...event.end };
             //No-month events are on every month.
@@ -192,6 +198,9 @@ export default class CalendarHelper extends Events {
 
         return events;
     }
+    /**
+     * Get the display name for a year. Used mainly for custom years.
+     */
     getNameForYear(year: number): string {
         if (!this.data.useCustomYears) return `${year}`;
         if (
@@ -202,14 +211,26 @@ export default class CalendarHelper extends Events {
             return this.data.years[year - 1].name;
         }
     }
+    /**
+     * Maximum number of days possible in a year.
+     */
     maxDays: number;
+    /**
+     * Options alias.
+     */
     get displayWeeks() {
-        return this.object.displayWeeks;
+        return this.calendar.displayWeeks;
     }
-    constructor(public object: Calendar, public plugin: FantasyCalendar) {
+    /**
+     * Creates an instance of CalendarHelper.
+     * @param {Calendar} calendar
+     * @param {FantasyCalendar} plugin
+     * @memberof CalendarHelper
+     */
+    constructor(public calendar: Calendar, public plugin: FantasyCalendar) {
         super();
         this.displayed = { ...this.current };
-        this.update(this.object);
+        this.update(this.calendar);
 
         //TODO: Tell existing months / days to update.
         this.plugin.registerEvent(
@@ -221,7 +242,7 @@ export default class CalendarHelper extends Events {
                         event
                     );
 
-                    if (calendar != this.object.id) return;
+                    if (calendar != this.calendar.id) return;
                     if (!event) return;
                     if (!event.date) return;
                 }
@@ -231,8 +252,14 @@ export default class CalendarHelper extends Events {
         /* window.calendar = this; */
     }
 
+    /**
+     * Cache used to store built month helpers.
+     */
     _cache: Map<number, Map<number, MonthHelper>> = new Map();
 
+    /**
+     * Get an array of month helpers for an entire year.
+     */
     getMonthsForYear(year: number) {
         if (!this._cache.has(year)) {
             this._cache.set(
@@ -247,6 +274,11 @@ export default class CalendarHelper extends Events {
         }
         return Array.from(this._cache.get(year).values());
     }
+    /**
+     * Get a hash of a given date.
+     *
+     * Hash takes the form of `YYYYMMDD`, with months and days padded to the maximum value.
+     */
     hash(date: CurrentCalendarData) {
         if (date.year == null || date.month == null || date.day == null)
             return null;
@@ -256,8 +288,18 @@ export default class CalendarHelper extends Events {
         const day = `${date.day}`.padStart(days, "0");
         return `${date.year}${month}${day}`;
     }
+    /**
+     * @deprecated
+     */
     map: Map<string, Set<string>> = new Map();
+    /**
+     * @deprecated
+     */
     invMap: Map<string, Set<string>> = new Map();
+
+    /**
+     * @deprecated
+     */
     isEqual(date: CurrentCalendarData, next: CurrentCalendarData) {
         return (
             date?.year == next?.year &&
@@ -265,42 +307,69 @@ export default class CalendarHelper extends Events {
             date?.day == next?.day
         );
     }
+    /**
+     * Update the calendar object to a new calendar.
+     */
     update(calendar?: Calendar) {
-        this.object = calendar ?? this.object;
+        this.calendar = calendar ?? this.calendar;
         this.maxDays = Math.max(...this.data.months.map((m) => m.length));
 
         this.trigger("month-update");
         this.trigger("day-update");
     }
+    /**
+     * Alias for calendar categories.
+     */
+    get categories() {
+        return this.calendar.categories;
+    }
+    /**
+     * Alias for calendar static data.
+     */
     get data() {
-        return this.object.static;
+        return this.calendar.static;
     }
+    /**
+     * Alias for calendar current date.
+     */
     get current() {
-        return this.object.current;
+        return this.calendar.current;
     }
-
+    /**
+     * Alias for calendar leap days data.
+     */
     get leapdays() {
         return this.data.leapDays;
     }
 
+    /**
+     * Used to track currently displayed date on the calendar.
+     * Probably just need to track month and year... or a MonthHelper.
+     */
     displayed: CurrentCalendarData = {
         year: null,
         month: null,
         day: null
     };
-
+    /**
+     * Used to track current viewed date (day view) on the calendar.
+     * Probably just need to track a DayHelper.
+     */
     viewing: CurrentCalendarData = {
         year: null,
         month: null,
         day: null
     };
+    /**
+     * @deprecated MonthHelpers should use CalendarHelper.eventsForMonth and DayHelpers should use MonthHelper.getEventsOnDay
+     */
     getEventsOnDate(date: CurrentCalendarData) {
         //this is being called multiple times why
         if (this.map && this.map.size) {
             const hash = this.hash(date);
             const set = this.map.get(hash) ?? new Set();
             if (!set.size) return [];
-            const events = this.object.events.filter((e) => set.has(e.id));
+            const events = this.calendar.events.filter((e) => set.has(e.id));
             return [...events].sort((a, b) => {
                 if (!a.end) return 0;
                 if (!b.end) return -1;
@@ -314,7 +383,7 @@ export default class CalendarHelper extends Events {
                 );
             });
         }
-        const events = this.object.events.filter((e) => {
+        const events = this.calendar.events.filter((e) => {
             if (!e.date.day) return false;
             if (!e.end) {
                 e.end = { ...e.date };
@@ -350,17 +419,29 @@ export default class CalendarHelper extends Events {
         return events;
     }
 
+    /**
+     * Display string for current date.
+     */
     get currentDate() {
         return dateString(this.current, this.data.months);
     }
 
+    /**
+     * Display string for displayed date.
+     */
     get displayedDate() {
         return dateString(this.displayed, this.data.months);
     }
+    /**
+     * Display string for viewed date.
+     */
     get viewedDate() {
         return dateString(this.viewing, this.data.months);
     }
 
+    /**
+     * Reset a calendar to display current date.
+     */
     reset() {
         this.displayed = { ...this.current };
         this.viewing = { ...this.current };
@@ -369,12 +450,17 @@ export default class CalendarHelper extends Events {
         this.trigger("day-update");
     }
 
+    /**
+     * Set the current displayed month.
+     */
     setCurrentMonth(n: number) {
         this.displayed.month = n;
 
         this.trigger("month-update");
     }
-
+    /**
+     * Increment viewed day and overflow months and years as necessary.
+     */
     goToNextDay() {
         this.viewing.day += 1;
         const currentMonth = this.getMonth(
@@ -389,6 +475,9 @@ export default class CalendarHelper extends Events {
         }
         this.trigger("day-update");
     }
+    /**
+     * Increment current day and overflow months and years as necessary.
+     */
     goToNextCurrentDay() {
         this.current.day += 1;
         const currentMonth = this.getMonth(
@@ -405,16 +494,27 @@ export default class CalendarHelper extends Events {
         }
         this.trigger("day-update");
     }
-
+    /**
+     * Get the index of the next month to be displayed, wrapping as necessary.
+     */
     get nextMonthIndex() {
         return wrap(this.displayed.month + 1, this.data.months.length);
     }
+    /**
+     * Get the MonthHelper of the next month to be displayed.
+     */
     get nextMonth() {
         return this.getMonth(this.displayed.month + 1, this.displayed.year);
     }
+    /**
+     * Check if the calendar can increment year. Always returns true unless the calendar has custom years defined.
+     */
     canGoToNextYear(year = this.displayed.year) {
         return !this.data.useCustomYears || year < this.data.years.length;
     }
+    /**
+     * Go to the next month index. Used to change months on the calendar.
+     */
     goToNext() {
         if (this.nextMonthIndex < this.displayed.month) {
             if (!this.canGoToNextYear()) {
@@ -427,16 +527,28 @@ export default class CalendarHelper extends Events {
         }
         this.setCurrentMonth(this.nextMonthIndex);
     }
+    /**
+     * Go to the next year index. Used to change years on the calendar.
+     */
     goToNextYear() {
         this.displayed.year += 1;
         this.trigger("year-update");
     }
+    /**
+     * Get the index of the previous month to be displayed, wrapping as necessary.
+     */
     get prevMonthIndex() {
         return wrap(this.displayed.month - 1, this.data.months.length);
     }
+    /**
+     * Get the MonthHelper of the previous month to be displayed.
+     */
     get previousMonth() {
         return this.getMonth(this.displayed.month - 1, this.displayed.year);
     }
+    /**
+     * Go to the previous month index. Used to change months on the calendar.
+     */
     goToPrevious() {
         if (this.prevMonthIndex > this.displayed.month) {
             if (this.displayed.year == 1) {
@@ -447,6 +559,9 @@ export default class CalendarHelper extends Events {
         }
         this.setCurrentMonth(this.prevMonthIndex);
     }
+    /**
+     * Go to the viewed previous day. Used to change days on the day view.
+     */
     goToPreviousDay() {
         this.viewing.day -= 1;
         if (this.viewing.day < 1) {
@@ -457,17 +572,29 @@ export default class CalendarHelper extends Events {
         }
         this.trigger("day-update");
     }
+    /**
+     * Go to the previous year index. Used to change years on the calendar.
+     */
     goToPreviousYear() {
         this.displayed.year -= 1;
         this.trigger("year-update");
     }
+    /**
+     * Alias for calendar data weekdays.
+     */
     get weekdays() {
         return this.data.weekdays;
     }
+    /**
+     * Get the MonthHelper for the currently displayed month.
+     */
     get currentMonth() {
         return this.getMonth(this.displayed.month, this.displayed.year);
     }
 
+    /**
+     * Test if a leap day occurs in a given year.
+     */
     testLeapDay(leapday: LeapDay, year: number) {
         return leapday.interval
             .sort((a, b) => a.interval - b.interval)
@@ -489,12 +616,17 @@ export default class CalendarHelper extends Events {
                 return (year - leapday.offset ?? 0) % interval == 0;
             });
     }
+    /**
+     * Get all leapdays that occur in a given year.
+     */
     leapDaysForYear(year: number) {
         return this.leapdays.filter((l) => {
             return this.testLeapDay(l, year);
         });
     }
-
+    /**
+     * Get all leapdays that occur in a given month in a specific year.
+     */
     leapDaysForMonth(month: number, year = this.displayed.year) {
         return this.leapdays.filter((l) => {
             if (l.timespan != month) return false;
@@ -502,6 +634,13 @@ export default class CalendarHelper extends Events {
         });
     }
 
+    /**
+     * Get a MonthHelper for a month number in a specific year, wrapping the month number as necessary.
+     *
+     * Will prioritize pulling a MonthHelper from the cache.
+     *
+     * TODO: What is the intercalary behavior? Need to document this, because I can't remember.
+     */
     getMonth(number: number, year: number, direction: number = 0): MonthHelper {
         const months = this.data.months;
         let index = wrap(number, months.length);
@@ -527,19 +666,25 @@ export default class CalendarHelper extends Events {
         this._cache.set(year, this._cache.get(year).set(index, helper));
         return helper;
     }
-
+    /**
+     * Get the padded days for a given month.
+     *
+     * This is used to display the "overflowed" days from the previous and next month on the calendar.
+     *
+     * This has the side benefit of pre-caching the previous and next months, so they are built when switched to.
+     */
     getPaddedDaysForMonth(month: MonthHelper) {
         let current = month.days;
 
         /** Get Days of Previous Month */
         let previous: DayHelper[] = [];
 
+        const previousMonth = this.getMonth(
+            month.index - 1,
+            this.displayed.year,
+            -1
+        );
         if (month.firstWeekday > 0 && month.type == "month") {
-            const previousMonth = this.getMonth(
-                month.index - 1,
-                this.displayed.year,
-                -1
-            );
             previous =
                 previousMonth != null
                     ? previousMonth.days.slice(-month.firstWeekday)
@@ -548,15 +693,15 @@ export default class CalendarHelper extends Events {
 
         /** Get Days of Next Month */
         let next: DayHelper[] = [];
+        const nextMonth = this.getMonth(
+            month.index + 1,
+            this.displayed.year,
+            1
+        );
         if (
             month.lastWeekday < this.weekdays.length - 1 &&
             month.type == "month"
         ) {
-            const nextMonth = this.getMonth(
-                month.index + 1,
-                this.displayed.year,
-                1
-            );
             next = nextMonth.days.slice(
                 0,
                 this.weekdays.length - month.lastWeekday - 1
@@ -570,15 +715,15 @@ export default class CalendarHelper extends Events {
         };
     }
 
+    /**
+     * Alias for the padded days of the current month.
+     */
     get paddedDays() {
         return this.getPaddedDaysForMonth(this.currentMonth);
     }
 
     /**
-     *
      * Returns the rounded up number of weeks of the current month. Use to build calendar rows.
-     * @readonly
-     * @memberof Calendar
      */
     get weeksPerCurrentMonth() {
         return Math.ceil(
@@ -586,26 +731,34 @@ export default class CalendarHelper extends Events {
                 this.data.weekdays.length
         );
     }
+    /**
+     * Get the number of weeks in a given month.
+     */
     weeksOfMonth(month: MonthHelper) {
         return Math.ceil(
             (month.length + month.firstWeekday) / this.data.weekdays.length
         );
     }
+    /**
+     * Get the first week number of a given month.
+     *
+     * TODO: Figure out how to add in ISO spec compliance here.
+     */
     weekNumbersOfMonth(month: MonthHelper) {
         const daysBefore = month.daysBefore + this.firstDayOfYear(month.year);
         return Math.floor(daysBefore / this.data.weekdays.length);
     }
     /**
-     * Total number of days in a year.
-     *
-     * @readonly
-     * @memberof Calendar
+     * Total number of days in a year. Does not include leap days.
      */
     get daysPerYear() {
         return this.data.months
             .filter((m) => m.type === "month")
             .reduce((a, b) => a + b.length, 0);
     }
+    /**
+     * Get the total number of days in a year before a given month.
+     */
     daysBeforeMonth(month: number, year: number, all: boolean = false) {
         if (!month || month == 0) return 0;
 
@@ -615,7 +768,9 @@ export default class CalendarHelper extends Events {
             .map((m, i) => m.length + this.leapDaysForMonth(i, year).length)
             .reduce((a, b) => a + b, 0);
     }
-
+    /**
+     * Used to determine event sorting. Can remove.
+     */
     areDatesEqual(date: CurrentCalendarData, date2: CurrentCalendarData) {
         if (date.day != date2.day) return false;
         if (
@@ -652,10 +807,7 @@ export default class CalendarHelper extends Events {
     }
 
     /**
-     *
-     * Total number of leap days that have occured before this year.
-     * @readonly
-     * @memberof CalendarHelper
+     * Alias to get the total number of leap days that have occured before the currently displayed year.
      */
     get leapDaysBefore() {
         if (this.displayed.year == 1) return 0;
@@ -667,7 +819,7 @@ export default class CalendarHelper extends Events {
     leapDaysBeforeYear(tester: number) {
         /** If we're checking year 1, there are no leap days. */
         if (tester == 1) return 0;
-        /** Subtract 1 from tester. */
+        /** Subtract 1 from tester. We're looking for leap days BEFORE the year. */
         const year = tester - 1;
         let total = 0;
         /** Iterate over each leap day. */
@@ -708,17 +860,32 @@ export default class CalendarHelper extends Events {
         }
         return total;
     }
+    /**
+     * Alias to get the number of days before the currently displayed year, not including leap days.
+     *
+     * @deprecated
+     */
     get daysBefore() {
         return this.daysBeforeYear(this.displayed.year);
     }
+    /**
+     * Alias to get the total number of days before the currently displayed year.
+     */
     get totalDaysBefore() {
-        return this.daysBefore + this.leapDaysBefore;
+        return this.totalDaysBeforeYear(this.displayed.year);
     }
-
+    /**
+     * Alias to get the number of days before the a given year, not including leap days.
+     *
+     * @deprecated
+     */
     daysBeforeYear(year: number) {
         if (year < 1) return 0;
         return Math.abs(year - 1) * this.daysPerYear;
     }
+    /**
+     * Get the total number of days before a given year.
+     */
     totalDaysBeforeYear(year: number, all = false) {
         if (year < 1) return 0;
         return (
@@ -729,7 +896,9 @@ export default class CalendarHelper extends Events {
             this.leapDaysBeforeYear(year)
         );
     }
-
+    /**
+     * Get the weekday of a given year.
+     */
     firstDayOfYear(year = this.displayed.year) {
         if (!this.data.overflow) return 0;
         if (year == 1) return this.firstWeekday;
@@ -743,11 +912,18 @@ export default class CalendarHelper extends Events {
         );
     }
 
-    /** Moons */
+    /**
+     * Alias to get the moon data.
+     */
     get moons() {
         return this.data.moons;
     }
 
+    /**
+     * Get the moons and their phases for a given date.
+     *
+     * @deprecated MonthHelpers should use getMoonsForMonth, and DayHelpers should get moons from MonthHelpers.
+     */
     getMoonsForDate(date: CurrentCalendarData): Array<[Moon, Phase]> {
         const phases: Array<[Moon, Phase]> = [];
 
@@ -779,6 +955,9 @@ export default class CalendarHelper extends Events {
 
         return phases;
     }
+    /**
+     * Get the moons and their phases for a given month.
+     */
     getMoonsForMonth(month: MonthHelper): Array<[Moon, Phase]>[] {
         const phases: Array<[Moon, Phase]>[] = [];
 

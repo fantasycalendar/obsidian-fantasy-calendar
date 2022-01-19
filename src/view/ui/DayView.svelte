@@ -20,7 +20,7 @@
     $: day = calendar.getDayForDate(date);
     $: dayNumber = calendar.dayNumberForDate(date);
     $: moons = day.moons;
-    $: categories = calendar.object.categories;
+    $: categories = calendar.categories;
 
     let displayMoons: boolean;
     const moonStore = getContext<Writable<boolean>>("displayMoons");

@@ -22,7 +22,7 @@
         }
     }
     $: moons = day.moons;
-    $: categories = day.calendar.object.categories;
+    $: categories = day.calendar.categories;
     $: date = day.date;
     $: today = day.isCurrentDay;
     $: displaying = day.isDisplaying;
