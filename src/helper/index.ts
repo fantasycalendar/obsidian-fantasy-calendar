@@ -68,7 +68,7 @@ export class MonthHelper {
         if (!this.moons || !this.moons.length || this.shouldUpdateMoons) {
             this.moons = this.calendar.getMoonsForMonth(this);
         }
-        return this.moons[day.day];
+        return this.moons[day.day - 1];
     }
     constructor(
         public data: Month,
@@ -636,13 +636,6 @@ export default class CalendarHelper extends Events {
             current,
             next
         };
-    }
-
-    /**
-     * Alias for the padded days of the current month.
-     */
-    get paddedDays() {
-        return this.getPaddedDaysForMonth(this.currentMonth);
     }
 
     /**
