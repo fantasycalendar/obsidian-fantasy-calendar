@@ -140,11 +140,9 @@ export class DayHelper {
             this.calendar.displayed.month == this.calendar.viewing.month
         );
     }
-
-    shouldUpdateMoons = false;
     private _moons: Array<[Moon, Phase]>;
     get moons() {
-        if (!this._moons || !this._moons.length || this.shouldUpdateMoons) {
+        if (!this._moons || !this._moons.length) {
             this._moons = this.month.getMoonsForDay(this.date);
         }
         return this._moons;
