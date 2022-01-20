@@ -1,21 +1,13 @@
-import type { Moon, CurrentCalendarData } from "src/@types";
+import type { CurrentCalendarData, Moon, Phase } from "src/@types";
+import type APIDefinition from "src/@types/api";
 import CalendarHelper from "src/helper";
 import FantasyCalendar from "src/main";
-import type { Phase } from "src/utils/constants";
 
 import MoonUI from "../view/ui/Moon.svelte";
 
-export class API {
+export class API implements APIDefinition {
     constructor(private plugin: FantasyCalendar) {}
-    getMoons({
-        date,
-        name,
-        icon
-    }: {
-        date?: CurrentCalendarData;
-        name?: string;
-        icon?: boolean;
-    } = {}) {
+    getMoons(date?: CurrentCalendarData, name?: string) {
         const calendar = name
             ? this.plugin.data.calendars.find(
                   ({ name: c_name }) => c_name == name
@@ -27,9 +19,10 @@ export class API {
 
         const day = helper.getDayForDate(dateToGet);
 
-        let moons = [];
+        let moons: Array<{ icon: HTMLSpanElement; moon: Moon; phase: Phase }> =
+            [];
         for (const [moon, phase] of day.moons) {
-            const target = createDiv();
+            const target = createSpan();
             new MoonUI({
                 target,
                 props: {

@@ -17,6 +17,9 @@ Create fantasy calendars in Obsidian!
 <a href="#events-1">Events</a>
 </td>
 <td>
+<a href="#plugin-api">API</a>
+</td>
+<td>
 <a href="#settings">Settings</a>
 </td>
 </tr>
@@ -328,6 +331,26 @@ fc-date:        # Event will repeat on the 3rd day of the month of February of t
 ```
 
 Turning on the [Parse Note Titles for Dates](#parse-note-titles-for-dates) will make this field optional, if a date matching the format specified in [the date format](#date-format) setting is in the title.
+
+## Plugin API
+
+The plugin has an API that can be used to get information for the calendars that you have created. This allows you to, for example, easily use data from your calendar in DataviewJS!
+
+The full API can be referenced [here](./src/@types/api.d.ts).
+
+### Accessing the API
+
+The plugin must be retrieved from Obsidian's `App` interface to be used. The easiest way to do that is:
+
+```js
+const plugin = app.plugins.getPlugin("fantasy-calendar");
+```
+
+This will then allow you to access the Fantasy Calendar API:
+
+```js
+const api = plugin.api;
+```
 
 ## Settings
 
