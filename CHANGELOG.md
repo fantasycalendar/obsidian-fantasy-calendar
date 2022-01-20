@@ -13,6 +13,28 @@ All notable changes to this project will be documented in this file. See [standa
 * hashed events (partial) ([d8b7d33](https://github.com/valentine195/obsidian-fantasy-calendar/commit/d8b7d33ba1b8ea89df3c5f658675666d6807915f))
 
 ## [1.12.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.11.0...1.12.0) (2021-12-26)
+### [1.12.3](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.12.2...1.12.3) (2022-01-17)
+
+
+### Bug Fixes
+
+* partially improves calendar performance with a large number of events ([d0028c5](https://github.com/valentine195/obsidian-fantasy-calendar/commit/d0028c5eb46a921f4bf7418e6571083907ed86c1))
+
+### [1.12.2](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.12.1...1.12.2) (2022-01-15)
+
+
+### Bug Fixes
+
+* fix issue with creating a calendar from preset ([47fd7f8](https://github.com/valentine195/obsidian-fantasy-calendar/commit/47fd7f8d286f1ae67d2d83015ace2a3e99274d10))
+
+### [1.12.1](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.12.0...1.12.1) (2021-12-26)
+
+
+### Bug Fixes
+
+* fixed events not appearing on calendar ([32ff704](https://github.com/valentine195/obsidian-fantasy-calendar/commit/32ff7042b4d835c8d4774f774e002ae63131ed2b))
+
+## [1.12.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/1.11.0...1.12.0) (2021-12-25)
 
 
 ### Features

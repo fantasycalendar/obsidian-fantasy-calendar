@@ -4,9 +4,39 @@ Create fantasy calendars in Obsidian!
 
 ![](https://raw.githubusercontent.com/valentine195/obsidian-fantasy-calendar/master/assets/example.png)
 
+<table>
+<tbody>
+<tr>
+<td>
+<a href="#using-the-plugin">Using the Plugin</a>
+</td>
+<td>
+<a href="#creating-a-calendar">Creating a Calendar</a>
+</td>
+<td>
+<a href="#events-1">Events</a>
+</td>
+<td>
+<a href="#settings">Settings</a>
+</td>
+</tr>
+<tbody>
+</table>
+
 ## Using the plugin
 
 The plugin will add a calendar view to the right pane on startup. If a calendar view is not in the workspace, one can be added using the "Open Fantasy Calendar" or "Open Large Fantasy Calendar" commands.
+
+> **:pencil: Opening the plugin for the first time?**
+> 
+> The plugin does not come pre-loaded with any calendars. You have to create them yourself!
+> 
+> See [Creating a Calendar](#creating-a-calendar) and [Calendar Presets](#presets) for more info.
+
+> **:calendar: Using the plugin for the real world?**
+> 
+> The plugin's Gregorian Calendar [preset](#presets) is fully accurate!
+
 
 ### Large and small calendars
 

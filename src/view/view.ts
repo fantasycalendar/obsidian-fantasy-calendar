@@ -249,17 +249,11 @@ export default class FantasyCalendarView extends ItemView {
                 if (!this.full) {
                     menu.addItem((item) => {
                         item.setTitle("Open Day").onClick(() => {
-                            this.helper.viewing.day = day.number;
-                            this.helper.viewing.month =
-                                this.helper.displayed.month;
-                            this.helper.viewing.year =
-                                this.helper.displayed.year;
-
-                            this.yearView = false;
-
-                            this._app.$set({ yearView: false });
-                            this._app.$set({ dayView: true });
-                            this.triggerHelperEvent("day-update", false);
+                            this.openDay({
+                                day: day.number,
+                                month: this.helper.displayed.month,
+                                year: this.helper.displayed.year
+                            });
                         });
                     });
                 }
@@ -329,25 +323,7 @@ export default class FantasyCalendarView extends ItemView {
                 item.setTitle("View Day");
 
                 item.onClick(() => {
-                    const modal = new ChangeDateModal(
-                        this.plugin,
-                        this.calendar
-                    );
-                    modal.onClose = () => {
-                        if (!modal.confirmed) return;
-                        if (modal.setCurrent) {
-                            this.calendar.current = { ...modal.date };
-                            this.setCurrentCalendar(this.calendar);
-                        } else {
-                            this.helper.displayed = { ...modal.date };
-                            this.helper.update();
-                            this._app.$set({ calendar: this.helper });
-                        }
-
-                        this.plugin.saveSettings();
-                    };
-
-                    modal.open();
+                    this.openDate();
                 });
             });
             menu.addItem((item) => {
@@ -579,6 +555,37 @@ export default class FantasyCalendarView extends ItemView {
             this._app.$set({ dayView: true });
             this.triggerHelperEvent("day-update", false);
         });
+    }
+    openDay(date: CurrentCalendarData) {
+        this.helper.viewing.day = date.day;
+        this.helper.viewing.month = date.month;
+        this.helper.viewing.year = date.year;
+
+        this.yearView = false;
+
+        this._app.$set({ yearView: false });
+        this._app.$set({ dayView: true });
+        this.triggerHelperEvent("day-update", false);
+    }
+    openDate() {
+        if (!this.helper) return;
+        if (!this.calendar) return;
+        const modal = new ChangeDateModal(this.plugin, this.calendar);
+        modal.onClose = () => {
+            if (!modal.confirmed) return;
+            if (modal.setCurrent) {
+                this.calendar.current = { ...modal.date };
+                this.setCurrentCalendar(this.calendar);
+            } else {
+                this.helper.displayed = { ...modal.date };
+                this.helper.update();
+                this._app.$set({ calendar: this.helper });
+            }
+
+            this.plugin.saveSettings();
+        };
+
+        modal.open();
     }
     toggleMoons() {
         this.moons = !this.moons;

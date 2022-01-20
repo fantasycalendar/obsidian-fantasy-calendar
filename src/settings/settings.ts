@@ -1092,6 +1092,7 @@ export class CalendarPresetModal extends Modal {
             .setButtonText("Apply")
             .onClick(() => {
                 this.saved = true;
+                this.preset = copy(this.preset);
                 this.close();
             })
             .setCta();

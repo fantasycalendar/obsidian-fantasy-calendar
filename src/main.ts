@@ -188,13 +188,50 @@ export default class FantasyCalendar extends Plugin {
             id: "toggle-moons",
             name: "Toggle Moons",
             checkCallback: (checking) => {
-                const view =
-                    this.app.workspace.getActiveViewOfType(FantasyCalendarView);
-                if (view) {
+                const views = this.app.workspace.getLeavesOfType(VIEW_TYPE);
+                if (views && views.length) {
                     if (!checking) {
-                        view.toggleMoons();
+                        (views[0].view as FantasyCalendarView).toggleMoons();
                     }
                     return true;
+                }
+            }
+        });
+        this.addCommand({
+            id: "view-date",
+            name: "View Date",
+            checkCallback: (checking) => {
+                const views = this.app.workspace.getLeavesOfType(VIEW_TYPE);
+                if (views && views.length) {
+                    if (!checking) {
+                        (views[0].view as FantasyCalendarView).openDate();
+                    }
+                    return true;
+                }
+            }
+        });
+        this.addCommand({
+            id: "view-date",
+            name: "View Note Event",
+            checkCallback: (checking) => {
+                const views = this.app.workspace.getLeavesOfType(VIEW_TYPE);
+                if (
+                    views &&
+                    views.length &&
+                    views[0].view instanceof FantasyCalendarView
+                ) {
+                    const file = this.app.workspace.getActiveFile();
+                    if (file) {
+                        const event = views[0].view.calendar.events.find(
+                            (e) => e.note == file.path
+                        );
+                        if (event) {
+                            if (!checking) {
+                                views[0].view.openDay(event.date);
+                            }
+                            return true;
+                        }
+                    }
                 }
             }
         });
@@ -212,7 +249,7 @@ export default class FantasyCalendar extends Plugin {
     }
 
     async addCalendarView(startup: boolean = false) {
-        if (startup && this.app.workspace.getLeavesOfType(VIEW_TYPE).length)
+        if (startup && this.app.workspace.getLeavesOfType(VIEW_TYPE)?.length)
             return;
         await this.app.workspace.getRightLeaf(false).setViewState({
             type: VIEW_TYPE
@@ -220,7 +257,7 @@ export default class FantasyCalendar extends Plugin {
         if (this.view) this.app.workspace.revealLeaf(this.view.leaf);
     }
     async addFullCalendarView(startup: boolean = false) {
-        if (startup && this.app.workspace.getLeavesOfType(FULL_VIEW).length)
+        if (startup && this.app.workspace.getLeavesOfType(FULL_VIEW)?.length)
             return;
         this.app.workspace.getLeaf(false).setViewState({ type: FULL_VIEW });
         if (this.full) this.app.workspace.revealLeaf(this.full.leaf);
