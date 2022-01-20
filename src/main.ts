@@ -19,6 +19,7 @@ import FantasyCalendarView, {
 
 import "./main.css";
 import { CalendarEventTree, Watcher } from "./watcher/watcher";
+import { API } from "./api/api";
 
 declare module "obsidian" {
     interface Workspace {
@@ -96,6 +97,7 @@ export const DEFAULT_DATA: FantasyCalendarData = {
 };
 
 export default class FantasyCalendar extends Plugin {
+    api = new API(this);
     async addNewCalendar(calendar: Calendar) {
         this.data.calendars.push({ ...calendar });
         if (!this.data.defaultCalendar) {

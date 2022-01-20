@@ -810,6 +810,7 @@ export default class CalendarHelper extends Events {
         if (year == 1) return this.firstWeekday;
 
         //note: added 1 here to fix gregorian offset??
+        //TODO: Figure out why.
         return wrap(
             (this.totalDaysBeforeYear(year) % this.data.weekdays.length) +
                 this.firstWeekday +
@@ -826,6 +827,8 @@ export default class CalendarHelper extends Events {
     }
     /**
      * Get the moons and their phases for a given month.
+     *
+     * TODO: This seems to be a little off? +/- 1 day in Gregorian?
      */
     getMoonsForMonth(month: MonthHelper): Array<[Moon, Phase]>[] {
         const phases: Array<[Moon, Phase]>[] = [];
