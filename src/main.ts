@@ -46,6 +46,15 @@ declare module "obsidian" {
             source: string //source
         ): void;
     }
+    interface App {
+        plugins: {
+            getPlugin(plugin: "obsidian-timelines"): {
+                settings: {
+                    timelineTag: string;
+                };
+            };
+        };
+    }
 }
 
 export const MODIFIER_KEY = Platform.isMacOS ? "Meta" : "Control";
@@ -92,7 +101,8 @@ export const DEFAULT_DATA: FantasyCalendarData = {
         patch: null
     },
     supportTimelines: false,
-    timelineTag: "#timeline",
+    timelineTag: "timeline",
+    syncTimelines: true,
     autoParse: true
 };
 
@@ -118,6 +128,20 @@ export default class FantasyCalendar extends Plugin {
     }
     get dailyNotes() {
         return this.app.internalPlugins.getPluginById("daily-notes");
+    }
+    get canUseTimelines() {
+        return this.app.plugins.getPlugin("obsidian-timelines") != null;
+    }
+    get syncTimelines() {
+        return this.data.syncTimelines && this.canUseTimelines;
+    }
+    get timelineTag() {
+        if (this.syncTimelines) {
+            return this.app.plugins.getPlugin("obsidian-timelines").settings
+                .timelineTag;
+        } else {
+            return this.data.timelineTag;
+        }
     }
     get format() {
         return (

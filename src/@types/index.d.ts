@@ -32,6 +32,7 @@ export interface FantasyCalendarData {
     path: string;
     supportTimelines: boolean;
     timelineTag: string;
+    syncTimelines: boolean;
     autoParse: boolean;
 }
 
