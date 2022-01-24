@@ -118,14 +118,14 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
         containerEl.empty();
 
         new Setting(containerEl)
-            .setClass("fantasy-calendar-config")
             .setName(
                 createFragment((e) => {
+                    const span = e.createSpan("fantasy-calendar-warning");
                     setIcon(
-                        e.createSpan("fantasy-calendar-warning"),
+                        span.createSpan("fantasy-calendar-warning"),
                         "fantasy-calendar-warning"
                     );
-                    e.createSpan({ text: "Default Config Directory" });
+                    span.createSpan({ text: "Default Config Directory" });
                 })
             )
             .setDesc(
@@ -403,55 +403,6 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                 });
             });
         new Setting(containerEl)
-            .setName("Parse Note Titles for Event Dates")
-            .setDesc("The plugin will parse note titles for event dates.")
-            .addToggle((t) => {
-                t.setValue(this.data.parseDates).onChange((v) => {
-                    this.data.parseDates = v;
-                    this.plugin.saveSettings();
-                });
-            });
-        new Setting(containerEl)
-            .setName("Date Format")
-            .setClass(this.data.dailyNotes ? "daily-notes" : "no-daily-notes")
-            .setDesc(
-                createFragment((e) => {
-                    e.createSpan({
-                        text: "Dates will be parsed per this format."
-                    });
-                    e.createEl("br");
-                    e.createSpan({ text: "Dates must include the " });
-                    e.createEl("strong", { text: "full" });
-                    e.createSpan({ text: " year." });
-                })
-            )
-            .addText((t) => {
-                t.setDisabled(this.data.dailyNotes)
-                    .setValue(this.plugin.format)
-                    .onChange((v) => {
-                        this.data.dateFormat = v;
-                        this.plugin.saveSettings();
-                    });
-            })
-            .addExtraButton((b) => {
-                if (this.data.dailyNotes) {
-                    b.setIcon("checkmark")
-                        .setTooltip("Unlink from Daily Notes")
-                        .onClick(() => {
-                            this.data.dailyNotes = false;
-                            this.buildEvents(containerEl);
-                        });
-                } else {
-                    b.setIcon("sync")
-                        .setTooltip("Link with Daily Notes")
-                        .onClick(() => {
-                            this.data.dailyNotes = true;
-                            this.buildEvents(containerEl);
-                        });
-                }
-            });
-
-        new Setting(containerEl)
             .setName("Events Folder")
             .setDesc("The plugin will only watch for changes in this folder.")
             .addText((text) => {
@@ -477,6 +428,95 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                         : "/";
                     this.plugin.data.path = normalizePath(v);
                 };
+            });
+        new Setting(containerEl)
+            .setName("Parse Note Titles for Event Dates")
+            .setDesc("The plugin will parse note titles for event dates.")
+            .addToggle((t) => {
+                t.setValue(this.data.parseDates).onChange((v) => {
+                    this.data.parseDates = v;
+                    this.plugin.saveSettings();
+                });
+            });
+        new Setting(containerEl)
+            .setName("Date Format")
+            .setClass(this.data.dailyNotes ? "daily-notes" : "no-daily-notes")
+            .setDesc(
+                createFragment((e) => {
+                    e.createSpan({
+                        text: "Event dates will be parsed using this format."
+                    });
+                    e.createSpan({ text: "Only the " });
+                    e.createEl("code", { text: "Y" });
+                    e.createSpan({
+                        text: ", "
+                    });
+                    e.createEl("code", { text: "M" });
+                    e.createSpan({
+                        text: ", and "
+                    });
+                    e.createEl("code", { text: "D" });
+                    e.createEl("a", {
+                        text: "tokens",
+                        href: "https://momentjs.com/docs/#/displaying/format/",
+                        cls: "external-link"
+                    });
+                    e.createSpan({
+                        text: " are supported."
+                    });
+                    if (
+                        ["Y", "M", "D"].some(
+                            (token) => !this.data.dateFormat.includes(token)
+                        )
+                    ) {
+                        e.createEl("br");
+                        const span = e.createSpan({
+                            cls: "fantasy-calendar-warning date-format"
+                        });
+                        setIcon(
+                            span.createSpan("fantasy-calendar-warning"),
+                            "fantasy-calendar-warning"
+                        );
+                        let missing = ["Y", "M", "D"].filter(
+                            (token) => !this.data.dateFormat.includes(token)
+                        );
+                        span.createSpan({
+                            text: ` Date format is missing: ${missing
+                                .join(", ")
+                                .replace(/, ([^,]*)$/, " and $1")}`
+                        });
+                    }
+                })
+            )
+            .addText((t) => {
+                t.setDisabled(this.data.dailyNotes)
+                    .setValue(this.plugin.format)
+                    .onChange((v) => {
+                        this.data.dateFormat = v;
+                        this.plugin.saveSettings();
+                    });
+                t.inputEl.onblur = () => this.buildEvents(containerEl);
+            })
+            .addExtraButton((b) => {
+                if (!this.plugin.canUseDailyNotes) {
+                    b.extraSettingsEl.detach();
+                    return;
+                }
+                if (this.data.dailyNotes) {
+                    b.setIcon("checkmark")
+                        .setTooltip("Unlink from Daily Notes")
+                        .onClick(() => {
+                            this.data.dailyNotes = false;
+                            this.buildEvents(containerEl);
+                        });
+                } else {
+                    b.setIcon("sync")
+                        .setTooltip("Link with Daily Notes")
+                        .onClick(() => {
+                            this.data.dailyNotes = true;
+                            this.buildEvents(containerEl);
+                        });
+                }
             });
 
         new Setting(containerEl)

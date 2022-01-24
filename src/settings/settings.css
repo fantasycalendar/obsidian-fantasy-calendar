@@ -60,8 +60,12 @@
     cursor: not-allowed;
 }
 
+.fantasy-calendar-settings .fantasy-calendar-warning.date-format {
+    color: red;
+}
 .fantasy-calendar-settings .fantasy-calendar-warning {
     display: flex;
+    align-items: center;gap: 0.25rem
 }
 
 .fantasy-calendar-settings .existing-calendars {
