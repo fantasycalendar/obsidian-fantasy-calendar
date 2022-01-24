@@ -101,7 +101,7 @@ export const DEFAULT_DATA: FantasyCalendarData = {
         patch: null
     },
     supportTimelines: false,
-    timelineTag: "timeline",
+    timelineTag: "#timeline",
     syncTimelines: true,
     autoParse: true
 };
