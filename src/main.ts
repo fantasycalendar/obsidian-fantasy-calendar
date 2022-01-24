@@ -104,7 +104,11 @@ export const DEFAULT_DATA: FantasyCalendarData = {
     supportTimelines: false,
     timelineTag: "#timeline",
     syncTimelines: true,
-    autoParse: true
+    autoParse: true,
+    settingsToggleState: {
+        calendars: false,
+        events: false
+    }
 };
 
 export default class FantasyCalendar extends Plugin {

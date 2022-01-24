@@ -34,6 +34,10 @@ export interface FantasyCalendarData {
     timelineTag: string;
     syncTimelines: boolean;
     autoParse: boolean;
+    settingsToggleState: {
+        calendars: boolean;
+        events: boolean;
+    };
 }
 
 export interface TimeSpan {

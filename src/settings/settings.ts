@@ -79,8 +79,6 @@ addIcon(
 );
 
 export default class FantasyCalendarSettings extends PluginSettingTab {
-    calendarUI: HTMLDivElement;
-    infoEl: HTMLDivElement;
     get data() {
         return this.plugin.data;
     }
@@ -92,188 +90,41 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
         this.containerEl.createEl("h2", { text: "Fantasy Calendars" });
         this.containerEl.addClass("fantasy-calendar-settings");
 
-        this.infoEl = this.containerEl.createDiv();
-        this.buildInfo();
-
-        const importSetting = new Setting(this.containerEl)
-            .setName("Import Calendar")
-            .setDesc("Import calendar from ");
-        importSetting.descEl.createEl("a", {
-            href: "https://app.fantasy-calendar.com",
-            text: "Fantasy Calendar",
-            cls: "external-link"
-        });
-        const input = createEl("input", {
-            attr: {
-                type: "file",
-                name: "merge",
-                accept: ".json",
-                multiple: true,
-                style: "display: none;"
-            }
-        });
-        input.onchange = async () => {
-            const { files } = input;
-
-            if (!files.length) return;
-            try {
-                const data = [];
-                for (let file of Array.from(files)) {
-                    data.push(JSON.parse(await file.text()));
+        this.buildInfo(
+            this.containerEl.createDiv("fantasy-calendar-nested-settings")
+        );
+        this.buildCalendars(
+            this.containerEl.createEl("details", {
+                cls: "fantasy-calendar-nested-settings",
+                attr: {
+                    ...(this.data.settingsToggleState.calendars
+                        ? { open: `open` }
+                        : {})
                 }
-                const calendars = Importer.import(data);
-                this.plugin.data.calendars.push(...calendars);
-                await this.plugin.saveCalendar();
-                this.buildCalendarUI();
-            } catch (e) {
-                new Notice(
-                    `There was an error while importing the calendar${
-                        files.length == 1 ? "" : "s"
-                    }.`
-                );
-                console.error(e);
-            }
-
-            input.value = null;
-        };
-        importSetting.addButton((b) => {
-            b.setButtonText("Choose Files");
-            b.buttonEl.addClass("calendar-file-upload");
-            b.buttonEl.appendChild(input);
-            b.onClick(() => input.click());
-        });
-
-        this.calendarUI = this.containerEl.createDiv("fantasy-calendars");
-
-        this.buildCalendarUI();
-    }
-    buildInfo() {
-        this.infoEl.empty();
-        new Setting(this.infoEl)
-            .setName("Default Calendar to Open")
-            .setDesc("Views will open to this calendar by default.")
-            .addDropdown((d) => {
-                d.addOption("none", "None");
-                for (let calendar of this.data.calendars) {
-                    d.addOption(calendar.id, calendar.name);
-                }
-                d.setValue(this.plugin.data.defaultCalendar);
-                d.onChange((v) => {
-                    if (v === "none") {
-                        this.plugin.data.defaultCalendar = null;
-                        this.plugin.saveSettings();
-                        return;
-                    }
-
-                    this.plugin.data.defaultCalendar = v;
-                    this.plugin.saveSettings();
-                });
-            });
-
-        new Setting(this.infoEl)
-            .setName("Display Event Previews")
-            .setDesc(
-                "Use the core Note Preview plugin to display event notes when hovered."
-            )
-            .addToggle((t) => {
-                t.setValue(this.data.eventPreview).onChange((v) => {
-                    this.data.eventPreview = v;
-                    this.plugin.saveSettings();
-                });
-            });
-        new Setting(this.infoEl)
-            .setName("Automatically Parse for Events")
-            .setDesc(
-                "The plugin will automatically parse files in the vault for events."
-            )
-            .addToggle((t) => {
-                t.setValue(this.data.autoParse).onChange((v) => {
-                    this.data.autoParse = v;
-                    this.plugin.saveSettings();
-                });
-            });
-        new Setting(this.infoEl)
-            .setName("Parse Note Titles for Dates")
-            .setDesc("The plugin will parse note titles for event dates.")
-            .addToggle((t) => {
-                t.setValue(this.data.parseDates).onChange((v) => {
-                    this.data.parseDates = v;
-                    this.plugin.saveSettings();
-                });
-            });
-        new Setting(this.infoEl)
-            .setName("Date format")
-            .setClass(this.data.dailyNotes ? "daily-notes" : "no-daily-notes")
-            .setDesc(
-                createFragment((e) => {
-                    e.createSpan({
-                        text: "Dates will be parsed per this format."
-                    });
-                    e.createEl("br");
-                    e.createSpan({ text: "Dates must include the " });
-                    e.createEl("strong", { text: "full " });
-                    e.createSpan({ text: "year." });
-                })
-            )
-            .addText((t) => {
-                t.setDisabled(this.data.dailyNotes)
-                    .setValue(this.plugin.format)
-                    .onChange((v) => {
-                        this.data.dateFormat = v;
-                        this.plugin.saveSettings();
-                    });
             })
-            .addExtraButton((b) => {
-                if (this.data.dailyNotes) {
-                    b.setIcon("checkmark")
-                        .setTooltip("Unlink from Daily Notes")
-                        .onClick(() => {
-                            this.data.dailyNotes = false;
-                            this.buildInfo();
-                        });
-                } else {
-                    b.setIcon("paper-plane-glyph")
-                        .setTooltip("Link with Daily Notes")
-                        .onClick(() => {
-                            this.data.dailyNotes = true;
-                            this.buildInfo();
-                        });
+        );
+        this.buildEvents(
+            this.containerEl.createEl("details", {
+                cls: "fantasy-calendar-nested-settings",
+                attr: {
+                    ...(this.data.settingsToggleState.events
+                        ? { open: `open` }
+                        : {})
                 }
-            });
+            })
+        );
+    }
+    buildInfo(containerEl: HTMLElement) {
+        containerEl.empty();
 
-        new Setting(this.infoEl)
-            .setName("Folder to Watch")
-            .setDesc("The plugin will only watch for changes in this folder.")
-            .addText((text) => {
-                let folders = this.app.vault
-                    .getAllLoadedFiles()
-                    .filter((f) => f instanceof TFolder);
-
-                text.setPlaceholder(this.plugin.data.path ?? "/");
-                const modal = new FolderSuggestionModal(this.app, text, [
-                    ...(folders as TFolder[])
-                ]);
-
-                modal.onClose = async () => {
-                    const v = text.inputEl.value?.trim()
-                        ? text.inputEl.value.trim()
-                        : "/";
-                    this.plugin.data.path = normalizePath(v);
-                };
-
-                text.inputEl.onblur = async () => {
-                    const v = text.inputEl.value?.trim()
-                        ? text.inputEl.value.trim()
-                        : "/";
-                    this.plugin.data.path = normalizePath(v);
-                };
-            });
-
-        new Setting(this.infoEl)
+        new Setting(containerEl)
             .setClass("fantasy-calendar-config")
             .setName(
                 createFragment((e) => {
-                    setIcon(e.createSpan(), "fantasy-calendar-warning");
+                    setIcon(
+                        e.createSpan("fantasy-calendar-warning"),
+                        "fantasy-calendar-warning"
+                    );
                     e.createSpan({ text: "Default Config Directory" });
                 })
             )
@@ -336,47 +187,104 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
             })
             .addExtraButton((b) => {
                 b.setTooltip("Reset to Default")
-                    .setIcon("undo-glyph")
+                    .setIcon("reset")
                     .onClick(async () => {
                         this.data.configDirectory = null;
                         await this.plugin.saveSettings();
                         this.display();
                     });
             });
-        
-        new Setting(this.infoEl)
-            .setName("Support Timelines data")
-            .setDesc(
-                "Support <span> elements used by the Obsidian Timelines plugin (by Darakah)."
-            )
-            .addToggle((t) => {
-                t.setValue(this.data.supportTimelines).onChange((v) => {
-                    this.data.supportTimelines = v;
+    }
+    buildCalendars(containerEl: HTMLDetailsElement) {
+        containerEl.empty();
+        containerEl.ontoggle = () => {
+            this.data.settingsToggleState.calendars = containerEl.open;
+        };
+        const summary = containerEl.createEl("summary");
+        new Setting(summary).setHeading().setName("Calendar Management");
+
+        summary.createDiv("collapser").createDiv("handle");
+
+        new Setting(containerEl)
+            .setName("Default Calendar")
+            .setDesc("Views will open to this calendar by default.")
+            .addDropdown((d) => {
+                d.addOption("none", "None");
+                for (let calendar of this.data.calendars) {
+                    d.addOption(calendar.id, calendar.name);
+                }
+                d.setValue(this.plugin.data.defaultCalendar);
+                d.onChange((v) => {
+                    if (v === "none") {
+                        this.plugin.data.defaultCalendar = null;
+                        this.plugin.saveSettings();
+                        return;
+                    }
+
+                    this.plugin.data.defaultCalendar = v;
                     this.plugin.saveSettings();
                 });
             });
-            
-        new Setting(this.infoEl)
-            .setName('Default tag marking pages containing Timelines data')
-            .setDesc("Tag to specify which notes to include in created timelines e.g. timeline to use the #timeline tag")
-            .addText(text => text
-                .setPlaceholder('timeline')
-                .setValue(this.data.timelineTag.replace('#', ''))
-                .onChange((v) => {
-                    this.data.timelineTag = v.startsWith('#') ? v : `#${v}`;
-                    this.plugin.saveSettings();
-                }));
-    }
-    buildCalendarUI() {
-        this.calendarUI.empty();
+        new Setting(containerEl)
+            .setName("Import Calendar")
+            .setDesc(
+                createFragment((e) => {
+                    e.createSpan({
+                        text: "Import calendar from "
+                    });
+                    e.createEl("a", {
+                        href: "https://app.fantasy-calendar.com",
+                        text: "Fantasy Calendar",
+                        cls: "external-link"
+                    });
+                })
+            )
+            .addButton((b) => {
+                const input = createEl("input", {
+                    attr: {
+                        type: "file",
+                        name: "merge",
+                        accept: ".json",
+                        multiple: true,
+                        style: "display: none;"
+                    }
+                });
+                input.onchange = async () => {
+                    const { files } = input;
 
-        new Setting(this.calendarUI)
-            .setHeading()
-            .setName("Add New Calendar")
+                    if (!files.length) return;
+                    try {
+                        const data = [];
+                        for (let file of Array.from(files)) {
+                            data.push(JSON.parse(await file.text()));
+                        }
+                        const calendars = Importer.import(data);
+                        this.plugin.data.calendars.push(...calendars);
+                        await this.plugin.saveCalendar();
+                        this.showCalendars(existing);
+                    } catch (e) {
+                        new Notice(
+                            `There was an error while importing the calendar${
+                                files.length == 1 ? "" : "s"
+                            }.`
+                        );
+                        console.error(e);
+                    }
+
+                    input.value = null;
+                };
+                b.setButtonText("Choose Files");
+                b.buttonEl.addClass("calendar-file-upload");
+                b.buttonEl.appendChild(input);
+                b.onClick(() => input.click());
+            });
+
+        new Setting(containerEl)
+            .setName("Create New Calendar")
             .addButton((button: ButtonComponent) =>
                 button
-                    .setTooltip("Add Calendar")
-                    .setButtonText("+")
+                    .setTooltip("Launch Calendar Creator")
+                    .setIcon("plus-with-circle")
                     .onClick(() => {
                         const modal = new CreateCalendarModal(this.plugin);
                         modal.onClose = async () => {
@@ -393,7 +301,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                     })
             );
 
-        const existing = this.calendarUI.createDiv("existing-calendars");
+        const existing = containerEl.createDiv("existing-calendars");
 
         this.showCalendars(existing);
     }
@@ -452,11 +360,191 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                             );
                         await this.plugin.saveCalendar();
 
-                        this.buildInfo();
-                        this.showCalendars(element);
+                        if (calendar.name == this.plugin.data.defaultCalendar) {
+                            this.display();
+                        } else {
+                            this.showCalendars(element);
+                        }
                     });
                 });
         }
+    }
+
+    buildEvents(containerEl: HTMLDetailsElement) {
+        containerEl.empty();
+        containerEl.ontoggle = () => {
+            this.data.settingsToggleState.events = containerEl.open;
+        };
+        const summary = containerEl.createEl("summary");
+        new Setting(summary).setHeading().setName("Events");
+
+        summary.createDiv("collapser").createDiv("handle");
+
+        new Setting(containerEl)
+            .setName("Display Event Previews")
+            .setDesc(
+                "Use the core Note Preview plugin to display event notes when hovered."
+            )
+            .addToggle((t) => {
+                t.setValue(this.data.eventPreview).onChange((v) => {
+                    this.data.eventPreview = v;
+                    this.plugin.saveSettings();
+                });
+            });
+        new Setting(containerEl)
+            .setName("Automatically Parse for Events")
+            .setDesc(
+                "The plugin will automatically parse files in the vault for events."
+            )
+            .addToggle((t) => {
+                t.setValue(this.data.autoParse).onChange((v) => {
+                    this.data.autoParse = v;
+                    this.plugin.saveSettings();
+                });
+            });
+        new Setting(containerEl)
+            .setName("Parse Note Titles for Event Dates")
+            .setDesc("The plugin will parse note titles for event dates.")
+            .addToggle((t) => {
+                t.setValue(this.data.parseDates).onChange((v) => {
+                    this.data.parseDates = v;
+                    this.plugin.saveSettings();
+                });
+            });
+        new Setting(containerEl)
+            .setName("Date Format")
+            .setClass(this.data.dailyNotes ? "daily-notes" : "no-daily-notes")
+            .setDesc(
+                createFragment((e) => {
+                    e.createSpan({
+                        text: "Dates will be parsed per this format."
+                    });
+                    e.createEl("br");
+                    e.createSpan({ text: "Dates must include the " });
+                    e.createEl("strong", { text: "full" });
+                    e.createSpan({ text: " year." });
+                })
+            )
+            .addText((t) => {
+                t.setDisabled(this.data.dailyNotes)
+                    .setValue(this.plugin.format)
+                    .onChange((v) => {
+                        this.data.dateFormat = v;
+                        this.plugin.saveSettings();
+                    });
+            })
+            .addExtraButton((b) => {
+                if (this.data.dailyNotes) {
+                    b.setIcon("checkmark")
+                        .setTooltip("Unlink from Daily Notes")
+                        .onClick(() => {
+                            this.data.dailyNotes = false;
+                            this.buildEvents(containerEl);
+                        });
+                } else {
+                    b.setIcon("sync")
+                        .setTooltip("Link with Daily Notes")
+                        .onClick(() => {
+                            this.data.dailyNotes = true;
+                            this.buildEvents(containerEl);
+                        });
+                }
+            });
+
+        new Setting(containerEl)
+            .setName("Events Folder")
+            .setDesc("The plugin will only watch for changes in this folder.")
+            .addText((text) => {
+                let folders = this.app.vault
+                    .getAllLoadedFiles()
+                    .filter((f) => f instanceof TFolder);
+
+                text.setPlaceholder(this.plugin.data.path ?? "/");
+                const modal = new FolderSuggestionModal(this.app, text, [
+                    ...(folders as TFolder[])
+                ]);
+
+                modal.onClose = async () => {
+                    const v = text.inputEl.value?.trim()
+                        ? text.inputEl.value.trim()
+                        : "/";
+                    this.plugin.data.path = normalizePath(v);
+                };
+
+                text.inputEl.onblur = async () => {
+                    const v = text.inputEl.value?.trim()
+                        ? text.inputEl.value.trim()
+                        : "/";
+                    this.plugin.data.path = normalizePath(v);
+                };
+            });
+
+        new Setting(containerEl)
+            .setName("Support Timelines Events")
+            .setDesc(
+                createFragment((e) => {
+                    e.createSpan({
+                        text: "Support <span> elements used by the "
+                    });
+                    e.createEl("a", {
+                        text: "Obsidian Timelines",
+                        href: "obsidian://show-plugin?id=obsidian-timelines"
+                    });
+                    e.createSpan({
+                        text: " plugin (by Darakah)."
+                    });
+                })
+            )
+            .addToggle((t) => {
+                t.setValue(this.data.supportTimelines).onChange((v) => {
+                    this.data.supportTimelines = v;
+                    this.plugin.saveSettings();
+                });
+            });
+
+        new Setting(containerEl)
+            .setName("Default tag marking pages containing Timelines data")
+            .setDesc(
+                "Tag to specify which notes to include in created timelines e.g. timeline to use the #timeline tag"
+            )
+            .addText((text) =>
+                text
+                    .setPlaceholder(this.data.timelineTag)
+                    .setValue(this.data.timelineTag.replace("#", ""))
+                    .setDisabled(this.plugin.syncTimelines)
+                    .onChange((v) => {
+                        this.data.timelineTag = v.startsWith("#") ? v : `#${v}`;
+                        this.plugin.saveSettings();
+                    })
+            )
+            .addExtraButton((b) => {
+                if (!this.plugin.canUseTimelines) {
+                    this.data.syncTimelines = false;
+                    b.extraSettingsEl.detach();
+                    return;
+                }
+                if (this.data.syncTimelines) {
+                    b.setIcon("checkmark")
+                        .setTooltip("Unsync from Timelines Plugin")
+                        .onClick(async () => {
+                            this.data.syncTimelines = false;
+                            await this.plugin.saveSettings();
+                            this.buildEvents(containerEl);
+                        });
+                } else {
+                    b.setIcon("sync")
+                        .setTooltip("Sync with Timelines Plugin")
+                        .onClick(async () => {
+                            this.data.syncTimelines = true;
+                            this.data.timelineTag =
+                                this.plugin.app.plugins.getPlugin(
+                                    "obsidian-timelines"
+                                ).settings.timelineTag;
+                            await this.plugin.saveSettings();
+                            this.buildEvents(containerEl);
+                        });
+                }
+            });
     }
 }
 
