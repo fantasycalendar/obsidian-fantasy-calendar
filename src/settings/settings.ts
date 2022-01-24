@@ -21,6 +21,8 @@ import type FantasyCalendar from "../main";
 import Importer from "./import/importer";
 import { PRESET_CALENDARS } from "../utils/presets";
 
+import CalendarCreator from "./creator/Creator.svelte";
+
 import Weekdays from "./ui/Weekdays.svelte";
 import Months from "./ui/Months.svelte";
 import EventsUI from "./ui/Events.svelte";
@@ -286,7 +288,8 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                     .setTooltip("Launch Calendar Creator")
                     .setIcon("plus-with-circle")
                     .onClick(() => {
-                        const modal = new CreateCalendarModal(this.plugin);
+                        this.launchCalendarCreator();
+                        /* const modal = new CreateCalendarModal(this.plugin);
                         modal.onClose = async () => {
                             if (!modal.saved) return;
                             const calendar = copy(modal.calendar);
@@ -297,7 +300,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
 
                             this.showCalendars(existing);
                         };
-                        modal.open();
+                        modal.open(); */
                     })
             );
 
@@ -585,6 +588,23 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                         });
                 }
             });
+    }
+
+    launchCalendarCreator(calendar?: Calendar) {
+        this.containerEl.empty();
+        const $app = new CalendarCreator({
+            target: this.containerEl,
+            props: {
+                calendar,
+                plugin: this.plugin
+            }
+        });
+        $app.$on("flown", () => {
+            /*  */
+        });
+        $app.$on("exit", () => {
+            this.display();
+        });
     }
 }
 

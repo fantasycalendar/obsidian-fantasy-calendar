@@ -6,6 +6,9 @@
 }
 
 /** Details */
+.fantasy-calendar-settings {
+    position: relative;
+}
 
 .fantasy-calendar-settings details > summary {
     outline: none;
@@ -65,7 +68,8 @@
 }
 .fantasy-calendar-settings .fantasy-calendar-warning {
     display: flex;
-    align-items: center;gap: 0.25rem
+    align-items: center;
+    gap: 0.25rem;
 }
 
 .fantasy-calendar-settings .existing-calendars {
