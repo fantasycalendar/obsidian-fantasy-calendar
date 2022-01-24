@@ -589,7 +589,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
 }
 
 class CreateCalendarModal extends Modal {
-    calendar: Calendar = { ...DEFAULT_CALENDAR };
+    calendar: Calendar = copy(DEFAULT_CALENDAR);
     saved: boolean = false;
     editing: boolean = false;
     weekdayEl: any;
