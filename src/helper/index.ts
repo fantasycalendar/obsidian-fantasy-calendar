@@ -241,7 +241,6 @@ export default class CalendarHelper extends Events {
                 "fantasy-calendars-event-update",
                 (tree) => {
                     if (!tree.has(this.calendar.id)) return;
-                    console.log(tree);
 
                     const years = tree.get(this.calendar.id);
 
