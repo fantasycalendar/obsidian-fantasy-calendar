@@ -20,6 +20,7 @@ import FantasyCalendarView, {
 import "./main.css";
 import { CalendarEventTree, Watcher } from "./watcher/watcher";
 import { API } from "./api/api";
+import copy from "fast-copy";
 
 declare module "obsidian" {
     interface Workspace {
@@ -288,7 +289,7 @@ export default class FantasyCalendar extends Plugin {
     }
     async loadSettings() {
         this.data = {
-            ...DEFAULT_DATA,
+            ...copy(DEFAULT_DATA),
             ...(await this.loadData())
         };
         if (
