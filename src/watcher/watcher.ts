@@ -160,7 +160,6 @@ export class Watcher extends Component {
 
                     const calendar = this.calendars.find((c) => c.id == id);
                     if (!calendar) return;
-                    console.log(index);
                     calendar.events.splice(index, index >= 0 ? 1 : 0, event);
 
                     this.addToTree(calendar, event);
@@ -180,7 +179,6 @@ export class Watcher extends Component {
                         "fantasy-calendars-event-update",
                         this.tree
                     );
-                    console.log(this.tree);
                     this.tree = new Map();
                     await this.plugin.saveCalendar();
                 }
