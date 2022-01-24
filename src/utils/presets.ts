@@ -4,7 +4,7 @@ export const PRESET_CALENDARS: Calendar[] = [
     {
         name: "Gregorian Calendar",
         description:
-            "A calendar for the real world. Note: May not be 100% accurate.",
+            "A calendar for the real world.",
         static: {
             displayDayNumber: false,
             incrementDay: true,
