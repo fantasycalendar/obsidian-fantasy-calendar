@@ -12,6 +12,7 @@
     import { writable, Writable } from "svelte/store";
     import Info from "./Info.svelte";
     import DateFields from "./DateFields.svelte";
+    import Weekdays from "./Weekdays.svelte";
 
     let ready = false;
     let width: number;
@@ -79,13 +80,18 @@
                 <h3>Calendar Creator</h3>
                 <div use:preset />
             </div>
-            <DateFields {calendar} />
             <Details name={"Basic Info"}>
                 <Info />
             </Details>
-            <Details name={"Weekdays"} />
+            <Details name={"Weekdays"}>
+                <Weekdays />
+            </Details>
             <Details name={"Months"} />
             <Details name={"Years"} />
+
+            <Details name={"Current Date"}>
+                <DateFields {calendar} />
+            </Details>
             <Details name={"Events"} />
             <Details name={"Categories"} />
             <Details name={"Moons"} />
