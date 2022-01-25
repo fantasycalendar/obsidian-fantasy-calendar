@@ -9,7 +9,7 @@
         Setting,
         TextComponent
     } from "obsidian";
-    import type { Day } from "src/@types";
+    import type { Calendar, Day } from "src/@types";
 
     import { nanoid } from "src/utils/functions";
     import { getDetachedSetting } from "../utils";
@@ -28,32 +28,6 @@
                 () => (weekdays = weekdays.filter((day) => day.id !== item.id))
             );
     };
-
-    const name = (node: HTMLElement, item: Day) => {
-        const comp = new TextComponent(node)
-            .setValue(item.name)
-            .setPlaceholder("Name")
-            .onChange((v) => {
-                item.name = v;
-                dispatch("weekday-update", weekdays);
-                weekdays = weekdays;
-            })
-            .inputEl.setAttr("style", "width: 100%;");
-    };
-
-    const overflowNode = (node: HTMLElement) => {
-        getDetachedSetting(node)
-            .setName("Overflow Weeks")
-            .setDesc(
-                "Turn this off to make each month start on the first of the week."
-            )
-            .addToggle((t) => {
-                t.setValue(overflow).onChange((v) => {
-                    overflow = v;
-                });
-            });
-    };
-
     function startDrag(e: Event) {
         e.preventDefault();
         dragDisabled = false;
@@ -84,12 +58,38 @@
         }
     }
 
-    const dispatch = createEventDispatcher();
+    const name = (node: HTMLElement, item: Day) => {
+        new TextComponent(node)
+            .setValue(item.name)
+            .setPlaceholder("Name")
+            .onChange((v) => {
+                item.name = v;
+                dispatch("weekday-update", weekdays);
+                weekdays = weekdays;
+            })
+            .inputEl.setAttr("style", "width: 100%;");
+    };
 
-    export let weekdays: Day[] = [];
+    const overflowNode = (node: HTMLElement) => {
+        getDetachedSetting(node)
+            .setName("Overflow Weeks")
+            .setDesc(
+                "Turn this off to make each month start on the first of the week."
+            )
+            .addToggle((t) => {
+                t.setValue(overflow).onChange((v) => {
+                    overflow = v;
+                });
+            });
+    };
+
+    const dispatch = createEventDispatcher();
+    export let calendar: Calendar;
+
+    $: weekdays = calendar.static.weekdays;
+
     $: {
         dispatch("weekday-update", weekdays);
-        //TODO: add new days to dropdown, remove removed days from dropdown
     }
 
     $: {
@@ -105,7 +105,7 @@
             .setTooltip("Add New")
             .setButtonText("+")
             .onClick(async () => {
-                weekdays = [
+                calendar.static.weekdays = [
                     ...weekdays,
                     {
                         type: "day",
@@ -120,35 +120,33 @@
 <div>
     <div class="overflow" use:overflowNode />
 </div>
-{#if weekdays.length}
-    <div class="setting-item">
-        <div class="setting-item-info">
-            <div class="setting-item-name">First Day</div>
-            <div class="setting-item-description">
-                This only effects which day of the week the first year starts
-                on.
-            </div>
-        </div>
-        <div class="setting-item-control">
-            <select
-                class="dropdown"
-                bind:value={firstWeekday}
-                aria-label={!overflow
-                    ? "Cannot be modified without overflow."
-                    : undefined}
-            >
-                {#each weekdays as weekday, index}
-                    <option
-                        disabled={!overflow}
-                        value={index}
-                        selected={index == firstWeekday}
-                        >{weekday.name ?? ""}</option
-                    >
-                {/each}
-            </select>
+<div class="setting-item">
+    <div class="setting-item-info">
+        <div class="setting-item-name">First Day</div>
+        <div class="setting-item-description">
+            The first day of the first year.
         </div>
     </div>
-{/if}
+    <div class="setting-item-control">
+        <select
+            class="dropdown"
+            bind:value={firstWeekday}
+            aria-label={!overflow
+                ? "Cannot be modified without overflow."
+                : undefined}
+        >
+            {#each weekdays as weekday, index}
+                <option
+                    disabled={!overflow}
+                    value={index}
+                    selected={index == firstWeekday}
+                    >{weekday.name ?? ""}</option
+                >
+            {/each}
+        </select>
+    </div>
+</div>
+
 <div>
     <div class="add-new" use:add />
 </div>

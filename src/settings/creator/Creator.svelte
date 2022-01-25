@@ -25,6 +25,8 @@
     const dispatch = createEventDispatcher();
 
     export let calendar: Calendar = copy(DEFAULT_CALENDAR);
+    console.log("🚀 ~ file: Creator.svelte ~ line 28 ~ calendar", calendar);
+    window.calendar = calendar;
     export let plugin: FantasyCalendar;
 
     const store: Writable<Calendar> = writable(calendar);
@@ -84,7 +86,7 @@
                 <Info />
             </Details>
             <Details name={"Weekdays"}>
-                <Weekdays />
+                <Weekdays {calendar} />
             </Details>
             <Details name={"Months"} />
             <Details name={"Years"} />
