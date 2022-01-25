@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { DropdownComponent, TextComponent } from "obsidian";
+    import { DropdownComponent, Setting, TextComponent } from "obsidian";
 
     import type { Calendar } from "src/@types";
 
@@ -21,15 +21,21 @@
     };
 </script>
 
-<div class="fantasy-calendar-date-field">
-    <div use:day />
-    <div use:month />
-    <div use:year />
+<div class="fantasy-calendar-date-field-container setting-item">
+    <div class="fantasy-calendar-date-field" use:day />
+    <div class="fantasy-calendar-date-field" use:month />
+    <div class="fantasy-calendar-date-field" use:year />
 </div>
 
 <style>
+    .fantasy-calendar-date-field-container {
+        display: flex;
+        gap: 1rem;
+        border: 0;
+    }
     .fantasy-calendar-date-field {
-        display: grid;
-        grid-template-columns: 33% 33% 33%;
+        display: flex;
+        flex-flow: column nowrap;
+        flex: 1 1 0;
     }
 </style>

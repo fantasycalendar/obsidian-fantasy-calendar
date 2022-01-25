@@ -5,6 +5,7 @@
 
     import { getContext } from "svelte";
     import { Writable } from "svelte/store";
+    import { getDetachedSetting } from "../utils";
 
     const store = getContext<Writable<Calendar>>("store");
     let calendar: Calendar;
@@ -13,12 +14,11 @@
     });
 
     const name = (containerEl: HTMLElement) => {
-        new Setting(containerEl.parentElement)
+        getDetachedSetting(containerEl)
             .setName("Calendar Name")
             .addText((t) => {
                 t.setValue(calendar.name).onChange((v) => (calendar.name = v));
             });
-        containerEl.detach();
     };
     const desc = (containerEl: HTMLElement) => {
         new TextAreaComponent(containerEl)
@@ -29,17 +29,16 @@
             });
     };
     const displayDayNumber = (containerEl: HTMLElement) => {
-        new Setting(containerEl.parentElement)
+        getDetachedSetting(containerEl)
             .setName("Display Day Number")
             .addToggle((t) => {
                 t.setValue(calendar.static.displayDayNumber).onChange((v) => {
                     calendar.static.displayDayNumber = v;
                 });
             });
-        containerEl.detach();
     };
     const incrementDay = (containerEl: HTMLElement) => {
-        new Setting(containerEl.parentElement)
+        getDetachedSetting(containerEl)
             .setName("Auto Increment Day")
             .setDesc("Automatically increment the calendar day every real day.")
             .addToggle((t) => {
@@ -47,7 +46,6 @@
                     calendar.static.incrementDay = v;
                 });
             });
-        containerEl.detach();
     };
 </script>
 
