@@ -11,6 +11,7 @@
     import Details from "./Details.svelte";
     import { writable, Writable } from "svelte/store";
     import Info from "./Info.svelte";
+    import DateFields from "./DateFields.svelte";
 
     let ready = false;
     let width: number;
@@ -78,6 +79,7 @@
                 <h3>Calendar Creator</h3>
                 <div use:preset />
             </div>
+            <DateFields {calendar} />
             <Details name={"Basic Info"}>
                 <Info />
             </Details>
