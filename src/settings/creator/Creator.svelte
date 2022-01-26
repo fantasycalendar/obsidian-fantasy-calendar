@@ -5,14 +5,18 @@
     import { DEFAULT_CALENDAR } from "src/main";
     import type FantasyCalendar from "src/main";
     import { CalendarPresetModal } from "../settings";
-    import { createEventDispatcher, setContext } from "svelte";
+    import { createEventDispatcher } from "svelte";
     import { fly } from "svelte/transition";
     import { onMount } from "svelte";
     import Details from "./Details.svelte";
-    import { writable, Writable } from "svelte/store";
     import Info from "./Info.svelte";
     import DateFields from "./DateFields.svelte";
-    import Weekdays from "./Weekdays.svelte";
+    import WeekdayContainer from "./WeekdayContainer.svelte";
+    import MonthContainer from "./MonthContainer.svelte";
+    import YearContainer from "./YearContainer.svelte";
+    import EventContainer from "./EventContainer.svelte";
+    import CategoryContainer from "./CategoryContainer.svelte";
+    import MoonContainer from "./MoonContainer.svelte";
 
     let ready = false;
     let width: number;
@@ -28,10 +32,6 @@
     console.log("🚀 ~ file: Creator.svelte ~ line 28 ~ calendar", calendar);
     window.calendar = calendar;
     export let plugin: FantasyCalendar;
-
-    const store: Writable<Calendar> = writable(calendar);
-
-    setContext("store", store);
 
     const back = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
@@ -83,20 +83,30 @@
                 <div use:preset />
             </div>
             <Details name={"Basic Info"}>
-                <Info />
+                <Info {calendar} />
             </Details>
             <Details name={"Weekdays"}>
-                <Weekdays {calendar} />
+                <WeekdayContainer {calendar} />
             </Details>
-            <Details name={"Months"} />
-            <Details name={"Years"} />
+            <Details name={"Months"}>
+                <MonthContainer {calendar} />
+            </Details>
+            <Details name={"Years"}>
+                <YearContainer {calendar} app={plugin.app} />
+            </Details>
 
             <Details name={"Current Date"}>
                 <DateFields {calendar} />
             </Details>
-            <Details name={"Events"} />
-            <Details name={"Categories"} />
-            <Details name={"Moons"} />
+            <Details name={"Events"}>
+                <EventContainer {calendar} />
+            </Details>
+            <Details name={"Categories"}>
+                <CategoryContainer {calendar} />
+            </Details>
+            <Details name={"Moons"}>
+                <MoonContainer {calendar} />
+            </Details>
         </div>
     {/if}
 </div>

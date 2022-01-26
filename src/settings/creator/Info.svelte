@@ -1,78 +1,76 @@
 <script lang="ts">
-    import { Setting, TextAreaComponent } from "obsidian";
-
     import type { Calendar } from "src/@types";
-
-    import { getContext } from "svelte";
-    import { Writable } from "svelte/store";
+    import {
+        Setting,
+        TextAreaComponent,
+        TextComponent,
+        ToggleComponent
+    } from "obsidian";
     import { getDetachedSetting } from "../utils";
 
-    const store = getContext<Writable<Calendar>>("store");
-    let calendar: Calendar;
-    store.subscribe((v) => {
-        calendar = v;
-    });
+    export let calendar: Calendar;
 
-    const name = (containerEl: HTMLElement) => {
-        getDetachedSetting(containerEl)
-            .setName("Calendar Name")
-            .addText((t) => {
-                t.setValue(calendar.name).onChange((v) => (calendar.name = v));
-            });
-    };
-    const desc = (containerEl: HTMLElement) => {
-        new TextAreaComponent(containerEl)
+    let nameComponent: TextComponent;
+    let descComponent: TextAreaComponent;
+    let displayComponent: ToggleComponent;
+    let incComponent: ToggleComponent;
+
+    $: name = calendar.name;
+    $: desc = calendar.description;
+    $: displayDayNumber = calendar.static.displayDayNumber;
+    $: incrementDay = calendar.static.incrementDay;
+
+    const build = (containerEl: HTMLElement) => {
+        new Setting(containerEl).setName("Calendar Name").addText((t) => {
+            nameComponent = t
+                .setValue(name)
+                .onChange((v) => (calendar.name = v));
+        });
+
+        const descEl = containerEl.createDiv(
+            "setting-item fantasy-calendar-description"
+        );
+        descEl.createEl("label", { text: "Calendar Description" });
+        descComponent = new TextAreaComponent(descEl)
             .setPlaceholder("Calendar Description")
-            .setValue(calendar.description)
+            .setValue(desc)
             .onChange((v) => {
                 calendar.description = v;
             });
-    };
-    const displayDayNumber = (containerEl: HTMLElement) => {
-        getDetachedSetting(containerEl)
+        new Setting(containerEl)
             .setName("Display Day Number")
             .addToggle((t) => {
-                t.setValue(calendar.static.displayDayNumber).onChange((v) => {
-                    calendar.static.displayDayNumber = v;
-                });
+                displayComponent = t
+                    .setValue(displayDayNumber)
+                    .onChange((v) => {
+                        calendar.static.displayDayNumber = v;
+                    });
             });
-    };
-    const incrementDay = (containerEl: HTMLElement) => {
-        getDetachedSetting(containerEl)
+        new Setting(containerEl)
             .setName("Auto Increment Day")
             .setDesc("Automatically increment the calendar day every real day.")
             .addToggle((t) => {
-                t.setValue(calendar.static.incrementDay).onChange((v) => {
+                incComponent = t.setValue(incrementDay).onChange((v) => {
                     calendar.static.incrementDay = v;
                 });
             });
     };
 </script>
 
-<div class="fantasy-calendar-info">
-    <div>
-        <div use:name />
-    </div>
-    <div class="setting-item">
-        <div class="fantasy-calendar-description">
-            <label for="description">Calendar Description</label>
-            <div name="description" use:desc />
-        </div>
-    </div>
-    <div>
-        <div use:displayDayNumber />
-    </div>
-    <div>
-        <div use:incrementDay />
-    </div>
-</div>
+<div class="fantasy-calendar-info" use:build />
 
 <style>
     .fantasy-calendar-info :global(.setting-item) {
         padding-top: 18px;
     }
-    .fantasy-calendar-description,
-    .fantasy-calendar-description :global(textarea) {
+    .fantasy-calendar-info :global(.fantasy-calendar-description) {
+        display: flex;
+        flex-flow: column;
+        align-items: flex-start;
+    }
+    .fantasy-calendar-info
+        :global(.fantasy-calendar-description)
+        :global(textarea) {
         width: 100%;
     }
 </style>

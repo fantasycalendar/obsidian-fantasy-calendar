@@ -14,9 +14,24 @@
     import { nanoid } from "src/utils/functions";
     import { getDetachedSetting } from "../utils";
 
+    const dispatch = createEventDispatcher();
+    export let calendar: Calendar;
     export let firstWeekday: number = 0;
     export let overflow: boolean = true;
 
+    $: weekdays = calendar.static.weekdays;
+
+    $: {
+        dispatch("weekday-update", weekdays);
+    }
+
+    $: {
+        dispatch("first-weekday-update", firstWeekday);
+    }
+
+    $: {
+        dispatch("overflow-update", overflow);
+    }
     const grip = (node: HTMLElement) => {
         setIcon(node, "fantasy-calendar-grip");
     };
@@ -82,23 +97,6 @@
                 });
             });
     };
-
-    const dispatch = createEventDispatcher();
-    export let calendar: Calendar;
-
-    $: weekdays = calendar.static.weekdays;
-
-    $: {
-        dispatch("weekday-update", weekdays);
-    }
-
-    $: {
-        dispatch("first-weekday-update", firstWeekday);
-    }
-
-    $: {
-        dispatch("overflow-update", overflow);
-    }
 
     const add = (node: HTMLElement) => {
         new ButtonComponent(node)
