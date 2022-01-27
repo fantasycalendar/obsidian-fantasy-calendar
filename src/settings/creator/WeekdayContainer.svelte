@@ -13,6 +13,8 @@
 
     import { nanoid } from "src/utils/functions";
     import { getDetachedSetting } from "../utils";
+    import ToggleComponent from "./Settings/ToggleComponent.svelte";
+    import DropdownComponent from "./Settings/DropdownComponent.svelte";
 
     const dispatch = createEventDispatcher();
     export let calendar: Calendar;
@@ -111,45 +113,27 @@
                         id: nanoid(6)
                     }
                 ];
-            }).buttonEl.style.width = "100%";
+            });
     };
 </script>
 
-<div>
-    <div class="overflow" use:overflowNode />
-</div>
-<div class="setting-item">
-    <div class="setting-item-info">
-        <div class="setting-item-name">First Day</div>
-        <div class="setting-item-description">
-            The first day of the first year.
-        </div>
-    </div>
-    <div class="setting-item-control">
-        <select
-            class="dropdown"
-            bind:value={firstWeekday}
-            aria-label={!overflow
-                ? "Cannot be modified without overflow."
-                : undefined}
-        >
-            {#each weekdays as weekday, index}
-                <option
-                    disabled={!overflow}
-                    value={index}
-                    selected={index == firstWeekday}
-                    >{weekday.name ?? ""}</option
-                >
-            {/each}
-        </select>
-    </div>
-</div>
+<ToggleComponent
+    name={"Overflow Weeks"}
+    desc={"Turn this off to make each month start on the first of the week."}
+    value={calendar.static.overflow}
+    on:click={() => (calendar.static.overflow = !calendar.static.overflow)}
+/>
 
-<div>
-    <div class="add-new" use:add />
-</div>
+<DropdownComponent
+    name="First Day"
+    desc={"The day of the week the first year starts on."}
+    value={"test"}
+/>
+
+<div class="add-new setting-item" use:add />
+
 {#if !weekdays.length}
-    <div class="existing-items">
+    <div class="no-existing-items setting-item">
         <span>Create a new weekday to see it here.</span>
     </div>
 {:else}
@@ -177,15 +161,27 @@
 {/if}
 
 <style>
-    .overflow {
-        padding-top: 0.75rem;
+    .add-new,
+    .add-new :global(button) {
+        width: 100%;
     }
+
+    .no-existing-items span {
+        width: 100%;
+        text-align: center;
+        color: var(--text-faint);
+    }
+    .existing-items {
+        width: 100%;
+    }
+
     .weekday {
         display: grid;
         grid-template-columns: auto 1fr auto;
         align-items: center;
         justify-content: space-between;
         gap: 1rem;
+        width: 100%;
     }
 
     .weekday .icon {

@@ -1,63 +1,44 @@
 <script lang="ts">
     import type { Calendar } from "src/@types";
-    import {
-        Setting,
-        TextAreaComponent,
-        TextComponent,
-        ToggleComponent
-    } from "obsidian";
-    import { getDetachedSetting } from "../utils";
+    import TextAreaComponent from "./Settings/TextAreaComponent.svelte";
+    import TextComponent from "./Settings/TextComponent.svelte";
+    import ToggleComponent from "./Settings/ToggleComponent.svelte";
 
     export let calendar: Calendar;
 
-    let nameComponent: TextComponent;
-    let descComponent: TextAreaComponent;
-    let displayComponent: ToggleComponent;
-    let incComponent: ToggleComponent;
-
-    $: name = calendar.name;
-    $: desc = calendar.description;
     $: displayDayNumber = calendar.static.displayDayNumber;
     $: incrementDay = calendar.static.incrementDay;
-
-    const build = (containerEl: HTMLElement) => {
-        new Setting(containerEl).setName("Calendar Name").addText((t) => {
-            nameComponent = t
-                .setValue(name)
-                .onChange((v) => (calendar.name = v));
-        });
-
-        const descEl = containerEl.createDiv(
-            "setting-item fantasy-calendar-description"
-        );
-        descEl.createEl("label", { text: "Calendar Description" });
-        descComponent = new TextAreaComponent(descEl)
-            .setPlaceholder("Calendar Description")
-            .setValue(desc)
-            .onChange((v) => {
-                calendar.description = v;
-            });
-        new Setting(containerEl)
-            .setName("Display Day Number")
-            .addToggle((t) => {
-                displayComponent = t
-                    .setValue(displayDayNumber)
-                    .onChange((v) => {
-                        calendar.static.displayDayNumber = v;
-                    });
-            });
-        new Setting(containerEl)
-            .setName("Auto Increment Day")
-            .setDesc("Automatically increment the calendar day every real day.")
-            .addToggle((t) => {
-                incComponent = t.setValue(incrementDay).onChange((v) => {
-                    calendar.static.incrementDay = v;
-                });
-            });
-    };
 </script>
 
-<div class="fantasy-calendar-info" use:build />
+<div class="fantasy-calendar-info">
+    <TextComponent
+        name={"Calendar Name"}
+        value={calendar.name}
+        on:blur={(evt) => (calendar.name = evt.detail)}
+    />
+    <TextAreaComponent
+        name={"Calendar Description"}
+        value={calendar.description}
+        on:blur={(evt) => (calendar.description = evt.detail)}
+    />
+    <ToggleComponent
+        name={"Display Day Number"}
+        desc={"Display day of year in Day View"}
+        value={displayDayNumber}
+        on:click={() => {
+            calendar.static.displayDayNumber =
+                !calendar.static.displayDayNumber;
+        }}
+    />
+    <ToggleComponent
+        name={"Auto Increment Day"}
+        desc={"Automatically increment the current day every real-world day."}
+        value={incrementDay}
+        on:click={() => {
+            calendar.static.incrementDay = !calendar.static.incrementDay;
+        }}
+    />
+</div>
 
 <style>
     .fantasy-calendar-info :global(.setting-item) {
