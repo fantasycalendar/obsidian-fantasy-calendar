@@ -90,9 +90,7 @@ export class Watcher extends Component {
         /** Metadata for a file has changed and the file should be checked. */
         this.registerEvent(
             this.metadataCache.on("changed", (file) => {
-                const parsing: Set<string> = new Set();
-                for (const path of this.getFiles(file)) parsing.add(path);
-                this.startParsing([...parsing]);
+                this.startParsing([file.path]);
             })
         );
         /** A file has been renamed and should be checked for events.
@@ -139,14 +137,26 @@ export class Watcher extends Component {
             async (event: MessageEvent<GetFileCacheMessage>) => {
                 if (event.data.type == "get") {
                     const { path } = event.data;
-                    const data = await this.getFileInformation(path);
-                    //TODO: Add in file data parsing for events
-                    //TODO: E.g., timelines
-                    this.worker.postMessage<FileCacheMessage>({
-                        type: "file",
-                        path,
-                        ...data
-                    });
+                    const file =
+                        this.plugin.app.vault.getAbstractFileByPath(path);
+                    if (file instanceof TFile) {
+                        const cache = this.metadataCache.getFileCache(file);
+                        const allTags = getAllTags(cache);
+                        const data = await this.vault.cachedRead(file);
+                        //TODO: Add in file data parsing for events
+                        //TODO: E.g., timelines
+                        this.worker.postMessage<FileCacheMessage>({
+                            type: "file",
+                            path,
+                            cache,
+                            file: { path: file.path, basename: file.basename },
+                            allTags,
+                            data
+                        });
+                    } else if (file instanceof TFolder) {
+                        const paths = file.children.map((f) => f.path);
+                        this.startParsing(paths);
+                    }
                 }
             }
         );
@@ -188,10 +198,8 @@ export class Watcher extends Component {
         //TODO: Add per-calendar root path.
         const folder = this.vault.getAbstractFileByPath(this.plugin.data.path);
         if (!folder || !(folder instanceof TFolder)) return;
-
-        const parsing: Set<string> = new Set();
-        for (const path of this.getFiles(folder)) parsing.add(path);
-        this.startParsing([...parsing]);
+        /* for (const path of this.getFiles(folder)) parsing.add(path); */
+        this.startParsing(folder.children.map((f) => f.path));
     }
     addToTree(calendar: Calendar, event: Event) {
         if (!this.tree.has(calendar.id)) {
@@ -211,6 +219,7 @@ export class Watcher extends Component {
         );
     }
     startParsing(paths: string[]) {
+        console.log("🚀 ~ file: watcher.ts ~ line 222 ~ paths", paths);
         if (paths.length) {
             this.worker.postMessage<QueueMessage>({
                 type: "queue",
@@ -218,21 +227,7 @@ export class Watcher extends Component {
             });
         }
     }
-    async getFileInformation(path: string) {
-        const file = this.plugin.app.vault.getAbstractFileByPath(path);
-        if (!(file instanceof TFile)) return;
-
-        const cache = this.metadataCache.getFileCache(file);
-        const allTags = getAllTags(cache);
-        const data = await this.vault.cachedRead(file);
-        return {
-            cache,
-            file: { path: file.path, basename: file.basename },
-            allTags,
-            data
-        };
-    }
-    getFiles(folder: TAbstractFile): string[] {
+    /*     getFiles(folder: TAbstractFile): string[] {
         if (!this.plugin.data.autoParse) return [];
         let files = [];
         if (folder instanceof TFolder) {
@@ -244,7 +239,7 @@ export class Watcher extends Component {
             files.push(folder.path);
         }
         return files;
-    }
+    } */
 
     onunload() {
         this.worker.terminate();

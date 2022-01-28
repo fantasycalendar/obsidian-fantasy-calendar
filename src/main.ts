@@ -179,22 +179,25 @@ export default class FantasyCalendar extends Plugin {
 
         await this.loadSettings();
 
-        this.watcher.load();
-
-        this.addSettingTab(new FantasyCalendarSettings(this));
         this.registerView(
             VIEW_TYPE,
             (leaf: WorkspaceLeaf) => new FantasyCalendarView(this, leaf)
         );
-        this.app.workspace.onLayoutReady(() => this.addCalendarView(true));
+        this.registerView(FULL_VIEW, (leaf: WorkspaceLeaf) => {
+            return new FantasyCalendarView(this, leaf, { full: true });
+        });
+
+        this.app.workspace.onLayoutReady(() => {
+            this.watcher.load();
+
+            this.addSettingTab(new FantasyCalendarSettings(this));
+
+            this.addCalendarView(true);
+        });
         this.addRibbonIcon(VIEW_TYPE, "Open Large Fantasy Calendar", (evt) => {
             this.app.workspace
                 .getLeaf(evt.getModifierState(MODIFIER_KEY))
                 .setViewState({ type: FULL_VIEW });
-        });
-
-        this.registerView(FULL_VIEW, (leaf: WorkspaceLeaf) => {
-            return new FantasyCalendarView(this, leaf, { full: true });
         });
 
         this.addCommand({
