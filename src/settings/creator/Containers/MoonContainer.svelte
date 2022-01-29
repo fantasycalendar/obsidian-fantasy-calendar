@@ -7,8 +7,11 @@
     import AddNew from "../Utilities/AddNew.svelte";
     import NoExistingItems from "../Utilities/NoExistingItems.svelte";
     import ToggleComponent from "../Settings/ToggleComponent.svelte";
+    import { CreateMoonModal } from "src/settings/modals/moons";
+    import type FantasyCalendar from "src/main";
 
     export let calendar: Calendar;
+    export let plugin: FantasyCalendar;
 
     $: moons = calendar.static.moons;
     $: displayMoons = calendar.static.displayMoons;
@@ -28,6 +31,26 @@
             (moon) => moon.id !== item.id
         );
     };
+
+    const add = (moon?: Moon) => {
+        const modal = new CreateMoonModal(plugin.app, calendar, moon);
+        modal.onClose = () => {
+            if (!modal.saved) return;
+            if (modal.editing) {
+                const index = calendar.static.moons.findIndex(
+                    (e) => e.id === modal.moon.id
+                );
+
+                calendar.static.moons.splice(index, 1, {
+                    ...modal.moon
+                });
+            } else {
+                calendar.static.moons.push({ ...modal.moon });
+            }
+            moons = calendar.static.moons;
+        };
+        modal.open();
+    };
 </script>
 
 <ToggleComponent
@@ -38,7 +61,7 @@
         (calendar.static.displayMoons = !calendar.static.displayMoons)}
 />
 
-<AddNew />
+<AddNew on:click={() => add()} />
 
 {#if !moons.length}
     <NoExistingItems message={"Create a new moon to see it here."} />
@@ -63,11 +86,7 @@
                     </div>
                 </div>
                 <div class="icons">
-                    <div
-                        class="icon"
-                        use:edit
-                        on:click={() => dispatch("new-item", moon)}
-                    />
+                    <div class="icon" use:edit on:click={() => add(moon)} />
                     <div
                         class="icon"
                         use:trash

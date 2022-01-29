@@ -22,7 +22,7 @@
             month.name = name;
             month.type = type;
             month.length = length;
-            dispatch("month-update");
+            dispatch("month-update", month);
         },
         300,
         true
@@ -30,7 +30,6 @@
 
     $: {
         month.type = type;
-        /* dispatch("month-update", month); */
     }
 </script>
 
@@ -67,6 +66,7 @@
         align-items: center;
         justify-content: space-between;
         gap: 1rem;
+        width: 100%;
     }
 
     .month .icon {

@@ -605,7 +605,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                 const $app = new CalendarCreator({
                     target: this.containerEl,
                     props: {
-                        calendar,
+                        calendar: copy(calendar),
                         plugin: this.plugin
                     }
                 });

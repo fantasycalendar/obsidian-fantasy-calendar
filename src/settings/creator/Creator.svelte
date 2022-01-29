@@ -1,15 +1,14 @@
 <script lang="ts">
+    import type { Calendar } from "src/@types";
+    import type FantasyCalendar from "src/main";
     import copy from "fast-copy";
     import { ExtraButtonComponent, Setting } from "obsidian";
-    import type { Calendar } from "src/@types";
-    import { DEFAULT_CALENDAR } from "src/main";
-    import type FantasyCalendar from "src/main";
     import { CalendarPresetModal } from "../settings";
-    import { createEventDispatcher } from "svelte";
+    import { createEventDispatcher, setContext } from "svelte";
     import { fly } from "svelte/transition";
     import { onMount } from "svelte";
     import Details from "./Utilities/Details.svelte";
-    import DateFields from "./Utilities/DateFields.svelte";
+    import CurrentDate from "./Containers/CurrentDate.svelte";
     import Info from "./Containers/Info.svelte";
     import WeekdayContainer from "./Containers/WeekdayContainer.svelte";
     import MonthContainer from "./Containers/MonthContainer.svelte";
@@ -17,7 +16,8 @@
     import EventContainer from "./Containers/EventContainer.svelte";
     import CategoryContainer from "./Containers/CategoryContainer.svelte";
     import MoonContainer from "./Containers/MoonContainer.svelte";
-    import { log } from "console";
+    import LeapDayContainer from "./Containers/LeapDayContainer.svelte";
+    import { Writable, writable } from "svelte/store";
 
     let ready = false;
     let width: number;
@@ -32,6 +32,9 @@
     export let calendar: Calendar;
     $: window.calendar = calendar;
     export let plugin: FantasyCalendar;
+
+    const store = writable<Calendar>(calendar);
+    setContext<Writable<Calendar>>("store", store);
 
     const back = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
@@ -74,20 +77,6 @@
             });
     };
 
-    const info = (node: HTMLElement) => {
-        new ExtraButtonComponent(node).setIcon("info");
-    };
-    const weeks = (node: HTMLElement) => {
-        new ExtraButtonComponent(node).setIcon("info");
-    };
-    const months = (node: HTMLElement) => {};
-    const years = (node: HTMLElement) => {};
-    const date = (node: HTMLElement) => {};
-    const events = (node: HTMLElement) => {};
-    const cats = (node: HTMLElement) => {};
-    const moons = (node: HTMLElement) => {
-        new ExtraButtonComponent(node).setIcon("fc-moon");
-    };
     let y: number;
 </script>
 
@@ -150,23 +139,26 @@
                     <WeekdayContainer {calendar} />
                 </Details>
                 <Details name={"Months"}>
-                    <MonthContainer {calendar} />
+                    <MonthContainer />
                 </Details>
                 <Details name={"Years"}>
                     <YearContainer {calendar} app={plugin.app} />
                 </Details>
 
                 <Details name={"Current Date"}>
-                    <DateFields {calendar} />
+                    <CurrentDate />
                 </Details>
                 <Details name={"Events"}>
-                    <EventContainer {calendar} />
+                    <EventContainer {plugin} {calendar} />
                 </Details>
                 <Details name={"Categories"}>
                     <CategoryContainer {calendar} />
                 </Details>
                 <Details name={"Moons"}>
-                    <MoonContainer {calendar} />
+                    <MoonContainer {plugin} {calendar} />
+                </Details>
+                <Details name={"Leap Days"}>
+                    <LeapDayContainer {calendar} {plugin} />
                 </Details>
             </div>
         </div>

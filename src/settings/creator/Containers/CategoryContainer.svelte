@@ -5,6 +5,7 @@
         TextComponent
     } from "obsidian";
     import { createEventDispatcher } from "svelte";
+    import randomColor from "randomcolor";
 
     import type { Calendar, EventCategory } from "src/@types";
     import { nanoid } from "src/utils/functions";
@@ -43,22 +44,6 @@
         category.color = target.value;
         dispatch("update", category);
     };
-
-    const add = (node: HTMLElement) => {
-        new ButtonComponent(node)
-            .setTooltip("Add New")
-            .setButtonText("+")
-            .onClick(async () => {
-                calendar.categories = [
-                    ...categories,
-                    {
-                        id: nanoid(6),
-                        color: DEFAULT_CATEGORY_COLOR,
-                        name: "Category"
-                    }
-                ];
-            }).buttonEl.style.width = "100%";
-    };
 </script>
 
 <AddNew
@@ -67,7 +52,7 @@
             ...categories,
             {
                 id: nanoid(6),
-                color: DEFAULT_CATEGORY_COLOR,
+                color: randomColor(),
                 name: "Category"
             }
         ])}

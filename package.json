@@ -27,6 +27,7 @@
         "@types/he": "^1.1.2",
         "@types/jest": "^27.0.2",
         "@types/node": "^14.17.21",
+        "@types/randomcolor": "^0.5.6",
         "@types/xmldom": "^0.1.31",
         "babel-jest": "^27.2.5",
         "babel-loader": "^8.2.2",
@@ -62,6 +63,7 @@
         "xmldom": "^0.6.0"
     },
     "dependencies": {
-        "@popperjs/core": "^2.10.2"
+        "@popperjs/core": "^2.10.2",
+        "randomcolor": "^0.6.2"
     }
 }

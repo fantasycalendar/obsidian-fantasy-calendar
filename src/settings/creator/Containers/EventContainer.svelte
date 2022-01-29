@@ -2,26 +2,21 @@
     import { createEventDispatcher } from "svelte";
 
     import type { Event, Calendar } from "src/@types";
-    import { dateString, nanoid } from "src/utils/functions";
+    import { dateString } from "src/utils/functions";
 
     import EventInstance from "./EventInstance.svelte";
-    import { ButtonComponent } from "obsidian";
     import AddNew from "../Utilities/AddNew.svelte";
     import NoExistingItems from "../Utilities/NoExistingItems.svelte";
+    import type FantasyCalendar from "src/main";
+    import { CreateEventModal } from "src/settings/modals/event";
 
     export let calendar: Calendar;
-    $: categories = calendar.categories;
+    export let plugin: FantasyCalendar;
     $: events = calendar.events;
     $: months = calendar.static.months;
 
-    const dispatch = createEventDispatcher();
-
-    const editEvent = (item: Event) => {
-        dispatch("new-item", item);
-    };
     const deleteEvent = (item: Event) => {
         events = events.filter((event) => event.id !== item.id);
-        dispatch("edit-events", events);
     };
 
     $: {
@@ -36,11 +31,28 @@
         });
     }
     const getCategory = (category: string) => {
-        return categories.find(({ id }) => id == category);
+        return calendar.categories.find(({ id }) => id == category);
+    };
+    const add = (event?: Event) => {
+        const modal = new CreateEventModal(plugin.app, calendar, event);
+        modal.onClose = () => {
+            if (!modal.saved) return;
+            if (modal.editing) {
+                const index = calendar.events.findIndex(
+                    (e) => e.id === modal.event.id
+                );
+
+                calendar.events.splice(index, 1, { ...modal.event });
+            } else {
+                calendar.events.push({ ...modal.event });
+            }
+            events = calendar.events;
+        };
+        modal.open();
     };
 </script>
 
-<AddNew />
+<AddNew on:click={() => add()} />
 
 {#if !events.length}
     <NoExistingItems message={"Create a new event to see it here."} />
@@ -51,7 +63,7 @@
                 {event}
                 category={getCategory(event.category)}
                 date={dateString(event.date, months, event.end)}
-                on:edit={() => editEvent(event)}
+                on:edit={() => add(event)}
                 on:delete={() => deleteEvent(event)}
             />
         {/each}

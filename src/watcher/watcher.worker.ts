@@ -108,7 +108,6 @@ class Parser {
         this.parsing = true;
         while (this.queue.length) {
             const path = this.queue.shift();
-            console.log("🚀 ~ file: watcher.worker.ts ~ line 111 ~ path", path);
             this.getFileData(path);
         }
         this.parsing = false;

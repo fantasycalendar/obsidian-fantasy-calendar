@@ -219,7 +219,6 @@ export class Watcher extends Component {
         );
     }
     startParsing(paths: string[]) {
-        console.log("🚀 ~ file: watcher.ts ~ line 222 ~ paths", paths);
         if (paths.length) {
             this.worker.postMessage<QueueMessage>({
                 type: "queue",

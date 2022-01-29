@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
+    import { createEventDispatcher, getContext } from "svelte";
     import { flip } from "svelte/animate";
     import { dndzone, SOURCES, TRIGGERS } from "svelte-dnd-action";
     import { ButtonComponent, setIcon } from "obsidian";
@@ -10,15 +10,19 @@
     import { nanoid } from "src/utils/functions";
     import AddNew from "../Utilities/AddNew.svelte";
     import NoExistingItems from "../Utilities/NoExistingItems.svelte";
+    import { Writable } from "svelte/store";
 
-    export let calendar: Calendar;
+    let calendar: Calendar;
+
+    const store = getContext<Writable<Calendar>>("store");
+    store.subscribe((v) => (calendar = v));
 
     $: months = calendar.static.months;
 
     const deleteMonth = (month: Month) => {
         months = months.filter((m) => m.id != month.id);
 
-        dispatch("month-update", months);
+        store.set(calendar);
     };
     const grip = (node: HTMLElement) => {
         setIcon(node, "fantasy-calendar-grip");
@@ -57,11 +61,9 @@
     }
 
     const dispatch = createEventDispatcher();
-</script>
 
-<AddNew
-    on:click={() =>
-        (calendar.static.months = [
+    const add = () => {
+        calendar.static.months = [
             ...months,
             {
                 type: "month",
@@ -69,8 +71,12 @@
                 length: null,
                 id: nanoid(6)
             }
-        ])}
-/>
+        ];
+        store.set(calendar);
+    };
+</script>
+
+<AddNew on:click={() => add()} />
 
 {#if !months.length}
     <NoExistingItems message={"Create a new month to see it here."} />
@@ -93,7 +99,10 @@
                     {month}
                     on:mousedown={startDrag}
                     on:month-delete={() => deleteMonth(month)}
-                    on:month-update={() => dispatch("month-update", months)}
+                    on:month-update={() => {
+                        console.log("update");
+                        store.set(calendar);
+                    }}
                 />
             </div>
         {/each}
