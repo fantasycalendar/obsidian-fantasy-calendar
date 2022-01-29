@@ -3,7 +3,7 @@
     import type FantasyCalendar from "src/main";
     import copy from "fast-copy";
     import { ExtraButtonComponent, Setting } from "obsidian";
-    import { CalendarPresetModal } from "../settings";
+    import { CalendarPresetModal } from "../modals/preset";
     import { createEventDispatcher, setContext } from "svelte";
     import { fly } from "svelte/transition";
     import { onMount } from "svelte";
