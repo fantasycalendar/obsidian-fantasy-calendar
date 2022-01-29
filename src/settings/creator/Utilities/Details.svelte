@@ -3,7 +3,7 @@
 
     export let open = true;
     export let name: string;
-    const details = (node: HTMLDetailsElement) => {
+    const details = (node: HTMLElement) => {
         if (open) node.setAttr("open", "open");
     };
     const summary = (node: HTMLDivElement) => {
@@ -12,7 +12,7 @@
 </script>
 
 <details class="fantasy-calendar-nested-settings" use:details>
-    <summary>
+    <summary class="fantasy-calendar-nested-summary">
         <div use:summary />
         <div class="collapser">
             <div class="handle" />
@@ -22,10 +22,7 @@
 </details>
 
 <style>
-    details {
-        background-color: inherit;
-    }
-    summary {
+    .fantasy-calendar-nested-summary {
         outline: none;
         display: block !important;
         list-style: none !important;
@@ -34,9 +31,6 @@
         border-top-left-radius: 0.1rem;
         border-top-right-radius: 0.1rem;
         cursor: pointer;
-        position: sticky;
-        top: 0;
-        background-color: inherit;
     }
 
     summary::-webkit-details-marker,
