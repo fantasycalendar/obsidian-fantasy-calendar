@@ -71,6 +71,7 @@
                                     day: today.getDate()
                                 };
                             }
+                            store.set(calendar);
                         };
                         modal.open();
                     });
@@ -83,7 +84,7 @@
 <div class="fantasy-calendar-creator" bind:this={creator}>
     {#if ready}
         <div
-            class="inherit"
+            class="inherit fantasy-calendar-creator-inner"
             transition:fly={{ x: width }}
             on:introend={() => dispatch("flown")}
             on:outroend={() => dispatch("exit")}
@@ -101,15 +102,15 @@
                         on:click={() => (ready = false)}
                     />
                 </div>
-                <h3 class="fantasy-calendar-creator-header">
+                <h3
+                    class="fantasy-calendar-creator-header"
+                    style="font-size: calc(var(--h1) - {y ?? 0}px);"
+                >
                     Calendar Creator
                 </h3>
             </div>
-            <div use:preset />
-            <div
-                class="fantasy-creator-app"
-                on:scroll={(evt) => console.log(evt)}
-            >
+            <div class="fantasy-creator-app" on:scroll={(evt) => y++}>
+                <div use:preset />
                 <!-- <div class="left-nav">
                     <div use:info />
                     <div>
@@ -167,8 +168,13 @@
 
 <style>
     .fantasy-calendar-creator,
-    .inherit {
+    .fantasy-calendar-creator-inner,
+    .fantasy-creator-app {
+        height: 100%;
         background-color: inherit;
+    }
+    .fantasy-creator-app {
+        overflow: auto;
     }
     .fantasy-calendar-creator-header {
         margin: 0;

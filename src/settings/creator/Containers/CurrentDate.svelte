@@ -30,19 +30,29 @@
 <div class="fantasy-calendar-date-field-container setting-item ">
     <div class="fantasy-calendar-date-field ">
         <label for="">Day</label>
-        <input type="number" spellcheck="false" placeholder="Day" />
+        <input
+            type="number"
+            spellcheck="false"
+            placeholder="Day"
+            bind:value={calendar.current.day}
+        />
     </div>
     <div class="fantasy-calendar-date-field ">
         <label for="">Month</label>
-        <select class="dropdown">
-            {#each months.filter((m) => m.name) as month}
-                <option value={month.id}>{month.name}</option>
+        <select class="dropdown" bind:value={calendar.current.month}>
+            {#each months.filter((m) => m.name) as month, index}
+                <option value={index}>{month.name}</option>
             {/each}
         </select>
     </div>
     <div class="fantasy-calendar-date-field ">
         <label for="">Year</label>
-        <input type="number" spellcheck="false" placeholder="Year" />
+        <input
+            type="number"
+            spellcheck="false"
+            placeholder="Year"
+            bind:value={calendar.current.year}
+        />
     </div>
 </div>
 

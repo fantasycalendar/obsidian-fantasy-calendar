@@ -22,6 +22,9 @@
 </details>
 
 <style>
+    details {
+        background-color: inherit;
+    }
     summary {
         outline: none;
         display: block !important;
@@ -31,7 +34,9 @@
         border-top-left-radius: 0.1rem;
         border-top-right-radius: 0.1rem;
         cursor: pointer;
-        position: relative;
+        position: sticky;
+        top: 0;
+        background-color: inherit;
     }
 
     summary::-webkit-details-marker,
