@@ -19,34 +19,13 @@ import copy from "fast-copy";
 import { DEFAULT_CALENDAR } from "../main";
 import type FantasyCalendar from "../main";
 import Importer from "./import/importer";
-import { PRESET_CALENDARS } from "../utils/presets";
 
 import CalendarCreator from "./creator/Creator.svelte";
 
-import Weekdays from "./ui/Weekdays.svelte";
-import Months from "./ui/Months.svelte";
-import EventsUI from "./ui/Events.svelte";
-import Categories from "./ui/Categories.svelte";
-import Year from "./old_creator/Year.svelte";
-
 import "./settings.css";
-import { nanoid } from "src/utils/functions";
-import type {
-    Calendar,
-    Event,
-    EventCategory,
-    LeapDay,
-    Moon,
-    Year as YearType
-} from "src/@types";
+import type { Calendar } from "src/@types";
 
-import { CreateEventModal } from "./modals/event";
 import { confirmWithModal } from "./modals/confirm";
-
-import MoonUI from "./ui/Moons.svelte";
-import LeapDays from "./ui/LeapDays.svelte";
-import { CreateMoonModal } from "src/settings/modals/moons";
-import { CreateLeapDayModal } from "./modals/leapday";
 import { FolderSuggestionModal } from "src/suggester/folder";
 
 export enum Recurring {
