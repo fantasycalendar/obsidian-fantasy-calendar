@@ -2,7 +2,7 @@
     import { createEventDispatcher } from "svelte";
     import type { Event, EventCategory } from "src/@types";
     import { ExtraButtonComponent } from "obsidian";
-    import Dot from "./Dot.svelte";
+    import Dot from "../Utilities/Dot.svelte";
 
     const dispatch = createEventDispatcher();
 

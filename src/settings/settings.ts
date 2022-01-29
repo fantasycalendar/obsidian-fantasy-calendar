@@ -89,6 +89,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
     }
     async display() {
         this.containerEl.empty();
+        console.log("display");
         this.containerEl.createEl("h2", { text: "Fantasy Calendars" });
         this.containerEl.addClass("fantasy-calendar-settings");
 
@@ -287,8 +288,13 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                 button
                     .setTooltip("Launch Calendar Creator")
                     .setIcon("plus-with-circle")
-                    .onClick(() => {
-                        this.launchCalendarCreator();
+                    .onClick(async () => {
+                        try {
+                            await this.launchCalendarCreator();
+                        } catch (e) {
+                        } finally {
+                            this.display();
+                        }
                         /* const modal = new CreateCalendarModal(this.plugin);
                         modal.onClose = async () => {
                             if (!modal.saved) return;
@@ -590,20 +596,37 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
             });
     }
 
-    launchCalendarCreator(calendar?: Calendar) {
-        this.containerEl.empty();
-        const $app = new CalendarCreator({
-            target: this.containerEl,
-            props: {
-                calendar,
-                plugin: this.plugin
+    launchCalendarCreator(calendar: Calendar = DEFAULT_CALENDAR) {
+        return new Promise((resolve, reject) => {
+            try {
+                this.containerEl.empty();
+                this.containerEl.addClass("fantasy-calendar-creator-open");
+                const clone = copy(calendar);
+                const $app = new CalendarCreator({
+                    target: this.containerEl,
+                    props: {
+                        calendar,
+                        plugin: this.plugin
+                    }
+                });
+                $app.$on("flown", () => {});
+                $app.$on("cancel", () => {
+                    this.containerEl.removeClass(
+                        "fantasy-calendar-creator-open"
+                    );
+                    console.log("cancel");
+                    resolve(clone);
+                });
+                $app.$on("save", () => {
+                    this.containerEl.removeClass(
+                        "fantasy-calendar-creator-open"
+                    );
+                    console.log("save");
+                    resolve(calendar);
+                });
+            } catch (e) {
+                reject(e);
             }
-        });
-        $app.$on("flown", () => {
-            /*  */
-        });
-        $app.$on("exit", () => {
-            this.display();
         });
     }
 }

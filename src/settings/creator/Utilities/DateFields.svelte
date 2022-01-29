@@ -16,8 +16,8 @@
         new DropdownComponent(node);
     };
     const year = (node: HTMLElement) => {
-        const label = node.createEl("label", { text: "Month" });
-        new TextComponent(node).setPlaceholder("Month");
+        const label = node.createEl("label", { text: "Year" });
+        new TextComponent(node).setPlaceholder("Year");
     };
 </script>
 

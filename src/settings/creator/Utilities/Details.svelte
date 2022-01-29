@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Setting } from "obsidian";
 
-    export let open = false;
+    export let open = true;
     export let name: string;
     const details = (node: HTMLDetailsElement) => {
         if (open) node.setAttr("open", "open");

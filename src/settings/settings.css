@@ -1,3 +1,9 @@
+.modal.mod-settings
+    .vertical-tab-content-container
+    .vertical-tab-content.fantasy-calendar-settings.fantasy-calendar-creator-open {
+    padding-top: 0;
+}
+
 .fantasy-calendar-confirm-buttons {
     display: flex;
     justify-content: flex-end;

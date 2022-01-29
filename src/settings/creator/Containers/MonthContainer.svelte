@@ -8,6 +8,8 @@
     import MonthInstance from "./MonthInstance.svelte";
 
     import { nanoid } from "src/utils/functions";
+    import AddNew from "../Utilities/AddNew.svelte";
+    import NoExistingItems from "../Utilities/NoExistingItems.svelte";
 
     export let calendar: Calendar;
 
@@ -55,31 +57,23 @@
     }
 
     const dispatch = createEventDispatcher();
-    const add = (node: HTMLElement) => {
-        new ButtonComponent(node)
-            .setTooltip("Add New")
-            .setButtonText("+")
-            .onClick(async () => {
-                calendar.static.months = [
-                    ...months,
-                    {
-                        type: "month",
-                        name: null,
-                        length: null,
-                        id: nanoid(6)
-                    }
-                ];
-            }).buttonEl.style.width = "100%";
-    };
 </script>
 
-<div>
-    <div class="add-new" use:add />
-</div>
+<AddNew
+    on:click={() =>
+        (calendar.static.months = [
+            ...months,
+            {
+                type: "month",
+                name: null,
+                length: null,
+                id: nanoid(6)
+            }
+        ])}
+/>
+
 {#if !months.length}
-    <div class="existing-items">
-        <span>Create a new month to see it here.</span>
-    </div>
+    <NoExistingItems message={"Create a new month to see it here."} />
 {:else}
     <div
         use:dndzone={{ items: months, flipDurationMs, dragDisabled }}

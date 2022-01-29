@@ -2,26 +2,25 @@
     import { createEventDispatcher } from "svelte";
     import { flip } from "svelte/animate";
     import { dndzone, SOURCES, TRIGGERS } from "svelte-dnd-action";
-    import {
-        ButtonComponent,
-        ExtraButtonComponent,
-        setIcon,
-        Setting,
-        TextComponent
-    } from "obsidian";
+    import { ExtraButtonComponent, setIcon, TextComponent } from "obsidian";
     import type { Calendar, Day } from "src/@types";
 
     import { nanoid } from "src/utils/functions";
-    import { getDetachedSetting } from "../utils";
-    import ToggleComponent from "./Settings/ToggleComponent.svelte";
-    import DropdownComponent from "./Settings/DropdownComponent.svelte";
+
+    import ToggleComponent from "../Settings/ToggleComponent.svelte";
+    import AddNew from "../Utilities/AddNew.svelte";
+    import NoExistingItems from "../Utilities/NoExistingItems.svelte";
 
     const dispatch = createEventDispatcher();
     export let calendar: Calendar;
-    export let firstWeekday: number = 0;
-    export let overflow: boolean = true;
 
     $: weekdays = calendar.static.weekdays;
+    let firstWeekday = calendar.static.firstWeekDay;
+    $: {
+        firstWeekday = calendar.static.firstWeekDay;
+        console.log(firstWeekday, calendar.static.firstWeekDay);
+    }
+    $: overflow = calendar.static.overflow;
 
     $: {
         dispatch("weekday-update", weekdays);
@@ -86,35 +85,6 @@
             })
             .inputEl.setAttr("style", "width: 100%;");
     };
-
-    const overflowNode = (node: HTMLElement) => {
-        getDetachedSetting(node)
-            .setName("Overflow Weeks")
-            .setDesc(
-                "Turn this off to make each month start on the first of the week."
-            )
-            .addToggle((t) => {
-                t.setValue(overflow).onChange((v) => {
-                    overflow = v;
-                });
-            });
-    };
-
-    const add = (node: HTMLElement) => {
-        new ButtonComponent(node)
-            .setTooltip("Add New")
-            .setButtonText("+")
-            .onClick(async () => {
-                calendar.static.weekdays = [
-                    ...weekdays,
-                    {
-                        type: "day",
-                        name: null,
-                        id: nanoid(6)
-                    }
-                ];
-            });
-    };
 </script>
 
 <ToggleComponent
@@ -124,18 +94,45 @@
     on:click={() => (calendar.static.overflow = !calendar.static.overflow)}
 />
 
-<DropdownComponent
-    name="First Day"
-    desc={"The day of the week the first year starts on."}
-    value={"test"}
+<div class="setting-item">
+    <div class="setting-item-info">
+        <div class="setting-item-name">First Day</div>
+        <div class="setting-item-description">
+            The day of the week the first year starts on.
+        </div>
+    </div>
+    <div class="setting-item-control">
+        <select
+            class="dropdown"
+            aria-label={weekdays.filter((v) => v.name?.length).length
+                ? null
+                : "Named Weekday Required"}
+            bind:value={calendar.static.firstWeekDay}
+        >
+            <option selected hidden disabled>Select a Weekday</option>
+            {#each weekdays.filter((v) => v.name?.length) as weekday, index}
+                <option disabled={!overflow} value={index}>
+                    {weekday.name ?? ""}
+                </option>
+            {/each}
+        </select>
+    </div>
+</div>
+
+<AddNew
+    on:click={() =>
+        (calendar.static.weekdays = [
+            ...weekdays,
+            {
+                type: "day",
+                name: null,
+                id: nanoid(6)
+            }
+        ])}
 />
 
-<div class="add-new setting-item" use:add />
-
 {#if !weekdays.length}
-    <div class="no-existing-items setting-item">
-        <span>Create a new weekday to see it here.</span>
-    </div>
+    <NoExistingItems message={"Create a new weekday to see it here."} />
 {:else}
     <div
         use:dndzone={{ items: weekdays, flipDurationMs, dragDisabled }}
@@ -161,16 +158,6 @@
 {/if}
 
 <style>
-    .add-new,
-    .add-new :global(button) {
-        width: 100%;
-    }
-
-    .no-existing-items span {
-        width: 100%;
-        text-align: center;
-        color: var(--text-faint);
-    }
     .existing-items {
         width: 100%;
     }

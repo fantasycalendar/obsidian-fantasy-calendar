@@ -1,8 +1,8 @@
 <script lang="ts">
     import type { Calendar } from "src/@types";
-    import TextAreaComponent from "./Settings/TextAreaComponent.svelte";
-    import TextComponent from "./Settings/TextComponent.svelte";
-    import ToggleComponent from "./Settings/ToggleComponent.svelte";
+    import TextAreaComponent from "../Settings/TextAreaComponent.svelte";
+    import TextComponent from "../Settings/TextComponent.svelte";
+    import ToggleComponent from "../Settings/ToggleComponent.svelte";
 
     export let calendar: Calendar;
 

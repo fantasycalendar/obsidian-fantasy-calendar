@@ -6,6 +6,8 @@
 
     import EventInstance from "./EventInstance.svelte";
     import { ButtonComponent } from "obsidian";
+    import AddNew from "../Utilities/AddNew.svelte";
+    import NoExistingItems from "../Utilities/NoExistingItems.svelte";
 
     export let calendar: Calendar;
     $: categories = calendar.categories;
@@ -36,31 +38,12 @@
     const getCategory = (category: string) => {
         return categories.find(({ id }) => id == category);
     };
-    const add = (node: HTMLElement) => {
-        new ButtonComponent(node)
-            .setTooltip("Add New")
-            .setButtonText("+")
-            .onClick(async () => {
-                calendar.static.months = [
-                    ...months,
-                    {
-                        type: "month",
-                        name: null,
-                        length: null,
-                        id: nanoid(6)
-                    }
-                ];
-            }).buttonEl.style.width = "100%";
-    };
 </script>
 
-<div>
-    <div class="add-new" use:add />
-</div>
+<AddNew />
+
 {#if !events.length}
-    <div class="existing-items">
-        <span>Create a new event to see it here.</span>
-    </div>
+    <NoExistingItems message={"Create a new event to see it here."} />
 {:else}
     <div class="existing-items">
         {#each events as event}

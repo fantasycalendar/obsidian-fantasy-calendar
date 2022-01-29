@@ -9,6 +9,8 @@
     import type { Calendar, EventCategory } from "src/@types";
     import { nanoid } from "src/utils/functions";
     import { DEFAULT_CATEGORY_COLOR } from "src/utils/constants";
+    import AddNew from "../Utilities/AddNew.svelte";
+    import NoExistingItems from "../Utilities/NoExistingItems.svelte";
 
     const dispatch = createEventDispatcher();
 
@@ -59,13 +61,20 @@
     };
 </script>
 
-<div>
-    <div class="add-new" use:add />
-</div>
+<AddNew
+    on:click={() =>
+        (calendar.categories = [
+            ...categories,
+            {
+                id: nanoid(6),
+                color: DEFAULT_CATEGORY_COLOR,
+                name: "Category"
+            }
+        ])}
+/>
+
 {#if !categories.length}
-    <div class="existing-items">
-        <span>Create a new category to see it here.</span>
-    </div>
+    <NoExistingItems message={"Create a new event category to see it here."} />
 {:else}
     <div class="existing-items">
         {#each categories as category}

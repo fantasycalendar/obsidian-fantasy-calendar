@@ -1,9 +1,13 @@
 <script lang="ts">
+    import { createEventDispatcher } from "svelte";
+
+    const dispatch = createEventDispatcher();
     export let name: string;
     export let desc = "";
-    export let value: string;
-    export let placeholder: string = name;
-    export let options: Record<string, string> = {};
+    export let label: string;
+
+    export let options: Array<[string, string | number]>;
+    export let selected: string | number = null;
 </script>
 
 <div class="setting-item">
@@ -14,12 +18,13 @@
         </div>
     </div>
     <div class="setting-item-control">
-        <select class="dropdown"
-            ><option value="0">Sunday</option><option value="1">Monday</option
-            ><option value="2">Tuesday</option><option value="3"
-                >Wednesday</option
-            ><option value="4">Thursday</option><option value="5">Friday</option
-            ><option value="6">Saturday</option></select
-        >
+        <select class="dropdown" aria-label={label} on:change>
+            <slot />
+            {#each options as [option, index]}
+                <option value={index} selected={index == selected}
+                    >{option ?? ""}</option
+                >
+            {/each}
+        </select>
     </div>
 </div>
