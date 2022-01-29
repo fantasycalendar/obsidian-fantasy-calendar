@@ -57,6 +57,7 @@ esbuild
         target: "es2020",
         logLevel: "info",
         sourcemap: prod ? false : "inline",
+        minify: true,
         treeShaking: true,
         outdir: dir,
         plugins: [
