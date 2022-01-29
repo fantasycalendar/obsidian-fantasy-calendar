@@ -168,9 +168,6 @@
 {/if}
 
 <style>
-    .use-custom {
-        padding-top: 0.75rem;
-    }
     .weekday {
         display: grid;
         grid-template-columns: auto 1fr auto;
