@@ -108,21 +108,31 @@ class Parser {
         this.parsing = true;
         while (this.queue.length) {
             const path = this.queue.shift();
-            this.getFileData(path);
+            await this.getFileData(path);
         }
         this.parsing = false;
+
         ctx.postMessage<SaveMessage>({ type: "save" });
     }
-    async getFileData(path: string): Promise<FileCacheMessage> {
+    async getFileData(path: string): Promise<void> {
         let self = this;
         return new Promise((resolve) => {
-            function resolution(event: MessageEvent<FileCacheMessage>) {
+            function resolution(
+                event: MessageEvent<FileCacheMessage | QueueMessage>
+            ) {
+                if (event.data.type == "queue") {
+                    ctx.removeEventListener("message", resolution);
+                    resolve();
+                    return;
+                }
                 if (event.data.type != "file") return;
                 if (event.data.path != path) return;
                 ctx.removeEventListener("message", resolution);
                 const { data, cache, allTags, file } = event.data;
                 self.parseFileForEvents(data, cache, allTags, file);
+                resolve();
             }
+            setTimeout(() => resolve, 500);
             ctx.addEventListener("message", resolution);
             ctx.postMessage<GetFileCacheMessage>({ path, type: "get" });
         });

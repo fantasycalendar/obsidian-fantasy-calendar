@@ -219,12 +219,10 @@ export class Watcher extends Component {
         );
     }
     startParsing(paths: string[]) {
-        if (paths.length) {
-            this.worker.postMessage<QueueMessage>({
-                type: "queue",
-                paths
-            });
-        }
+        this.worker.postMessage<QueueMessage>({
+            type: "queue",
+            paths
+        });
     }
     /*     getFiles(folder: TAbstractFile): string[] {
         if (!this.plugin.data.autoParse) return [];
