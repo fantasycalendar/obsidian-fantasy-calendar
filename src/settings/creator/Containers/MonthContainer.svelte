@@ -100,7 +100,6 @@
                     on:mousedown={startDrag}
                     on:month-delete={() => deleteMonth(month)}
                     on:month-update={() => {
-                        console.log("update");
                         store.set(calendar);
                     }}
                 />
