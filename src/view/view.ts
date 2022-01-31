@@ -74,7 +74,7 @@ export default class FantasyCalendarView extends ItemView {
         this.contentEl.addClass("fantasy-calendar-view-content");
         this.registerEvent(
             this.plugin.app.workspace.on("fantasy-calendars-updated", () => {
-                this.updateCalendars();
+                this.plugin.onSettingsLoad(() => this.updateCalendars());
             })
         );
         this.registerEvent(
@@ -198,7 +198,7 @@ export default class FantasyCalendarView extends ItemView {
     }
 
     async onOpen() {
-        this.updateCalendars();
+        this.plugin.onSettingsLoad(() => this.updateCalendars());
     }
     build() {
         this.contentEl.empty();

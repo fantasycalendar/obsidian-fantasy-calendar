@@ -38,6 +38,11 @@ declare module "obsidian" {
             note: string, //linkText
             source: string //source
         ): void;
+        trigger(name: "fantasy-calendars-settings-loaded"): void;
+        on(
+            name: "fantasy-calendars-settings-loaded",
+            callback: () => any
+        ): EventRef;
     }
     interface App {
         plugins: {
@@ -105,6 +110,7 @@ export const DEFAULT_DATA: FantasyCalendarData = {
 
 export default class FantasyCalendar extends Plugin {
     api = new API(this);
+    settingsLoaded: boolean;
     async addNewCalendar(calendar: Calendar) {
         this.data.calendars.push({ ...calendar });
         if (!this.data.defaultCalendar) {
@@ -169,8 +175,6 @@ export default class FantasyCalendar extends Plugin {
     async onload() {
         console.log("Loading Fantasy Calendars v" + this.manifest.version);
 
-        await this.loadSettings();
-
         this.registerView(
             VIEW_TYPE,
             (leaf: WorkspaceLeaf) => new FantasyCalendarView(this, leaf)
@@ -178,8 +182,9 @@ export default class FantasyCalendar extends Plugin {
         this.registerView(FULL_VIEW, (leaf: WorkspaceLeaf) => {
             return new FantasyCalendarView(this, leaf, { full: true });
         });
+        this.app.workspace.onLayoutReady(async () => {
+            await this.loadSettings();
 
-        this.app.workspace.onLayoutReady(() => {
             this.watcher.load();
 
             this.addCommands();
@@ -321,10 +326,20 @@ export default class FantasyCalendar extends Plugin {
             minor: version[1],
             patch: version[2]
         }; */
+        this.settingsLoaded = true;
+        this.app.workspace.trigger("fantasy-calendars-settings-loaded");
+    }
+    onSettingsLoad(callback: () => any) {
+        if (this.settingsLoaded) {
+            callback();
+        } else {
+            this.app.workspace.on("fantasy-calendars-settings-loaded", () =>
+                callback()
+            );
+        }
     }
 
     async saveCalendar() {
-        await this.saveSettings();
         this.app.workspace.trigger("fantasy-calendars-updated");
     }
     get configDirectory() {
