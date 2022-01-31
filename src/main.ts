@@ -1,16 +1,8 @@
-import {
-    addIcon,
-    Component,
-    Notice,
-    Platform,
-    Plugin,
-    Vault,
-    WorkspaceLeaf
-} from "obsidian";
+import { Notice, Platform, Plugin, WorkspaceLeaf } from "obsidian";
 
 import FantasyCalendarSettings from "./settings/settings";
 
-import type { Calendar, Event, FantasyCalendarData } from "./@types";
+import type { Calendar, FantasyCalendarData } from "./@types";
 
 import FantasyCalendarView, {
     VIEW_TYPE,
