@@ -18,7 +18,6 @@ import FantasyCalendarView, {
     /* FullCalendarView */
 } from "./view/view";
 
-import "./main.css";
 import { CalendarEventTree, Watcher } from "./watcher/watcher";
 import { API } from "./api/api";
 import copy from "fast-copy";

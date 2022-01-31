@@ -22,8 +22,6 @@ import CalendarHelper from "src/helper";
 import { CreateEventModal } from "src/settings/modals/event";
 import type FantasyCalendar from "../main";
 
-import "./view.css";
-
 export const VIEW_TYPE = "FANTASY_CALENDAR";
 export const FULL_VIEW = "FANTASY_CALENDAR_FULL_VIEW";
 

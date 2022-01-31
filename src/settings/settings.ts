@@ -17,7 +17,6 @@ import Importer from "./import/importer";
 
 import CalendarCreator from "./creator/Creator.svelte";
 
-import "./settings.css";
 import type { Calendar } from "src/@types";
 
 import { confirmWithModal } from "./modals/confirm";
