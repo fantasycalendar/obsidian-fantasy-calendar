@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
+    import { createEventDispatcher, getContext } from "svelte";
     import { flip } from "svelte/animate";
     import { dndzone, SOURCES, TRIGGERS } from "svelte-dnd-action";
     import {
@@ -17,8 +17,12 @@
     import ToggleComponent from "../Settings/ToggleComponent.svelte";
     import AddNew from "../Utilities/AddNew.svelte";
     import NoExistingItems from "../Utilities/NoExistingItems.svelte";
+    import type { Writable } from "svelte/store";
 
     export let calendar: Calendar;
+
+    const store = getContext<Writable<Calendar>>("store");
+    store.subscribe((v) => (calendar = v));
 
     $: years = calendar.static.years;
     $: useCustomYears = calendar.static.useCustomYears;
@@ -73,6 +77,7 @@
             calendar.static.years = [];
         }
         calendar.static.useCustomYears = !calendar.static.useCustomYears;
+        store.set(calendar);
     };
 
     function startDrag(e: Event) {

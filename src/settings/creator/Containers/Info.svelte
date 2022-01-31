@@ -1,10 +1,15 @@
 <script lang="ts">
     import type { Calendar } from "src/@types";
+    import { getContext } from "svelte";
+    import { Writable } from "svelte/store";
     import TextAreaComponent from "../Settings/TextAreaComponent.svelte";
     import TextComponent from "../Settings/TextComponent.svelte";
     import ToggleComponent from "../Settings/ToggleComponent.svelte";
 
     export let calendar: Calendar;
+
+    const store = getContext<Writable<Calendar>>("store");
+    store.subscribe((v) => (calendar = v));
 
     $: displayDayNumber = calendar.static.displayDayNumber;
     $: incrementDay = calendar.static.incrementDay;
@@ -14,7 +19,10 @@
     <TextComponent
         name={"Calendar Name"}
         value={calendar.name}
-        on:blur={(evt) => (calendar.name = evt.detail)}
+        on:blur={(evt) => {
+            calendar.name = evt.detail;
+            store.set(calendar);
+        }}
     />
     <TextAreaComponent
         name={"Calendar Description"}

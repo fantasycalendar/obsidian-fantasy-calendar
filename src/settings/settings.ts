@@ -1,16 +1,11 @@
 import {
     addIcon,
     ButtonComponent,
-    DropdownComponent,
-    ExtraButtonComponent,
-    Modal,
     normalizePath,
     Notice,
     PluginSettingTab,
     setIcon,
     Setting,
-    TextAreaComponent,
-    TextComponent,
     TFolder
 } from "obsidian";
 
@@ -268,12 +263,8 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                     .setTooltip("Launch Calendar Creator")
                     .setIcon("plus-with-circle")
                     .onClick(async () => {
-                        try {
-                            await this.launchCalendarCreator();
-                        } catch (e) {
-                        } finally {
-                            this.display();
-                        }
+                        this.launchCalendarCreator();
+
                         /* const modal = new CreateCalendarModal(this.plugin);
                         modal.onClose = async () => {
                             if (!modal.saved) return;
@@ -557,36 +548,20 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
     }
 
     launchCalendarCreator(calendar: Calendar = DEFAULT_CALENDAR) {
-        return new Promise((resolve, reject) => {
-            try {
-                this.containerEl.empty();
-                this.containerEl.addClass("fantasy-calendar-creator-open");
-                const clone = copy(calendar);
-                const $app = new CalendarCreator({
-                    target: this.containerEl,
-                    props: {
-                        calendar: copy(calendar),
-                        plugin: this.plugin
-                    }
-                });
-                $app.$on("flown", () => {});
-                $app.$on("cancel", () => {
-                    this.containerEl.removeClass(
-                        "fantasy-calendar-creator-open"
-                    );
-                    console.log("cancel");
-                    resolve(clone);
-                });
-                $app.$on("save", () => {
-                    this.containerEl.removeClass(
-                        "fantasy-calendar-creator-open"
-                    );
-                    console.log("save");
-                    resolve(calendar);
-                });
-            } catch (e) {
-                reject(e);
+        this.containerEl.empty();
+        this.containerEl.addClass("fantasy-calendar-creator-open");
+        const clone = copy(calendar);
+        const $app = new CalendarCreator({
+            target: this.containerEl,
+            props: {
+                calendar: clone,
+                plugin: this.plugin
             }
+        });
+        $app.$on("exit", (evt: CustomEvent<boolean>) => {
+            this.containerEl.removeClass("fantasy-calendar-creator-open");
+            this.display();
+            console.log(evt.detail);
         });
     }
 }

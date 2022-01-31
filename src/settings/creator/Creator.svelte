@@ -2,7 +2,7 @@
     import type { Calendar } from "src/@types";
     import type FantasyCalendar from "src/main";
     import copy from "fast-copy";
-    import { ExtraButtonComponent, Setting } from "obsidian";
+    import { ExtraButtonComponent, Notice, Setting } from "obsidian";
     import { CalendarPresetModal } from "../modals/preset";
     import { createEventDispatcher, setContext } from "svelte";
     import { fly } from "svelte/transition";
@@ -34,6 +34,9 @@
     export let plugin: FantasyCalendar;
 
     const store = writable<Calendar>(calendar);
+    store.subscribe((v) => {
+        calendar = v;
+    });
     setContext<Writable<Calendar>>("store", store);
 
     const back = (node: HTMLElement) => {
@@ -79,6 +82,107 @@
     };
 
     let y: number;
+    let saved = false;
+
+    let canSave = false;
+    const missing = () => {
+        let missing: string[] = [];
+
+        if (!calendar.name?.length) {
+            missing.push("A calendar must have a name.");
+        }
+        if (!calendar.static.weekdays?.length) {
+            missing.push("A calendar must have at least 1 weekday.");
+        } else {
+            if (!calendar.static.weekdays?.every((d) => d.name?.length)) {
+                const length = calendar.static.weekdays?.filter(
+                    (d) => !d.name?.length
+                ).length;
+                if (length == 1) {
+                    missing.push(`${length} weekday does not have a name.`);
+                } else {
+                    missing.push(`${length} weekdays do not have names.`);
+                }
+            }
+            if (
+                calendar.static.firstWeekDay >=
+                (calendar.static.weekdays?.length ?? Infinity)
+            ) {
+                missing.push(
+                    `Invalid first weekday selection: ${
+                        calendar.static.weekdays[calendar.static.firstWeekDay]
+                    }`
+                );
+            }
+        }
+        if (!calendar.static.months?.length) {
+            missing.push("A calendar must have at least 1 month.");
+        } else {
+            if (!calendar.static.months?.every((m) => m.name?.length)) {
+                const length = calendar.static.months?.filter(
+                    (m) => !m.name?.length
+                ).length;
+                if (length == 1) {
+                    missing.push(`${length} month does not have a name.`);
+                } else {
+                    missing.push(`${length} months do not have names.`);
+                }
+            }
+            if (!calendar.static.months?.every((m) => m.length > 0)) {
+                const length = calendar.static.months?.filter(
+                    (m) => !(m.length > 0)
+                ).length;
+                if (length == 1) {
+                    missing.push(`${length} month does not have a length.`);
+                } else {
+                    missing.push(`${length} months do not have lengths.`);
+                }
+            }
+        }
+        if (calendar.static.useCustomYears) {
+            if (!calendar.static.years?.length) {
+                missing.push(
+                    `Use Custom Years is on but no years have been created.`
+                );
+            } else if (!calendar.static.years.every((y) => y.name?.length)) {
+                const length = calendar.static.years.filter(
+                    (y) => !y.name?.length
+                ).length;
+                if (length == 1) {
+                    missing.push(`${length} year does not have a name.`);
+                } else {
+                    missing.push(`${length} years do not have names.`);
+                }
+            }
+        }
+        return missing.join("\n");
+    };
+    $: {
+        if (
+            calendar.static.months?.length &&
+            calendar.static.months?.every((m) => m.name?.length) &&
+            calendar.static.months?.every((m) => m.length > 0) &&
+            calendar.static.weekdays?.length &&
+            calendar.static.weekdays?.every((d) => d.name?.length) &&
+            calendar.name?.length &&
+            calendar.static.firstWeekDay <
+                (calendar.static.weekdays?.length ?? Infinity) &&
+            (!calendar.static.useCustomYears ||
+                (calendar.static.useCustomYears &&
+                    calendar.static.years?.length &&
+                    calendar.static.years.every((y) => y.name?.length)))
+        ) {
+            canSave = true;
+        }
+    }
+    const checkCanSave = () => {
+        if (!canSave) {
+            new Notice(missing());
+            return;
+        }
+        saved = true;
+        ready = false;
+    };
 </script>
 
 <div class="fantasy-calendar-creator" bind:this={creator}>
@@ -87,14 +191,16 @@
             class="inherit fantasy-calendar-creator-inner"
             transition:fly={{ x: width }}
             on:introend={() => dispatch("flown")}
-            on:outroend={() => dispatch("exit")}
+            on:outroend={() => dispatch("exit", saved)}
         >
             <div class="top-nav">
                 <div class="icons">
                     <div
                         class="back"
                         use:back
-                        on:click={() => (ready = false)}
+                        on:click={() => {
+                            checkCanSave();
+                        }}
                     />
                     <div
                         class="cancel"

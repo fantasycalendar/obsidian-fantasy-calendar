@@ -18,7 +18,6 @@
     let firstWeekday = calendar.static.firstWeekDay;
     $: {
         firstWeekday = calendar.static.firstWeekDay;
-        console.log(firstWeekday, calendar.static.firstWeekDay);
     }
     $: overflow = calendar.static.overflow;
 
