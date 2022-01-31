@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.5](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.0.4...2.0.5) (2022-01-31)
+
+
+### Bug Fixes
+
+* re-add styles ([559d650](https://github.com/valentine195/obsidian-fantasy-calendar/commit/559d6503aedc27f781aa34116ae278cb181d8d53))
+
 ### [2.0.4](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.0.3...2.0.4) (2022-01-31)
 
 
