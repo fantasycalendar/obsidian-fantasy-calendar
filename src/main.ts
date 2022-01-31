@@ -182,6 +182,8 @@ export default class FantasyCalendar extends Plugin {
         this.app.workspace.onLayoutReady(() => {
             this.watcher.load();
 
+            this.addCommands();
+
             this.addSettingTab(new FantasyCalendarSettings(this));
 
             this.addCalendarView(true);
@@ -191,7 +193,20 @@ export default class FantasyCalendar extends Plugin {
                 .getLeaf(evt.getModifierState(MODIFIER_KEY))
                 .setViewState({ type: FULL_VIEW });
         });
+    }
 
+    async onunload() {
+        console.log("Unloading Fantasy Calendars v" + this.manifest.version);
+        this.app.workspace
+            .getLeavesOfType(VIEW_TYPE)
+            .forEach((leaf) => leaf.detach());
+        this.app.workspace
+            .getLeavesOfType(FULL_VIEW)
+            .forEach((leaf) => leaf.detach());
+        this.watcher.unload();
+    }
+
+    addCommands() {
         this.addCommand({
             id: "open-fantasy-calendar",
             name: "Open Fantasy Calendar",
@@ -259,17 +274,6 @@ export default class FantasyCalendar extends Plugin {
                 }
             }
         });
-    }
-
-    async onunload() {
-        console.log("Unloading Fantasy Calendars v" + this.manifest.version);
-        this.app.workspace
-            .getLeavesOfType(VIEW_TYPE)
-            .forEach((leaf) => leaf.detach());
-        this.app.workspace
-            .getLeavesOfType(FULL_VIEW)
-            .forEach((leaf) => leaf.detach());
-        this.watcher.unload();
     }
 
     async addCalendarView(startup: boolean = false) {
