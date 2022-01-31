@@ -2,7 +2,7 @@
     import type { Calendar } from "src/@types";
     import type FantasyCalendar from "src/main";
     import copy from "fast-copy";
-    import { ExtraButtonComponent, Notice, Setting } from "obsidian";
+    import { ExtraButtonComponent, Notice, setIcon, Setting } from "obsidian";
     import { CalendarPresetModal } from "../modals/preset";
     import { createEventDispatcher, setContext } from "svelte";
     import { fly } from "svelte/transition";
@@ -20,15 +20,16 @@
     import { Writable, writable } from "svelte/store";
 
     let ready = false;
-    let width: number;
     let creator: HTMLDivElement;
+
     onMount(() => {
-        width = creator.clientWidth;
         ready = true;
     });
 
     const dispatch = createEventDispatcher();
 
+    export let width: number;
+    export let top: number;
     export let calendar: Calendar;
     $: window.calendar = calendar;
     export let plugin: FantasyCalendar;
@@ -81,34 +82,35 @@
             });
     };
 
-    let y: number;
+    let y = 0;
     let saved = false;
 
     let canSave = false;
-    const missing = () => {
-        let missing: string[] = [];
+    let missing: string;
+    $: {
+        let missingArr: string[] = [];
 
         if (!calendar.name?.length) {
-            missing.push("A calendar must have a name.");
+            missingArr.push("A calendar must have a name.");
         }
         if (!calendar.static.weekdays?.length) {
-            missing.push("A calendar must have at least 1 weekday.");
+            missingArr.push("A calendar must have at least 1 weekday.");
         } else {
             if (!calendar.static.weekdays?.every((d) => d.name?.length)) {
                 const length = calendar.static.weekdays?.filter(
                     (d) => !d.name?.length
                 ).length;
                 if (length == 1) {
-                    missing.push(`${length} weekday does not have a name.`);
+                    missingArr.push(`${length} weekday does not have a name.`);
                 } else {
-                    missing.push(`${length} weekdays do not have names.`);
+                    missingArr.push(`${length} weekdays do not have names.`);
                 }
             }
             if (
                 calendar.static.firstWeekDay >=
                 (calendar.static.weekdays?.length ?? Infinity)
             ) {
-                missing.push(
+                missingArr.push(
                     `Invalid first weekday selection: ${
                         calendar.static.weekdays[calendar.static.firstWeekDay]
                     }`
@@ -116,16 +118,16 @@
             }
         }
         if (!calendar.static.months?.length) {
-            missing.push("A calendar must have at least 1 month.");
+            missingArr.push("A calendar must have at least 1 month.");
         } else {
             if (!calendar.static.months?.every((m) => m.name?.length)) {
                 const length = calendar.static.months?.filter(
                     (m) => !m.name?.length
                 ).length;
                 if (length == 1) {
-                    missing.push(`${length} month does not have a name.`);
+                    missingArr.push(`${length} month does not have a name.`);
                 } else {
-                    missing.push(`${length} months do not have names.`);
+                    missingArr.push(`${length} months do not have names.`);
                 }
             }
             if (!calendar.static.months?.every((m) => m.length > 0)) {
@@ -133,15 +135,15 @@
                     (m) => !(m.length > 0)
                 ).length;
                 if (length == 1) {
-                    missing.push(`${length} month does not have a length.`);
+                    missingArr.push(`${length} month does not have a length.`);
                 } else {
-                    missing.push(`${length} months do not have lengths.`);
+                    missingArr.push(`${length} months do not have lengths.`);
                 }
             }
         }
         if (calendar.static.useCustomYears) {
             if (!calendar.static.years?.length) {
-                missing.push(
+                missingArr.push(
                     `Use Custom Years is on but no years have been created.`
                 );
             } else if (!calendar.static.years.every((y) => y.name?.length)) {
@@ -149,14 +151,14 @@
                     (y) => !y.name?.length
                 ).length;
                 if (length == 1) {
-                    missing.push(`${length} year does not have a name.`);
+                    missingArr.push(`${length} year does not have a name.`);
                 } else {
-                    missing.push(`${length} years do not have names.`);
+                    missingArr.push(`${length} years do not have names.`);
                 }
             }
         }
-        return missing.join("\n");
-    };
+        missing = missingArr.join("\n");
+    }
     $: {
         if (
             calendar.static.months?.length &&
@@ -173,49 +175,81 @@
                     calendar.static.years.every((y) => y.name?.length)))
         ) {
             canSave = true;
+        } else {
+            canSave = false;
         }
     }
     const checkCanSave = () => {
         if (!canSave) {
-            new Notice(missing());
+            new Notice(missing);
             return;
         }
         saved = true;
         ready = false;
     };
+    const savedEl = (node: HTMLElement) => {
+        if (canSave) {
+            setIcon(node, "checkmark");
+        } else {
+            setIcon(node, "fantasy-calendar-warning");
+        }
+    };
 </script>
 
-<div class="fantasy-calendar-creator" bind:this={creator}>
+<div
+    class="fantasy-calendar-creator"
+    bind:this={creator}
+    style="padding-top: {top}px;"
+>
     {#if ready}
         <div
             class="inherit fantasy-calendar-creator-inner"
-            transition:fly={{ x: width }}
+            style="width: {width}px;"
+            transition:fly={{ x: width * 1.5, opacity: 1 }}
             on:introend={() => dispatch("flown")}
-            on:outroend={() => dispatch("exit", saved)}
+            on:outroend={() => dispatch("exit", { saved, calendar })}
         >
             <div class="top-nav">
                 <div class="icons">
-                    <div
-                        class="back"
-                        use:back
-                        on:click={() => {
-                            checkCanSave();
-                        }}
-                    />
+                    <div class="left">
+                        <div
+                            class="back"
+                            use:back
+                            on:click={() => {
+                                checkCanSave();
+                            }}
+                        />
+                        <div class="check">
+                            {#if canSave}
+                                <div
+                                    class="save can-save"
+                                    use:savedEl
+                                    aria-label={missing}
+                                />
+                            {:else}
+                                <div
+                                    class="save"
+                                    use:savedEl
+                                    aria-label={missing}
+                                />
+                                <span class="additional">
+                                    Additional information is required before
+                                    saving
+                                </span>
+                            {/if}
+                        </div>
+                    </div>
                     <div
                         class="cancel"
                         use:cancel
                         on:click={() => (ready = false)}
                     />
                 </div>
-                <h3
-                    class="fantasy-calendar-creator-header"
-                    style="font-size: calc(var(--h1) - {y ?? 0}px);"
-                >
+                <h3 class="fantasy-calendar-creator-header">
                     Calendar Creator
                 </h3>
             </div>
-            <div class="fantasy-creator-app" on:scroll={(evt) => y++}>
+            <div class="fantasy-creator-app">
                 <div use:preset />
                 <!-- <div class="left-nav">
                     <div use:info />
@@ -273,6 +307,15 @@
 </div>
 
 <style>
+    .fantasy-calendar-creator {
+        position: absolute;
+        top: 0;
+    }
+    .fantasy-calendar-creator-inner {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
     .fantasy-calendar-creator,
     .fantasy-calendar-creator-inner,
     .fantasy-creator-app {
@@ -287,7 +330,7 @@
     }
     .top-nav {
         position: sticky;
-        top: 0px;
+        top: 0;
         padding: 10px 0px;
         background-color: inherit;
         z-index: 1;
@@ -296,6 +339,26 @@
         display: flex;
         justify-content: space-between;
     }
+
+    .icons .left {
+        display: flex;
+        align-items: center;
+    }
+    .check {
+        display: flex;
+        gap: 0.25rem;
+        align-items: center;
+    }
+    .additional {
+        color: var(--text-faint);
+    }
+    .save {
+        color: var(--text-error);
+    }
+    .save.can-save {
+        color: var(--interactive-success);
+    }
+
     /* .fantasy-creator-app {
         display: grid;
         grid-template-columns: auto 1fr;

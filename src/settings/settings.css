@@ -12,8 +12,17 @@
 }
 
 /** Details */
-.fantasy-calendar-settings {
+.modal.mod-settings
+    .vertical-tab-content-container
+    .vertical-tab-content.fantasy-calendar-settings {
     position: relative;
+    padding-top: 0px;
+}
+
+.modal.mod-settings
+    .vertical-tab-content.fantasy-calendar-settings
+    > h2:first-child {
+    margin-top: initial;
 }
 
 .fantasy-calendar-settings details > summary {

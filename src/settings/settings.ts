@@ -54,6 +54,7 @@ addIcon(
 );
 
 export default class FantasyCalendarSettings extends PluginSettingTab {
+    contentEl: HTMLDivElement;
     get data() {
         return this.plugin.data;
     }
@@ -65,12 +66,16 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
         console.log("display");
         this.containerEl.createEl("h2", { text: "Fantasy Calendars" });
         this.containerEl.addClass("fantasy-calendar-settings");
+        this.contentEl = this.containerEl.createDiv(
+            "fantasy-calendar-settings-content"
+        );
+
 
         this.buildInfo(
-            this.containerEl.createDiv("fantasy-calendar-nested-settings")
+            this.contentEl.createDiv("fantasy-calendar-nested-settings")
         );
         this.buildCalendars(
-            this.containerEl.createEl("details", {
+            this.contentEl.createEl("details", {
                 cls: "fantasy-calendar-nested-settings",
                 attr: {
                     ...(this.data.settingsToggleState.calendars
@@ -80,7 +85,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
             })
         );
         this.buildEvents(
-            this.containerEl.createEl("details", {
+            this.contentEl.createEl("details", {
                 cls: "fantasy-calendar-nested-settings",
                 attr: {
                     ...(this.data.settingsToggleState.events
@@ -262,7 +267,11 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                     .setTooltip("Launch Calendar Creator")
                     .setIcon("plus-with-circle")
                     .onClick(async () => {
-                        this.launchCalendarCreator();
+                        const calendar = await this.launchCalendarCreator();
+                        console.log(
+                            "🚀 ~ file: settings.ts ~ line 266 ~ calendar",
+                            calendar
+                        );
 
                         /* const modal = new CreateCalendarModal(this.plugin);
                         modal.onClose = async () => {
@@ -547,20 +556,39 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
     }
 
     launchCalendarCreator(calendar: Calendar = DEFAULT_CALENDAR) {
-        this.containerEl.empty();
-        this.containerEl.addClass("fantasy-calendar-creator-open");
-        const clone = copy(calendar);
-        const $app = new CalendarCreator({
-            target: this.containerEl,
-            props: {
-                calendar: clone,
-                plugin: this.plugin
-            }
-        });
-        $app.$on("exit", (evt: CustomEvent<boolean>) => {
-            this.containerEl.removeClass("fantasy-calendar-creator-open");
-            this.display();
-            console.log(evt.detail);
+        /* this.containerEl.empty(); */
+        console.log(this.containerEl.offsetTop, this.contentEl.offsetTop);
+        return new Promise((resolve) => {
+            const clone = copy(calendar);
+            const $app = new CalendarCreator({
+                target: this.containerEl,
+                props: {
+                    calendar: clone,
+                    plugin: this.plugin,
+                    width: this.contentEl.clientWidth,
+                    top: this.containerEl.offsetTop
+                }
+            });
+            $app.$on(
+                "exit",
+                (evt: CustomEvent<{ saved: boolean; calendar: Calendar }>) => {
+                    this.display();
+                    if (evt.detail.saved) {
+                        //saved
+                        calendar = copy(evt.detail.calendar);
+                        resolve(calendar);
+                    }
+                }
+            );
+            $app.$on("destroy", (evt: CustomEvent<boolean>) => {
+                this.display();
+                console.log(evt.detail);
+                if (evt.detail) {
+                    //saved
+                    calendar = copy(clone);
+                    resolve(calendar);
+                }
+            });
         });
     }
 }
