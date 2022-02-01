@@ -56,7 +56,7 @@ esbuild
         watch: !prod,
         target: "es2020",
         logLevel: "info",
-        sourcemap: !prod,
+        sourcemap: prod ? false : "inline",
         minify: true,
         treeShaking: true,
         outdir: dir,
@@ -68,4 +68,6 @@ esbuild
             inlineWorkerPlugin(/* { format: "cjs" } */)
         ]
     })
-    .catch(() => {process.exit(1)});
+    .catch(() => {
+        process.exit(1);
+    });
