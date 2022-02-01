@@ -557,13 +557,23 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
         /* this.containerEl.empty(); */
         return new Promise((resolve) => {
             const clone = copy(calendar);
+
+            const top =
+                -1 *
+                Number(
+                    getComputedStyle(this.containerEl).paddingTop.replace(
+                        /[^\d]/g,
+                        ""
+                    )
+                );
+
             const $app = new CalendarCreator({
                 target: this.containerEl,
                 props: {
                     calendar: clone,
                     plugin: this.plugin,
                     width: this.contentEl.clientWidth,
-                    top: this.containerEl.offsetTop
+                    top
                 }
             });
             const observer = new ResizeObserver(() => {

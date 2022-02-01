@@ -109,7 +109,7 @@
     };
 </script>
 
-<div class="fantasy-calendar-creator" style="padding-top: {top}px;">
+<div class="fantasy-calendar-creator">
     {#if ready}
         <div
             class="inherit fantasy-calendar-creator-inner"
@@ -118,7 +118,7 @@
             on:introend={() => dispatch("flown")}
             on:outroend={() => dispatch("exit", { saved, calendar })}
         >
-            <div class="top-nav">
+            <div class="top-nav" style="--top: {top}px;">
                 <div class="icons">
                     <div class="left">
                         <div
@@ -201,7 +201,7 @@
     }
     .top-nav {
         position: sticky;
-        top: 0;
+        top: var(--top, 0);
         padding: 10px 0px;
         background-color: inherit;
         z-index: 1;
