@@ -1,8 +1,10 @@
 <script lang="ts">
     import { Setting } from "obsidian";
+    import { warning } from "./utils";
 
     export let open = true;
     export let name: string;
+    export let warn: boolean = false;
     const details = (node: HTMLElement) => {
         if (open) node.setAttr("open", "open");
     };
@@ -13,7 +15,17 @@
 
 <details class="fantasy-calendar-nested-settings" use:details>
     <summary class="fantasy-calendar-nested-summary">
-        <div use:summary />
+        <div class="setting-item setting-item-heading">
+            <div class="setting-item-info">
+                <div class="name-container">
+                    {#if warn}
+                        <div use:warning />
+                    {/if}
+                    <div class="setting-item-name">{name}</div>
+                </div>
+                <div class="setting-item-description" />
+            </div>
+        </div>
         <div class="collapser">
             <div class="handle" />
         </div>
@@ -22,6 +34,11 @@
 </details>
 
 <style>
+    .name-container {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
     .fantasy-calendar-nested-summary {
         outline: none;
         display: block !important;
