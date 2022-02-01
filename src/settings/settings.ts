@@ -63,7 +63,6 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
     }
     async display() {
         this.containerEl.empty();
-        console.log("display");
         this.containerEl.createEl("h2", { text: "Fantasy Calendars" });
         this.containerEl.addClass("fantasy-calendar-settings");
         this.contentEl = this.containerEl.createDiv(
@@ -557,7 +556,6 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
 
     launchCalendarCreator(calendar: Calendar = DEFAULT_CALENDAR) {
         /* this.containerEl.empty(); */
-        console.log(this.containerEl.offsetTop, this.contentEl.offsetTop);
         return new Promise((resolve) => {
             const clone = copy(calendar);
             const $app = new CalendarCreator({
