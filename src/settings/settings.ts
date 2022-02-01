@@ -69,7 +69,6 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
             "fantasy-calendar-settings-content"
         );
 
-
         this.buildInfo(
             this.contentEl.createDiv("fantasy-calendar-nested-settings")
         );
@@ -567,6 +566,10 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                     top: this.containerEl.offsetTop
                 }
             });
+            const observer = new ResizeObserver(() => {
+                $app.$set({ width: this.contentEl.clientWidth });
+            });
+            observer.observe(this.contentEl);
             $app.$on(
                 "exit",
                 (evt: CustomEvent<{ saved: boolean; calendar: Calendar }>) => {
@@ -574,6 +577,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                     if (evt.detail.saved) {
                         //saved
                         calendar = copy(evt.detail.calendar);
+                        observer.disconnect();
                         resolve(calendar);
                     }
                 }
@@ -584,6 +588,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                 if (evt.detail) {
                     //saved
                     calendar = copy(clone);
+                    observer.disconnect();
                     resolve(calendar);
                 }
             });
