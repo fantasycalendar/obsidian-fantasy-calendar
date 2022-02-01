@@ -13,11 +13,15 @@
 
     $: displayDayNumber = calendar.static.displayDayNumber;
     $: incrementDay = calendar.static.incrementDay;
+
+    $: validName = calendar.name != null && calendar.name.length;
 </script>
 
 <div class="fantasy-calendar-info">
     <TextComponent
         name={"Calendar Name"}
+        warn={!validName}
+        desc={!validName ? "The calendar must have a name" : ""}
         value={calendar.name}
         on:blur={(evt) => {
             calendar.name = evt.detail;
