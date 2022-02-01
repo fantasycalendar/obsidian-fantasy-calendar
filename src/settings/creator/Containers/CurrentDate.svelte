@@ -2,7 +2,7 @@
     import type { Calendar } from "src/@types";
     import { getContext } from "svelte";
     import { Writable } from "svelte/store";
-import Details from "../Utilities/Details.svelte";
+    import Details from "../Utilities/Details.svelte";
     import {
         warning,
         invalidDayLabel,
@@ -29,14 +29,14 @@ import Details from "../Utilities/Details.svelte";
     $: console.log(invalid, validDay, validMonth, validYear);
 </script>
 
-<Details name={"Current Date"}>
+<Details name={"Current Date"} warn={invalid} label={"Invalid current date specified"}>
     <div class="fantasy-calendar-date-field-container setting-item">
         <div class="fantasy-calendar-date-field">
-            <div class="date-label">
+            <div class="warning-container">
+                <label for="">Day</label>
                 {#if !validDay}
                     <div use:warning />
                 {/if}
-                <label for="">Day</label>
             </div>
             <input
                 type="number"
@@ -54,11 +54,11 @@ import Details from "../Utilities/Details.svelte";
             {/if}
         </div>
         <div class="fantasy-calendar-date-field">
-            <div class="date-label">
+            <div class="warning-container">
+                <label for="">Month</label>
                 {#if !validMonth}
                     <div use:warning />
                 {/if}
-                <label for="">Month</label>
             </div>
             <select
                 class="dropdown"
@@ -78,11 +78,11 @@ import Details from "../Utilities/Details.svelte";
             {/if}
         </div>
         <div class="fantasy-calendar-date-field">
-            <div class="date-label">
+            <div class="warning-container">
+                <label for="">Year</label>
                 {#if !validYear}
                     <div use:warning />
                 {/if}
-                <label for="">Year</label>
             </div>
             <input
                 type="number"
@@ -117,12 +117,6 @@ import Details from "../Utilities/Details.svelte";
 
     .fantasy-calendar-date-field .setting-item-description {
         padding-top: 0;
-    }
-
-    .date-label {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
     }
 
     .fantasy-calendar-date-field .invalid {

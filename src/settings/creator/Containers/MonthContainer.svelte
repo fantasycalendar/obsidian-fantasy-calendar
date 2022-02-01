@@ -11,6 +11,7 @@
     import AddNew from "../Utilities/AddNew.svelte";
     import NoExistingItems from "../Utilities/NoExistingItems.svelte";
     import { Writable } from "svelte/store";
+    import Details from "../Utilities/Details.svelte";
 
     let calendar: Calendar;
 
@@ -76,37 +77,39 @@
     };
 </script>
 
-<AddNew on:click={() => add()} />
+<Details name={"Months"} warn={!months?.length} label={"At least one month is required"}>
+    <AddNew on:click={() => add()} />
 
-{#if !months.length}
-    <NoExistingItems message={"Create a new month to see it here."} />
-{:else}
-    <div
-        use:dndzone={{ items: months, flipDurationMs, dragDisabled }}
-        class="existing-items"
-        on:consider={handleConsider}
-        on:finalize={handleFinalize}
-    >
-        {#each months as month (month.id)}
-            <div animate:flip={{ duration: flipDurationMs }} class="month">
-                <div
-                    class="icon"
-                    use:grip
-                    on:mousedown={startDrag}
-                    on:touchstart={startDrag}
-                />
-                <MonthInstance
-                    {month}
-                    on:mousedown={startDrag}
-                    on:month-delete={() => deleteMonth(month)}
-                    on:month-update={() => {
-                        store.set(calendar);
-                    }}
-                />
-            </div>
-        {/each}
-    </div>
-{/if}
+    {#if !months.length}
+        <NoExistingItems message={"Create a new month to see it here."} />
+    {:else}
+        <div
+            use:dndzone={{ items: months, flipDurationMs, dragDisabled }}
+            class="existing-items"
+            on:consider={handleConsider}
+            on:finalize={handleFinalize}
+        >
+            {#each months as month (month.id)}
+                <div animate:flip={{ duration: flipDurationMs }} class="month">
+                    <div
+                        class="icon"
+                        use:grip
+                        on:mousedown={startDrag}
+                        on:touchstart={startDrag}
+                    />
+                    <MonthInstance
+                        {month}
+                        on:mousedown={startDrag}
+                        on:month-delete={() => deleteMonth(month)}
+                        on:month-update={() => {
+                            store.set(calendar);
+                        }}
+                    />
+                </div>
+            {/each}
+        </div>
+    {/if}
+</Details>
 
 <style>
     .month {

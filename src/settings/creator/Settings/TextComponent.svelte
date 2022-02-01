@@ -16,35 +16,30 @@
 <div class="setting-item">
     <div class="setting-item-info">
         <div class="setting-item-name">
-            <div class="name-container">
-                {#if warn}
-                    <div use:warning />
-                {/if}
-                {name}
-            </div>
+            {name}
         </div>
         <div class="setting-item-description">{desc}</div>
     </div>
     <div class="setting-item-control">
-        <input
-            type="text"
-            spellcheck="false"
-            {placeholder}
-            class:warn
-            bind:value
-            on:blur={() => {
-                dispatch("blur", value);
-            }}
-        />
+        <div class="warning-container">
+            {#if warn}
+                <div use:warning />
+            {/if}
+            <input
+                type="text"
+                spellcheck="false"
+                {placeholder}
+                class:warn
+                bind:value
+                on:blur={() => {
+                    dispatch("blur", value);
+                }}
+            />
+        </div>
     </div>
 </div>
 
 <style>
-    .name-container {
-        display: flex;
-        align-items: center;
-        gap: 0.25rem;
-    }
     input.warn {
         border-color: var(--text-error);
     }

@@ -87,7 +87,7 @@ import Details from "../Utilities/Details.svelte";
     };
 </script>
 
-<Details name={"Weekdays"}>
+<Details name={"Weekdays"} warn={!weekdays?.length} label={"At least one weekday is required"}>
     <ToggleComponent
         name={"Overflow Weeks"}
         desc={"Turn this off to make each month start on the first of the week."}

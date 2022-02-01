@@ -242,4 +242,11 @@
     .back :global(.clickable-icon) {
         margin-left: 0;
     }
+    /* Globals */
+    .fantasy-calendar-creator :global(.warning-container) {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
 </style>

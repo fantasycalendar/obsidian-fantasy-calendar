@@ -18,7 +18,7 @@
     import AddNew from "../Utilities/AddNew.svelte";
     import NoExistingItems from "../Utilities/NoExistingItems.svelte";
     import type { Writable } from "svelte/store";
-import Details from "../Utilities/Details.svelte";
+    import Details from "../Utilities/Details.svelte";
 
     export let calendar: Calendar;
 
@@ -69,7 +69,7 @@ import Details from "../Utilities/Details.svelte";
     const confirmCustom = async () => {
         if (
             calendar.static.useCustomYears &&
-            years.length &&
+            years?.length &&
             (await confirmWithModal(
                 app,
                 "The custom years you have created will be removed. Proceed?"
@@ -123,7 +123,11 @@ import Details from "../Utilities/Details.svelte";
     }
 </script>
 
-<Details name={"Years"}>
+<Details
+    name={"Years"}
+    warn={useCustomYears && !years?.length}
+    label={"At least one year is required when using custom years"}
+>
     <ToggleComponent
         name="Use Custom Years"
         desc={customDesc}

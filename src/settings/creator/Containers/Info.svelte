@@ -18,7 +18,11 @@
     $: validName = calendar.name != null && calendar.name.length;
 </script>
 
-<Details name={"Basic Info"} warn={!validName}>
+<Details
+    name={"Basic Info"}
+    warn={!validName}
+    label={"The calendar must have a name"}
+>
     <div class="fantasy-calendar-info">
         <TextComponent
             name={"Calendar Name"}

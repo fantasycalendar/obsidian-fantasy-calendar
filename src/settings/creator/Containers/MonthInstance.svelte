@@ -2,7 +2,6 @@
     import { debounce, ExtraButtonComponent } from "obsidian";
     import type { Month } from "src/@types";
     import { createEventDispatcher } from "svelte";
-import Details from "../Utilities/Details.svelte";
 
     const dispatch = createEventDispatcher();
 
@@ -34,7 +33,6 @@ import Details from "../Utilities/Details.svelte";
     }
 </script>
 
-<Details name={"Months"}>
     <div class="month">
         <input
             type="text"
@@ -60,7 +58,6 @@ import Details from "../Utilities/Details.svelte";
 
         <div class="icon" use:trash />
     </div>
-</Details>
 
 <style>
     .month {

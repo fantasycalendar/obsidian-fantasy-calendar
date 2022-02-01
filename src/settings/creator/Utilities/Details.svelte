@@ -5,6 +5,7 @@
     export let open = true;
     export let name: string;
     export let warn: boolean = false;
+    export let label: string = null;
     const details = (node: HTMLElement) => {
         if (open) node.setAttr("open", "open");
     };
@@ -17,27 +18,41 @@
     <summary class="fantasy-calendar-nested-summary">
         <div class="setting-item setting-item-heading">
             <div class="setting-item-info">
-                <div class="name-container">
-                    {#if warn}
-                        <div use:warning />
-                    {/if}
-                    <div class="setting-item-name">{name}</div>
-                </div>
+                <div class="setting-item-name">{name}</div>
                 <div class="setting-item-description" />
             </div>
         </div>
         <div class="collapser">
-            <div class="handle" />
+            <div class="warning-container">
+                {#if warn}
+                    <div use:warning />
+                {/if}
+                <div class="handle" />
+            </div>
         </div>
     </summary>
+    {#if warn && label}
+        <div class="warning-label-container">
+            <div class="setting-item-description warning-label">
+                {label}
+            </div>
+        </div>
+    {/if}
     <slot />
 </details>
 
 <style>
-    .name-container {
+    .warning-label-container {
         display: flex;
-        align-items: center;
-        gap: 0.25rem;
+        justify-content: flex-end;
+        position: absolute;
+        right: 0;
+    }
+    .fantasy-calendar-nested-settings {
+        position: relative;
+    }
+    .warning-label {
+        color: var(--text-error);
     }
     .fantasy-calendar-nested-summary {
         outline: none;
