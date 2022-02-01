@@ -25,11 +25,13 @@
     $: validMonth = isValidMonth(current.month, calendar);
     $: validYear = isValidYear(current.year, calendar);
     $: invalid = !validDay || !validMonth || !validYear;
-
-    $: console.log(invalid, validDay, validMonth, validYear);
 </script>
 
-<Details name={"Current Date"} warn={invalid} label={"Invalid current date specified"}>
+<Details
+    name={"Current Date"}
+    warn={invalid}
+    label={"Invalid current date specified"}
+>
     <div class="fantasy-calendar-date-field-container setting-item">
         <div class="fantasy-calendar-date-field">
             <div class="warning-container">
