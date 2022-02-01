@@ -18,9 +18,9 @@
     import MoonContainer from "./Containers/MoonContainer.svelte";
     import LeapDayContainer from "./Containers/LeapDayContainer.svelte";
     import { Writable, writable } from "svelte/store";
+    import { getCanSave, getMissingNotice, warning } from "./Utilities/utils";
 
     let ready = false;
-    let creator: HTMLDivElement;
 
     onMount(() => {
         ready = true;
@@ -31,8 +31,9 @@
     export let width: number;
     export let top: number;
     export let calendar: Calendar;
-    $: window.calendar = calendar;
     export let plugin: FantasyCalendar;
+
+    window.calendar = calendar;
 
     const store = writable<Calendar>(calendar);
     store.subscribe((v) => {
@@ -82,103 +83,11 @@
             });
     };
 
-    let y = 0;
     let saved = false;
 
-    let canSave = false;
-    let missing: string;
-    $: {
-        let missingArr: string[] = [];
+    $: missing = getMissingNotice(calendar);
+    $: canSave = getCanSave(calendar);
 
-        if (!calendar.name?.length) {
-            missingArr.push("A calendar must have a name.");
-        }
-        if (!calendar.static.weekdays?.length) {
-            missingArr.push("A calendar must have at least 1 weekday.");
-        } else {
-            if (!calendar.static.weekdays?.every((d) => d.name?.length)) {
-                const length = calendar.static.weekdays?.filter(
-                    (d) => !d.name?.length
-                ).length;
-                if (length == 1) {
-                    missingArr.push(`${length} weekday does not have a name.`);
-                } else {
-                    missingArr.push(`${length} weekdays do not have names.`);
-                }
-            }
-            if (
-                calendar.static.firstWeekDay >=
-                (calendar.static.weekdays?.length ?? Infinity)
-            ) {
-                missingArr.push(
-                    `Invalid first weekday selection: ${
-                        calendar.static.weekdays[calendar.static.firstWeekDay]
-                    }`
-                );
-            }
-        }
-        if (!calendar.static.months?.length) {
-            missingArr.push("A calendar must have at least 1 month.");
-        } else {
-            if (!calendar.static.months?.every((m) => m.name?.length)) {
-                const length = calendar.static.months?.filter(
-                    (m) => !m.name?.length
-                ).length;
-                if (length == 1) {
-                    missingArr.push(`${length} month does not have a name.`);
-                } else {
-                    missingArr.push(`${length} months do not have names.`);
-                }
-            }
-            if (!calendar.static.months?.every((m) => m.length > 0)) {
-                const length = calendar.static.months?.filter(
-                    (m) => !(m.length > 0)
-                ).length;
-                if (length == 1) {
-                    missingArr.push(`${length} month does not have a length.`);
-                } else {
-                    missingArr.push(`${length} months do not have lengths.`);
-                }
-            }
-        }
-        if (calendar.static.useCustomYears) {
-            if (!calendar.static.years?.length) {
-                missingArr.push(
-                    `Use Custom Years is on but no years have been created.`
-                );
-            } else if (!calendar.static.years.every((y) => y.name?.length)) {
-                const length = calendar.static.years.filter(
-                    (y) => !y.name?.length
-                ).length;
-                if (length == 1) {
-                    missingArr.push(`${length} year does not have a name.`);
-                } else {
-                    missingArr.push(`${length} years do not have names.`);
-                }
-            }
-        }
-        missing = missingArr.join("\n");
-    }
-    $: {
-        if (
-            calendar.static.months?.length &&
-            calendar.static.months?.every((m) => m.name?.length) &&
-            calendar.static.months?.every((m) => m.length > 0) &&
-            calendar.static.weekdays?.length &&
-            calendar.static.weekdays?.every((d) => d.name?.length) &&
-            calendar.name?.length &&
-            calendar.static.firstWeekDay <
-                (calendar.static.weekdays?.length ?? Infinity) &&
-            (!calendar.static.useCustomYears ||
-                (calendar.static.useCustomYears &&
-                    calendar.static.years?.length &&
-                    calendar.static.years.every((y) => y.name?.length)))
-        ) {
-            canSave = true;
-        } else {
-            canSave = false;
-        }
-    }
     const checkCanSave = () => {
         if (!canSave) {
             new Notice(missing);
@@ -191,16 +100,12 @@
         if (canSave) {
             setIcon(node, "checkmark");
         } else {
-            setIcon(node, "fantasy-calendar-warning");
+            warning(node);
         }
     };
 </script>
 
-<div
-    class="fantasy-calendar-creator"
-    bind:this={creator}
-    style="padding-top: {top}px;"
->
+<div class="fantasy-calendar-creator" style="padding-top: {top}px;">
     {#if ready}
         <div
             class="inherit fantasy-calendar-creator-inner"
@@ -251,56 +156,15 @@
             </div>
             <div class="fantasy-creator-app">
                 <div use:preset />
-                <!-- <div class="left-nav">
-                    <div use:info />
-                    <div>
-                        <div class=" clickable-icon">W</div>
-                    </div>
-                    <div>
-                        <div class=" clickable-icon">M</div>
-                    </div>
-                    <div>
-                        <div class=" clickable-icon">Y</div>
-                    </div>
-                    <div>
-                        <div class=" clickable-icon">D</div>
-                    </div>
-                    <div>
-                        <div class=" clickable-icon">E</div>
-                    </div>
-                    <div>
-                        <div class=" clickable-icon">C</div>
-                    </div>
-                    <div use:moons />
-                </div> -->
-                <Details name={"Basic Info"}>
-                    <Info {calendar} />
-                </Details>
-                <Details name={"Weekdays"}>
-                    <WeekdayContainer {calendar} />
-                </Details>
-                <Details name={"Months"}>
-                    <MonthContainer />
-                </Details>
-                <Details name={"Years"}>
-                    <YearContainer {calendar} app={plugin.app} />
-                </Details>
-
-                <Details name={"Current Date"}>
-                    <CurrentDate />
-                </Details>
-                <Details name={"Events"}>
-                    <EventContainer {plugin} {calendar} />
-                </Details>
-                <Details name={"Categories"}>
-                    <CategoryContainer {calendar} />
-                </Details>
-                <Details name={"Moons"}>
-                    <MoonContainer {plugin} {calendar} />
-                </Details>
-                <Details name={"Leap Days"}>
-                    <LeapDayContainer {calendar} {plugin} />
-                </Details>
+                <Info {calendar} />
+                <WeekdayContainer {calendar} />
+                <MonthContainer />
+                <YearContainer {calendar} app={plugin.app} />
+                <CurrentDate />
+                <EventContainer {plugin} {calendar} />
+                <CategoryContainer {calendar} />
+                <MoonContainer {plugin} {calendar} />
+                <LeapDayContainer {calendar} {plugin} />
             </div>
         </div>
     {/if}

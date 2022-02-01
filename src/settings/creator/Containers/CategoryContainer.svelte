@@ -1,8 +1,5 @@
 <script lang="ts">
-    import {
-        ExtraButtonComponent,
-        TextComponent
-    } from "obsidian";
+    import { ExtraButtonComponent, TextComponent } from "obsidian";
     import { createEventDispatcher } from "svelte";
     import randomColor from "randomcolor";
 
@@ -10,6 +7,7 @@
     import { nanoid } from "src/utils/functions";
     import AddNew from "../Utilities/AddNew.svelte";
     import NoExistingItems from "../Utilities/NoExistingItems.svelte";
+    import Details from "../Utilities/Details.svelte";
 
     const dispatch = createEventDispatcher();
 
@@ -44,37 +42,41 @@
     };
 </script>
 
-<AddNew
-    on:click={() =>
-        (calendar.categories = [
-            ...categories,
-            {
-                id: nanoid(6),
-                color: randomColor(),
-                name: "Category"
-            }
-        ])}
-/>
+<Details name={"Categories"}>
+    <AddNew
+        on:click={() =>
+            (calendar.categories = [
+                ...categories,
+                {
+                    id: nanoid(6),
+                    color: randomColor(),
+                    name: "Category"
+                }
+            ])}
+    />
 
-{#if !categories.length}
-    <NoExistingItems message={"Create a new event category to see it here."} />
-{:else}
-    <div class="existing-items">
-        {#each categories as category}
-            <div class="category">
-                <div use:name={category} />
-                <div class="color">
-                    <input
-                        type="color"
-                        value={category.color}
-                        on:change={(evt) => updateColor(evt, category)}
-                    />
+    {#if !categories.length}
+        <NoExistingItems
+            message={"Create a new event category to see it here."}
+        />
+    {:else}
+        <div class="existing-items">
+            {#each categories as category}
+                <div class="category">
+                    <div use:name={category} />
+                    <div class="color">
+                        <input
+                            type="color"
+                            value={category.color}
+                            on:change={(evt) => updateColor(evt, category)}
+                        />
+                    </div>
+                    <div use:trash={category} />
                 </div>
-                <div use:trash={category} />
-            </div>
-        {/each}
-    </div>
-{/if}
+            {/each}
+        </div>
+    {/if}
+</Details>
 
 <style>
     .category {

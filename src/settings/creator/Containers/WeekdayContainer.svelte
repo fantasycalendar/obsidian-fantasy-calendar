@@ -10,6 +10,7 @@
     import ToggleComponent from "../Settings/ToggleComponent.svelte";
     import AddNew from "../Utilities/AddNew.svelte";
     import NoExistingItems from "../Utilities/NoExistingItems.svelte";
+import Details from "../Utilities/Details.svelte";
 
     const dispatch = createEventDispatcher();
     export let calendar: Calendar;
@@ -86,75 +87,80 @@
     };
 </script>
 
-<ToggleComponent
-    name={"Overflow Weeks"}
-    desc={"Turn this off to make each month start on the first of the week."}
-    value={calendar.static.overflow}
-    on:click={() => (calendar.static.overflow = !calendar.static.overflow)}
-/>
+<Details name={"Weekdays"}>
+    <ToggleComponent
+        name={"Overflow Weeks"}
+        desc={"Turn this off to make each month start on the first of the week."}
+        value={calendar.static.overflow}
+        on:click={() => (calendar.static.overflow = !calendar.static.overflow)}
+    />
 
-<div class="setting-item">
-    <div class="setting-item-info">
-        <div class="setting-item-name">First Day</div>
-        <div class="setting-item-description">
-            The day of the week the first year starts on.
+    <div class="setting-item">
+        <div class="setting-item-info">
+            <div class="setting-item-name">First Day</div>
+            <div class="setting-item-description">
+                The day of the week the first year starts on.
+            </div>
+        </div>
+        <div class="setting-item-control">
+            <select
+                class="dropdown"
+                aria-label={weekdays.filter((v) => v.name?.length).length
+                    ? null
+                    : "Named Weekday Required"}
+                bind:value={calendar.static.firstWeekDay}
+            >
+                <option selected hidden disabled>Select a Weekday</option>
+                {#each weekdays.filter((v) => v.name?.length) as weekday, index}
+                    <option disabled={!overflow} value={index}>
+                        {weekday.name ?? ""}
+                    </option>
+                {/each}
+            </select>
         </div>
     </div>
-    <div class="setting-item-control">
-        <select
-            class="dropdown"
-            aria-label={weekdays.filter((v) => v.name?.length).length
-                ? null
-                : "Named Weekday Required"}
-            bind:value={calendar.static.firstWeekDay}
+
+    <AddNew
+        on:click={() =>
+            (calendar.static.weekdays = [
+                ...weekdays,
+                {
+                    type: "day",
+                    name: null,
+                    id: nanoid(6)
+                }
+            ])}
+    />
+
+    {#if !weekdays.length}
+        <NoExistingItems message={"Create a new weekday to see it here."} />
+    {:else}
+        <div
+            use:dndzone={{ items: weekdays, flipDurationMs, dragDisabled }}
+            class="existing-items"
+            on:consider={handleConsider}
+            on:finalize={handleFinalize}
         >
-            <option selected hidden disabled>Select a Weekday</option>
-            {#each weekdays.filter((v) => v.name?.length) as weekday, index}
-                <option disabled={!overflow} value={index}>
-                    {weekday.name ?? ""}
-                </option>
-            {/each}
-        </select>
-    </div>
-</div>
-
-<AddNew
-    on:click={() =>
-        (calendar.static.weekdays = [
-            ...weekdays,
-            {
-                type: "day",
-                name: null,
-                id: nanoid(6)
-            }
-        ])}
-/>
-
-{#if !weekdays.length}
-    <NoExistingItems message={"Create a new weekday to see it here."} />
-{:else}
-    <div
-        use:dndzone={{ items: weekdays, flipDurationMs, dragDisabled }}
-        class="existing-items"
-        on:consider={handleConsider}
-        on:finalize={handleFinalize}
-    >
-        {#each weekdays as item (item.id)}
-            <div animate:flip={{ duration: flipDurationMs }} class="weekday">
+            {#each weekdays as item (item.id)}
                 <div
-                    class="icon"
-                    use:grip
-                    on:mousedown={startDrag}
-                    on:touchstart={startDrag}
-                />
+                    animate:flip={{ duration: flipDurationMs }}
+                    class="weekday"
+                >
+                    <div
+                        class="icon"
+                        use:grip
+                        on:mousedown={startDrag}
+                        on:touchstart={startDrag}
+                    />
 
-                <div use:name={item} />
+                    <div use:name={item} />
 
-                <div class="icon" use:trash={item} />
-            </div>
-        {/each}
-    </div>
-{/if}
+                    <div class="icon" use:trash={item} />
+                </div>
+            {/each}
+        </div>
+    {/if}
+</Details>
 
 <style>
     .existing-items {

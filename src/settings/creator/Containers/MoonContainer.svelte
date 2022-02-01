@@ -9,6 +9,7 @@
     import ToggleComponent from "../Settings/ToggleComponent.svelte";
     import { CreateMoonModal } from "src/settings/modals/moons";
     import type FantasyCalendar from "src/main";
+import Details from "../Utilities/Details.svelte";
 
     export let calendar: Calendar;
     export let plugin: FantasyCalendar;
@@ -53,50 +54,52 @@
     };
 </script>
 
-<ToggleComponent
-    name={"Display Moons"}
-    desc={"Display moons by default when viewing this calendar."}
-    value={displayMoons}
-    on:click={() =>
-        (calendar.static.displayMoons = !calendar.static.displayMoons)}
-/>
+<Details name={"Moons"}>
+    <ToggleComponent
+        name={"Display Moons"}
+        desc={"Display moons by default when viewing this calendar."}
+        value={displayMoons}
+        on:click={() =>
+            (calendar.static.displayMoons = !calendar.static.displayMoons)}
+    />
 
-<AddNew on:click={() => add()} />
+    <AddNew on:click={() => add()} />
 
-{#if !moons.length}
-    <NoExistingItems message={"Create a new moon to see it here."} />
-{:else}
-    <div class="existing-items">
-        {#each moons as moon}
-            <div class="moon">
-                <div class="moon-info">
-                    <span class="setting-item-name">
-                        <MoonSVG
-                            {moon}
-                            phase={"First Quarter"}
-                            label={false}
-                            size={20}
-                        />
-                        {moon.name}
-                    </span>
-                    <div class="setting-item-description">
-                        <div class="date">
-                            Cycle: {moon.cycle} days
+    {#if !moons.length}
+        <NoExistingItems message={"Create a new moon to see it here."} />
+    {:else}
+        <div class="existing-items">
+            {#each moons as moon}
+                <div class="moon">
+                    <div class="moon-info">
+                        <span class="setting-item-name">
+                            <MoonSVG
+                                {moon}
+                                phase={"First Quarter"}
+                                label={false}
+                                size={20}
+                            />
+                            {moon.name}
+                        </span>
+                        <div class="setting-item-description">
+                            <div class="date">
+                                Cycle: {moon.cycle} days
+                            </div>
                         </div>
                     </div>
+                    <div class="icons">
+                        <div class="icon" use:edit on:click={() => add(moon)} />
+                        <div
+                            class="icon"
+                            use:trash
+                            on:click={() => deleteMoon(moon)}
+                        />
+                    </div>
                 </div>
-                <div class="icons">
-                    <div class="icon" use:edit on:click={() => add(moon)} />
-                    <div
-                        class="icon"
-                        use:trash
-                        on:click={() => deleteMoon(moon)}
-                    />
-                </div>
-            </div>
-        {/each}
-    </div>
-{/if}
+            {/each}
+        </div>
+    {/if}
+</Details>
 
 <style>
     .moon {

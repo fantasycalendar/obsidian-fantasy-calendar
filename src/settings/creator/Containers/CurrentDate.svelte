@@ -2,6 +2,7 @@
     import type { Calendar } from "src/@types";
     import { getContext } from "svelte";
     import { Writable } from "svelte/store";
+import Details from "../Utilities/Details.svelte";
     import {
         warning,
         invalidDayLabel,
@@ -28,76 +29,78 @@
     $: console.log(invalid, validDay, validMonth, validYear);
 </script>
 
-<div class="fantasy-calendar-date-field-container setting-item">
-    <div class="fantasy-calendar-date-field">
-        <div class="date-label">
-            {#if !validDay}
-                <div use:warning />
-            {/if}
-            <label for="">Day</label>
-        </div>
-        <input
-            type="number"
-            spellcheck="false"
-            placeholder="Day"
-            class:invalid={!validDay}
-            bind:value={current.day}
-        />
-        {#if invalid}
-            <div class="setting-item-description">
+<Details name={"Current Date"}>
+    <div class="fantasy-calendar-date-field-container setting-item">
+        <div class="fantasy-calendar-date-field">
+            <div class="date-label">
                 {#if !validDay}
-                    {invalidDayLabel(current.day, calendar)}
+                    <div use:warning />
                 {/if}
+                <label for="">Day</label>
             </div>
-        {/if}
-    </div>
-    <div class="fantasy-calendar-date-field">
-        <div class="date-label">
-            {#if !validMonth}
-                <div use:warning />
+            <input
+                type="number"
+                spellcheck="false"
+                placeholder="Day"
+                class:invalid={!validDay}
+                bind:value={current.day}
+            />
+            {#if invalid}
+                <div class="setting-item-description">
+                    {#if !validDay}
+                        {invalidDayLabel(current.day, calendar)}
+                    {/if}
+                </div>
             {/if}
-            <label for="">Month</label>
         </div>
-        <select
-            class="dropdown"
-            bind:value={current.month}
-            class:invalid={!validMonth}
-        >
-            {#each months.filter((m) => m.name) as month, index}
-                <option value={index}>{month.name}</option>
-            {/each}
-        </select>
-        {#if invalid}
-            <div class="setting-item-description">
+        <div class="fantasy-calendar-date-field">
+            <div class="date-label">
                 {#if !validMonth}
-                    {invalidMonthLabel(current.month, calendar)}
+                    <div use:warning />
                 {/if}
+                <label for="">Month</label>
             </div>
-        {/if}
-    </div>
-    <div class="fantasy-calendar-date-field">
-        <div class="date-label">
-            {#if !validYear}
-                <div use:warning />
+            <select
+                class="dropdown"
+                bind:value={current.month}
+                class:invalid={!validMonth}
+            >
+                {#each months.filter((m) => m.name) as month, index}
+                    <option value={index}>{month.name}</option>
+                {/each}
+            </select>
+            {#if invalid}
+                <div class="setting-item-description">
+                    {#if !validMonth}
+                        {invalidMonthLabel(current.month, calendar)}
+                    {/if}
+                </div>
             {/if}
-            <label for="">Year</label>
         </div>
-        <input
-            type="number"
-            spellcheck="false"
-            placeholder="Year"
-            class:invalid={!validYear}
-            bind:value={current.year}
-        />
-        {#if invalid}
-            <div class="setting-item-description">
+        <div class="fantasy-calendar-date-field">
+            <div class="date-label">
                 {#if !validYear}
-                    {invalidYearLabel(current.year, calendar)}
+                    <div use:warning />
                 {/if}
+                <label for="">Year</label>
             </div>
-        {/if}
+            <input
+                type="number"
+                spellcheck="false"
+                placeholder="Year"
+                class:invalid={!validYear}
+                bind:value={current.year}
+            />
+            {#if invalid}
+                <div class="setting-item-description">
+                    {#if !validYear}
+                        {invalidYearLabel(current.year, calendar)}
+                    {/if}
+                </div>
+            {/if}
+        </div>
     </div>
-</div>
+</Details>
 
 <style>
     .fantasy-calendar-date-field-container {

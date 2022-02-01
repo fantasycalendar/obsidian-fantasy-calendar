@@ -9,6 +9,7 @@
     import NoExistingItems from "../Utilities/NoExistingItems.svelte";
     import type FantasyCalendar from "src/main";
     import { CreateEventModal } from "src/settings/modals/event";
+    import Details from "../Utilities/Details.svelte";
 
     export let calendar: Calendar;
     export let plugin: FantasyCalendar;
@@ -52,23 +53,25 @@
     };
 </script>
 
-<AddNew on:click={() => add()} />
+<Details name={"Events"}>
+    <AddNew on:click={() => add()} />
 
-{#if !events.length}
-    <NoExistingItems message={"Create a new event to see it here."} />
-{:else}
-    <div class="existing-items">
-        {#each events as event}
-            <EventInstance
-                {event}
-                category={getCategory(event.category)}
-                date={dateString(event.date, months, event.end)}
-                on:edit={() => add(event)}
-                on:delete={() => deleteEvent(event)}
-            />
-        {/each}
-    </div>
-{/if}
+    {#if !events.length}
+        <NoExistingItems message={"Create a new event to see it here."} />
+    {:else}
+        <div class="existing-items">
+            {#each events as event}
+                <EventInstance
+                    {event}
+                    category={getCategory(event.category)}
+                    date={dateString(event.date, months, event.end)}
+                    on:edit={() => add(event)}
+                    on:delete={() => deleteEvent(event)}
+                />
+            {/each}
+        </div>
+    {/if}
+</Details>
 
 <style>
 </style>

@@ -8,6 +8,7 @@
     import { CreateLeapDayModal } from "src/settings/modals/leapday";
     import type FantasyCalendar from "src/main";
     import { Writable } from "svelte/store";
+import Details from "../Utilities/Details.svelte";
 
     export let calendar: Calendar;
     export let plugin: FantasyCalendar;
@@ -51,25 +52,27 @@
     };
 </script>
 
-<AddNew
-    on:click={() => add()}
-    {disabled}
-    label={disabled ? "At least one named month is required" : null}
-/>
+<Details name={"Leap Days"}>
+    <AddNew
+        on:click={() => add()}
+        {disabled}
+        label={disabled ? "At least one named month is required" : null}
+    />
 
-{#if !leapdays.length}
-    <NoExistingItems message={"Create a new leap day to see it here."} />
-{:else}
-    <div class="existing-items">
-        {#each leapdays as leapday}
-            <LeapDayUI
-                {leapday}
-                on:edit={() => add(leapday)}
-                on:delete={() => deleteLeapDay(leapday)}
-            />
-        {/each}
-    </div>
-{/if}
+    {#if !leapdays.length}
+        <NoExistingItems message={"Create a new leap day to see it here."} />
+    {:else}
+        <div class="existing-items">
+            {#each leapdays as leapday}
+                <LeapDayUI
+                    {leapday}
+                    on:edit={() => add(leapday)}
+                    on:delete={() => deleteLeapDay(leapday)}
+                />
+            {/each}
+        </div>
+    {/if}
+</Details>
 
 <style>
 </style>

@@ -18,6 +18,7 @@
     import AddNew from "../Utilities/AddNew.svelte";
     import NoExistingItems from "../Utilities/NoExistingItems.svelte";
     import type { Writable } from "svelte/store";
+import Details from "../Utilities/Details.svelte";
 
     export let calendar: Calendar;
 
@@ -122,57 +123,59 @@
     }
 </script>
 
-<ToggleComponent
-    name="Use Custom Years"
-    desc={customDesc}
-    value={useCustomYears}
-    on:click={() => confirmCustom()}
-/>
-
-{#if useCustomYears}
-    <AddNew
-        on:click={() => {
-            calendar.static.years = [
-                ...(years ?? []),
-                {
-                    name: null,
-                    id: nanoid(6),
-                    type: "year"
-                }
-            ];
-            store.set(calendar);
-        }}
+<Details name={"Years"}>
+    <ToggleComponent
+        name="Use Custom Years"
+        desc={customDesc}
+        value={useCustomYears}
+        on:click={() => confirmCustom()}
     />
 
-    {#if !years || !years.length}
-        <NoExistingItems message={"Create a new year to see it here."} />
-    {:else}
-        <div
-            use:dndzone={{ items: years, flipDurationMs, dragDisabled }}
-            class="existing-items"
-            on:consider={handleConsider}
-            on:finalize={handleFinalize}
-        >
-            {#each years as item (item.id)}
-                <div
-                    animate:flip={{ duration: flipDurationMs }}
-                    class="weekday"
-                >
+    {#if useCustomYears}
+        <AddNew
+            on:click={() => {
+                calendar.static.years = [
+                    ...(years ?? []),
+                    {
+                        name: null,
+                        id: nanoid(6),
+                        type: "year"
+                    }
+                ];
+                store.set(calendar);
+            }}
+        />
+
+        {#if !years || !years.length}
+            <NoExistingItems message={"Create a new year to see it here."} />
+        {:else}
+            <div
+                use:dndzone={{ items: years, flipDurationMs, dragDisabled }}
+                class="existing-items"
+                on:consider={handleConsider}
+                on:finalize={handleFinalize}
+            >
+                {#each years as item (item.id)}
                     <div
-                        class="icon"
-                        use:grip
-                        on:mousedown={startDrag}
-                        on:touchstart={startDrag}
-                    />
+                        animate:flip={{ duration: flipDurationMs }}
+                        class="weekday"
+                    >
+                        <div
+                            class="icon"
+                            use:grip
+                            on:mousedown={startDrag}
+                            on:touchstart={startDrag}
+                        />
 
-                    <div use:name={item} />
+                        <div use:name={item} />
 
-                    <div class="icon" use:trash={item} />
-                </div>
-            {/each}
-        </div>
+                        <div class="icon" use:trash={item} />
+                    </div>
+                {/each}
+            </div>
+        {/if}
     {/if}
-{/if}
+</Details>
 
 <style>
     .weekday {
