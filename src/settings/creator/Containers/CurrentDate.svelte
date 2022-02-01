@@ -1,9 +1,16 @@
 <script lang="ts">
-    import { DropdownComponent, Setting, TextComponent } from "obsidian";
-
     import type { Calendar } from "src/@types";
     import { getContext } from "svelte";
     import { Writable } from "svelte/store";
+    import {
+        warning,
+        invalidDayLabel,
+        invalidMonthLabel,
+        invalidYearLabel,
+        isValidDay,
+        isValidMonth,
+        isValidYear
+    } from "../Utilities/utils";
 
     let calendar: Calendar;
     const store = getContext<Writable<Calendar>>("store");
@@ -13,46 +20,82 @@
     $: current = calendar.current;
     $: months = calendar.static.months;
 
-    const day = (node: HTMLElement) => {
-        const label = node.createEl("label", { text: "Day" });
-        new TextComponent(node).setPlaceholder("Day");
-    };
-    const month = (node: HTMLElement) => {
-        node.createEl("label", { text: "Month" });
-        new DropdownComponent(node);
-    };
-    const year = (node: HTMLElement) => {
-        const label = node.createEl("label", { text: "Year" });
-        new TextComponent(node).setPlaceholder("Year");
-    };
+    $: validDay = isValidDay(current.day, calendar);
+    $: validMonth = isValidMonth(current.month, calendar);
+    $: validYear = isValidYear(current.year, calendar);
+    $: invalid = !validDay || !validMonth || !validYear;
+
+    $: console.log(invalid, validDay, validMonth, validYear);
 </script>
 
-<div class="fantasy-calendar-date-field-container setting-item ">
-    <div class="fantasy-calendar-date-field ">
-        <label for="">Day</label>
+<div class="fantasy-calendar-date-field-container setting-item">
+    <div class="fantasy-calendar-date-field">
+        <div class="date-label">
+            {#if !validDay}
+                <div use:warning />
+            {/if}
+            <label for="">Day</label>
+        </div>
         <input
             type="number"
             spellcheck="false"
             placeholder="Day"
-            bind:value={calendar.current.day}
+            class:invalid={!validDay}
+            bind:value={current.day}
         />
+        {#if invalid}
+            <div class="setting-item-description">
+                {#if !validDay}
+                    {invalidDayLabel(current.day, calendar)}
+                {/if}
+            </div>
+        {/if}
     </div>
-    <div class="fantasy-calendar-date-field ">
-        <label for="">Month</label>
-        <select class="dropdown" bind:value={calendar.current.month}>
+    <div class="fantasy-calendar-date-field">
+        <div class="date-label">
+            {#if !validMonth}
+                <div use:warning />
+            {/if}
+            <label for="">Month</label>
+        </div>
+        <select
+            class="dropdown"
+            bind:value={current.month}
+            class:invalid={!validMonth}
+        >
             {#each months.filter((m) => m.name) as month, index}
                 <option value={index}>{month.name}</option>
             {/each}
         </select>
+        {#if invalid}
+            <div class="setting-item-description">
+                {#if !validMonth}
+                    {invalidMonthLabel(current.month, calendar)}
+                {/if}
+            </div>
+        {/if}
     </div>
-    <div class="fantasy-calendar-date-field ">
-        <label for="">Year</label>
+    <div class="fantasy-calendar-date-field">
+        <div class="date-label">
+            {#if !validYear}
+                <div use:warning />
+            {/if}
+            <label for="">Year</label>
+        </div>
         <input
             type="number"
             spellcheck="false"
             placeholder="Year"
-            bind:value={calendar.current.year}
+            class:invalid={!validYear}
+            bind:value={current.year}
         />
+        {#if invalid}
+            <div class="setting-item-description">
+                {#if !validYear}
+                    {invalidYearLabel(current.year, calendar)}
+                {/if}
+            </div>
+        {/if}
     </div>
 </div>
 
@@ -63,9 +106,23 @@
         border: 0;
     }
     .fantasy-calendar-date-field {
-        display: flex;
-        flex-flow: column nowrap;
+        display: grid;
+        grid-auto-rows: 1fr;
         flex: 1 1 0;
         gap: 0.5rem;
+    }
+
+    .fantasy-calendar-date-field .setting-item-description {
+        padding-top: 0;
+    }
+
+    .date-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .fantasy-calendar-date-field .invalid {
+        border: 1px solid var(--text-error);
     }
 </style>
