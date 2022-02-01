@@ -1,6 +1,5 @@
 <script lang="ts">
     import {
-        ButtonComponent,
         ExtraButtonComponent,
         TextComponent
     } from "obsidian";
@@ -9,7 +8,6 @@
 
     import type { Calendar, EventCategory } from "src/@types";
     import { nanoid } from "src/utils/functions";
-    import { DEFAULT_CATEGORY_COLOR } from "src/utils/constants";
     import AddNew from "../Utilities/AddNew.svelte";
     import NoExistingItems from "../Utilities/NoExistingItems.svelte";
 
