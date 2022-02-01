@@ -2,12 +2,11 @@
     import type { Calendar } from "src/@types";
     import type FantasyCalendar from "src/main";
     import copy from "fast-copy";
-    import { ExtraButtonComponent, Notice, setIcon, Setting } from "obsidian";
+    import { ExtraButtonComponent, setIcon, Setting } from "obsidian";
     import { CalendarPresetModal } from "../modals/preset";
     import { createEventDispatcher, setContext } from "svelte";
     import { fly } from "svelte/transition";
     import { onMount } from "svelte";
-    import Details from "./Utilities/Details.svelte";
     import CurrentDate from "./Containers/CurrentDate.svelte";
     import Info from "./Containers/Info.svelte";
     import WeekdayContainer from "./Containers/WeekdayContainer.svelte";
@@ -19,6 +18,7 @@
     import LeapDayContainer from "./Containers/LeapDayContainer.svelte";
     import { Writable, writable } from "svelte/store";
     import { getCanSave, getMissingNotice, warning } from "./Utilities/utils";
+    import { ConfirmExitModal } from "../modals/confirm";
 
     let ready = false;
 
@@ -87,12 +87,18 @@
     $: canSave = getCanSave(calendar);
 
     const checkCanSave = () => {
-        if (!canSave) {
-            new Notice(missing);
-            return;
+        if (!canSave && !plugin.data.exitWithoutSaving) {
+            const modal = new ConfirmExitModal(plugin);
+            modal.onClose = () => {
+                if (modal.confirmed) {
+                    ready = false;
+                }
+            };
+            modal.open();
+        } else {
+            saved = true;
+            ready = false;
         }
-        saved = true;
-        ready = false;
     };
     const savedEl = (node: HTMLElement) => {
         if (canSave) {

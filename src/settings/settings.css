@@ -4,6 +4,16 @@
     padding-top: 0;
 }
 
+.fantasy-calendar-confirm-buttons-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.fantasy-calendar-confirm-buttons-container .dont-ask {
+    cursor: pointer;
+}
+
 .fantasy-calendar-confirm-buttons {
     display: flex;
     justify-content: flex-end;

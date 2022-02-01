@@ -29,5 +29,5 @@ export interface FantasyCalendarData {
         calendars: boolean;
         events: boolean;
     };
+    exitWithoutSaving: boolean;
 }
-
