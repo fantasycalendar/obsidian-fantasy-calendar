@@ -42,9 +42,7 @@
     setContext<Writable<Calendar>>("store", store);
 
     const back = (node: HTMLElement) => {
-        new ExtraButtonComponent(node)
-            .setIcon("left-arrow-with-tail")
-            .setTooltip("Save and exit");
+        new ExtraButtonComponent(node).setIcon("left-arrow-with-tail");
     };
     const cancel = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
@@ -120,6 +118,9 @@
                         <div
                             class="back"
                             use:back
+                            aria-label={canSave
+                                ? "Save and exit"
+                                : "Exit without saving"}
                             on:click={() => {
                                 checkCanSave();
                             }}
@@ -172,6 +173,7 @@
 
 <style>
     .fantasy-calendar-creator {
+        height: 100%;
         position: absolute;
         top: 0;
     }
@@ -183,7 +185,6 @@
     .fantasy-calendar-creator,
     .fantasy-calendar-creator-inner,
     .fantasy-creator-app {
-        height: 100%;
         background-color: inherit;
     }
     .fantasy-creator-app {
