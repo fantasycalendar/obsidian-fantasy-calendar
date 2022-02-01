@@ -1,5 +1,5 @@
-import { Moon } from '.';
-import { Event, EventCategory } from '.';
+import { Moon } from ".";
+import { Event, EventCategory } from ".";
 
 export interface Calendar {
     id: string;
@@ -7,6 +7,7 @@ export interface Calendar {
     description: string;
     static: StaticCalendarData;
     current: CurrentCalendarData;
+    _current?: CurrentCalendarData;
     events: Event[];
     categories: EventCategory[];
     date?: number;

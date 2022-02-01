@@ -26,3 +26,7 @@ export interface EventCategory {
     color: string;
     id: string;
 }
+
+export interface EventCondition {
+    
+}
