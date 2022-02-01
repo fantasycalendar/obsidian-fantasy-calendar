@@ -213,6 +213,7 @@
     gap: 1rem;
     align-items: center;
     justify-content: flex-start;
+    margin: 5px;
 }
 .fantasy-calendar-choose-preset .fantasy-calendar-preset-container button {
     height: 100%;
@@ -223,7 +224,7 @@
 .fantasy-calendar-choose-preset
     .fantasy-calendar-preset-container
     button.mod-cta {
-    box-shadow: 0px 0px 5px var(--background-modifier-box-shadow);
+    box-shadow: 0 0 10px var(--background-modifier-success);
 }
 
 /** Leap Day Editor */
