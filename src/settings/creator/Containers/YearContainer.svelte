@@ -131,15 +131,17 @@
 
 {#if useCustomYears}
     <AddNew
-        on:click={() =>
-            (calendar.static.years = [
+        on:click={() => {
+            calendar.static.years = [
                 ...(years ?? []),
                 {
                     name: null,
                     id: nanoid(6),
                     type: "year"
                 }
-            ])}
+            ];
+            store.set(calendar);
+        }}
     />
 
     {#if !years || !years.length}
