@@ -56,6 +56,7 @@ addIcon(
 export default class FantasyCalendarSettings extends PluginSettingTab {
     contentEl: HTMLDivElement;
     calendarsEl: HTMLDetailsElement;
+    existingEl: HTMLDivElement;
     get data() {
         return this.plugin.data;
     }
@@ -175,10 +176,6 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
             });
     }
     buildCalendars() {
-        console.log(
-            "🚀 ~ file: settings.ts ~ line 178 ~ containerEl",
-            this.calendarsEl
-        );
         this.calendarsEl.empty();
         this.calendarsEl.ontoggle = () => {
             this.data.settingsToggleState.calendars = this.calendarsEl.open;
@@ -244,7 +241,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                         const calendars = Importer.import(data);
                         this.plugin.data.calendars.push(...calendars);
                         await this.plugin.saveCalendar();
-                        this.showCalendars(existing);
+                        this.showCalendars();
                     } catch (e) {
                         new Notice(
                             `There was an error while importing the calendar${
@@ -272,34 +269,41 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                         const calendar = await this.launchCalendarCreator();
                         if (calendar) {
                             await this.plugin.addNewCalendar(calendar);
-                            this.buildCalendars();
+                            this.showCalendars();
                         }
                     })
             );
 
-        const existing = this.calendarsEl.createDiv("existing-calendars");
+        this.existingEl = this.calendarsEl.createDiv("existing-calendars");
 
-        this.showCalendars(existing);
+        this.showCalendars();
     }
-    showCalendars(element: HTMLElement) {
-        element.empty();
+    showCalendars() {
+        this.existingEl.empty();
         if (!this.data.calendars.length) {
-            element.createSpan({
+            this.existingEl.createSpan({
                 text: "No calendars created! Create a calendar to see it here."
             });
             return;
         }
         for (let calendar of this.data.calendars) {
-            console.log(
-                "🚀 ~ file: settings.ts ~ line 307 ~ calendar",
-                calendar.name
-            );
-            new Setting(element)
+            new Setting(this.existingEl)
                 .setName(calendar.name)
                 .setDesc(calendar.description ?? "")
                 .addExtraButton((b) => {
-                    b.setIcon("pencil").onClick(() => {
-                        this.launchCalendarCreator(calendar);
+                    b.setIcon("pencil").onClick(async () => {
+                        const edited = await this.launchCalendarCreator(
+                            calendar
+                        );
+                        if (edited) {
+                            this.plugin.data.calendars.splice(
+                                this.data.calendars.indexOf(calendar),
+                                1,
+                                edited
+                            );
+                            await this.plugin.saveCalendar();
+                            this.showCalendars();
+                        }
                     });
                 })
                 .addExtraButton((b) => {
@@ -325,7 +329,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                         }
                         await this.plugin.saveCalendar();
 
-                        this.showCalendars(element);
+                        this.showCalendars();
                     });
                 });
         }
@@ -592,7 +596,6 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
             );
             $app.$on("destroy", (evt: CustomEvent<boolean>) => {
                 this.display();
-                console.log(evt.detail);
                 if (evt.detail) {
                     //saved
                     calendar = copy(clone);
