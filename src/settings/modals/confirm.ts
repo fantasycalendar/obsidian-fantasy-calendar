@@ -93,7 +93,6 @@ export class ConfirmExitModal extends Modal {
             cls: "dont-ask",
             text: "Keep editing"
         }).onclick = () => {
-            this.plugin.saveSettings();
             this.close();
         };
         /* new ExtraButtonComponent(buttonEl).setIcon("cross").onClick(() => {
