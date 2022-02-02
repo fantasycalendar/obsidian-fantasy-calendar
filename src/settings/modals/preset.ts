@@ -1,6 +1,7 @@
 import copy from "fast-copy";
 import { Modal, ButtonComponent, ExtraButtonComponent } from "obsidian";
 import type { Calendar } from "src/@types";
+import { nanoid } from "src/utils/functions";
 import { PRESET_CALENDARS } from "src/utils/presets";
 
 export class CalendarPresetModal extends Modal {
@@ -44,6 +45,7 @@ export class CalendarPresetModal extends Modal {
             .onClick(() => {
                 this.saved = true;
                 this.preset = copy(this.preset);
+                this.preset.id = nanoid(6);
                 this.close();
             })
             .setCta();
