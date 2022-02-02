@@ -7,6 +7,7 @@
     export let value: string;
     export let name: string;
     export let warn: boolean = false;
+    export let type = "text";
 
     export let desc = "";
 
@@ -25,16 +26,29 @@
             {#if warn}
                 <div use:warning />
             {/if}
-            <input
-                type="text"
-                spellcheck="false"
-                {placeholder}
-                class:warn
-                bind:value
-                on:blur={() => {
-                    dispatch("blur", value);
-                }}
-            />
+            {#if type == "text"}
+                <input
+                    type="text"
+                    spellcheck="false"
+                    {placeholder}
+                    class:warn
+                    bind:value
+                    on:blur={() => {
+                        dispatch("blur", value);
+                    }}
+                />
+            {:else if type == "number"}
+                <input
+                    type="number"
+                    spellcheck="false"
+                    {placeholder}
+                    class:warn
+                    bind:value
+                    on:blur={() => {
+                        dispatch("blur", value);
+                    }}
+                />
+            {/if}
         </div>
     </div>
 </div>
