@@ -10,6 +10,8 @@ import type { Calendar, LeapDay, LeapDayCondition } from "../../@types";
 
 import { getIntervalDescription, nanoid } from "../../utils/functions";
 
+import LeapDayNew from "../creator/Containers/LeapDayNew.svelte";
+
 export class CreateLeapDayModal extends Modal {
     saved = false;
     leapday: LeapDay = {
@@ -34,6 +36,17 @@ export class CreateLeapDayModal extends Modal {
     }
 
     async display() {
+        this.titleEl.setText(this.editing ? "Edit Leap Day" : "New Leap Day");
+        new LeapDayNew({
+            target: this.contentEl,
+            props: {
+                leapDay: this.leapday,
+                calendar: this.calendar
+            }
+        });
+    }
+
+    async displayOld() {
         this.contentEl.empty();
         this.contentEl.createEl("h3", {
             text: this.editing ? "Edit Leap Day" : "New Leap Day"
