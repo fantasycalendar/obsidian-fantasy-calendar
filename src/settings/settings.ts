@@ -240,7 +240,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                         const calendars = Importer.import(data);
                         this.plugin.data.calendars.push(...calendars);
                         await this.plugin.saveCalendar();
-                        this.showCalendars(existing);
+                        this.showCalendars(existing, containerEl);
                     } catch (e) {
                         new Notice(
                             `There was an error while importing the calendar${
@@ -267,9 +267,13 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                     .onClick(async () => {
                         const calendar = await this.launchCalendarCreator();
                         console.log(
-                            "🚀 ~ file: settings.ts ~ line 266 ~ calendar",
+                            "🚀 ~ file: settings.ts ~ line 270 ~ calendar",
                             calendar
                         );
+                        if (calendar) {
+                            await this.plugin.addNewCalendar(calendar);
+                            this.showCalendars(existing, containerEl);
+                        }
 
                         /* const modal = new CreateCalendarModal(this.plugin);
                         modal.onClose = async () => {
@@ -288,9 +292,9 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
 
         const existing = containerEl.createDiv("existing-calendars");
 
-        this.showCalendars(existing);
+        this.showCalendars(existing, containerEl);
     }
-    showCalendars(element: HTMLElement) {
+    showCalendars(element: HTMLElement, calendarsEl: HTMLElement) {
         element.empty();
         if (!this.data.calendars.length) {
             element.createSpan({
@@ -324,13 +328,13 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                             this.plugin.data.calendars.filter(
                                 (c) => c.id != calendar.id
                             );
+                        if (calendar.id == this.data.defaultCalendar) {
+                            this.plugin.data.defaultCalendar =
+                                this.plugin.data.calendars[0]?.id;
+                        }
                         await this.plugin.saveCalendar();
 
-                        if (calendar.name == this.plugin.data.defaultCalendar) {
-                            this.display();
-                        } else {
-                            this.showCalendars(element);
-                        }
+                        this.showCalendars(element, calendarsEl);
                     });
                 });
         }
@@ -553,7 +557,9 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
             });
     }
 
-    launchCalendarCreator(calendar: Calendar = DEFAULT_CALENDAR) {
+    launchCalendarCreator(
+        calendar: Calendar = DEFAULT_CALENDAR
+    ): Promise<Calendar | void> {
         /* this.containerEl.empty(); */
         return new Promise((resolve) => {
             const clone = copy(calendar);
@@ -590,6 +596,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                         observer.disconnect();
                         resolve(calendar);
                     }
+                    resolve();
                 }
             );
             $app.$on("destroy", (evt: CustomEvent<boolean>) => {
@@ -601,6 +608,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                     observer.disconnect();
                     resolve(calendar);
                 }
+                resolve();
             });
         });
     }

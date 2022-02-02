@@ -113,7 +113,7 @@ export default class FantasyCalendar extends Plugin {
     api = new API(this);
     settingsLoaded: boolean;
     async addNewCalendar(calendar: Calendar) {
-        this.data.calendars.push({ ...calendar });
+        this.data.calendars.push(calendar);
         if (!this.data.defaultCalendar) {
             this.data.defaultCalendar = calendar.id;
         }
@@ -154,7 +154,7 @@ export default class FantasyCalendar extends Plugin {
                 : this.data.dateFormat) ?? "YYYY-MM-DD"
         );
     }
-    get defaultCalendar() {
+    get defaultCalendar(): Calendar {
         return (
             this.data.calendars.find(
                 (c) => c.id == this.data.defaultCalendar
@@ -349,6 +349,7 @@ export default class FantasyCalendar extends Plugin {
     }
 
     async saveCalendar() {
+        await this.saveSettings();
         this.app.workspace.trigger("fantasy-calendars-updated");
     }
     get configDirectory() {
