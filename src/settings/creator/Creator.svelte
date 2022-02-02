@@ -61,10 +61,7 @@
                         const modal = new CalendarPresetModal(plugin.app);
                         modal.onClose = () => {
                             if (!modal.saved) return;
-                            calendar = {
-                                ...copy(modal.preset),
-                                id: calendar.id
-                            };
+                            calendar = copy(modal.preset);
                             if (calendar?.name == "Gregorian Calendar") {
                                 const today = new Date();
 
