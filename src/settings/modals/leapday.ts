@@ -75,6 +75,14 @@ export class CreateLeapDayModal extends Modal {
                 this.leapday.name = v;
             });
         });
+
+        new Setting(this.infoEl).setName("Intercalary").addToggle((t) => {
+            t.setValue(this.leapday.intercalary).onChange((v) => {
+                this.leapday.intercalary = v;
+                this.display();
+            });
+        });
+
         new Setting(this.infoEl)
             .setName("Month")
             .setDesc("The leap day will be added to this month.")
