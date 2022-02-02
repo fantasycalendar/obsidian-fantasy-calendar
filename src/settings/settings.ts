@@ -266,13 +266,14 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                     .setIcon("plus-with-circle")
                     .onClick(async () => {
                         const calendar = await this.launchCalendarCreator();
-                        console.log(
-                            "🚀 ~ file: settings.ts ~ line 270 ~ calendar",
-                            calendar
-                        );
                         if (calendar) {
+                            console.log(
+                                "🚀 ~ file: settings.ts ~ line 270 ~ calendar",
+                                calendar,
+                                calendar.id
+                            );
                             await this.plugin.addNewCalendar(calendar);
-                            this.showCalendars(existing, containerEl);
+                            this.buildCalendars(containerEl);
                         }
 
                         /* const modal = new CreateCalendarModal(this.plugin);
@@ -302,7 +303,12 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
             });
             return;
         }
+        console.log(element, this.data.calendars);
         for (let calendar of this.data.calendars) {
+            console.log(
+                "🚀 ~ file: settings.ts ~ line 307 ~ calendar",
+                calendar.name
+            );
             new Setting(element)
                 .setName(calendar.name)
                 .setDesc(calendar.description ?? "")
