@@ -55,6 +55,7 @@ addIcon(
 
 export default class FantasyCalendarSettings extends PluginSettingTab {
     contentEl: HTMLDivElement;
+    calendarsEl: HTMLDetailsElement;
     get data() {
         return this.plugin.data;
     }
@@ -72,16 +73,15 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
         this.buildInfo(
             this.contentEl.createDiv("fantasy-calendar-nested-settings")
         );
-        this.buildCalendars(
-            this.contentEl.createEl("details", {
-                cls: "fantasy-calendar-nested-settings",
-                attr: {
-                    ...(this.data.settingsToggleState.calendars
-                        ? { open: `open` }
-                        : {})
-                }
-            })
-        );
+        this.calendarsEl = this.contentEl.createEl("details", {
+            cls: "fantasy-calendar-nested-settings",
+            attr: {
+                ...(this.data.settingsToggleState.calendars
+                    ? { open: `open` }
+                    : {})
+            }
+        });
+        this.buildCalendars();
         this.buildEvents(
             this.contentEl.createEl("details", {
                 cls: "fantasy-calendar-nested-settings",
@@ -174,17 +174,21 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                     });
             });
     }
-    buildCalendars(containerEl: HTMLDetailsElement) {
-        containerEl.empty();
-        containerEl.ontoggle = () => {
-            this.data.settingsToggleState.calendars = containerEl.open;
+    buildCalendars() {
+        console.log(
+            "🚀 ~ file: settings.ts ~ line 178 ~ containerEl",
+            this.calendarsEl
+        );
+        this.calendarsEl.empty();
+        this.calendarsEl.ontoggle = () => {
+            this.data.settingsToggleState.calendars = this.calendarsEl.open;
         };
-        const summary = containerEl.createEl("summary");
+        const summary = this.calendarsEl.createEl("summary");
         new Setting(summary).setHeading().setName("Calendar Management");
 
         summary.createDiv("collapser").createDiv("handle");
 
-        new Setting(containerEl)
+        new Setting(this.calendarsEl)
             .setName("Default Calendar")
             .setDesc("Views will open to this calendar by default.")
             .addDropdown((d) => {
@@ -204,7 +208,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                     this.plugin.saveSettings();
                 });
             });
-        new Setting(containerEl)
+        new Setting(this.calendarsEl)
             .setName("Import Calendar")
             .setDesc(
                 createFragment((e) => {
@@ -240,7 +244,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                         const calendars = Importer.import(data);
                         this.plugin.data.calendars.push(...calendars);
                         await this.plugin.saveCalendar();
-                        this.showCalendars(existing, containerEl);
+                        this.showCalendars(existing);
                     } catch (e) {
                         new Notice(
                             `There was an error while importing the calendar${
@@ -258,7 +262,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                 b.onClick(() => input.click());
             });
 
-        new Setting(containerEl)
+        new Setting(this.calendarsEl)
             .setName("Create New Calendar")
             .addButton((button: ButtonComponent) =>
                 button
@@ -267,35 +271,17 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                     .onClick(async () => {
                         const calendar = await this.launchCalendarCreator();
                         if (calendar) {
-                            console.log(
-                                "🚀 ~ file: settings.ts ~ line 270 ~ calendar",
-                                calendar,
-                                calendar.id
-                            );
                             await this.plugin.addNewCalendar(calendar);
-                            this.buildCalendars(containerEl);
+                            this.buildCalendars();
                         }
-
-                        /* const modal = new CreateCalendarModal(this.plugin);
-                        modal.onClose = async () => {
-                            if (!modal.saved) return;
-                            const calendar = copy(modal.calendar);
-                            if (!calendar.current.year) {
-                                calendar.current.year = 1;
-                            }
-                            await this.plugin.addNewCalendar(calendar);
-
-                            this.showCalendars(existing);
-                        };
-                        modal.open(); */
                     })
             );
 
-        const existing = containerEl.createDiv("existing-calendars");
+        const existing = this.calendarsEl.createDiv("existing-calendars");
 
-        this.showCalendars(existing, containerEl);
+        this.showCalendars(existing);
     }
-    showCalendars(element: HTMLElement, calendarsEl: HTMLElement) {
+    showCalendars(element: HTMLElement) {
         element.empty();
         if (!this.data.calendars.length) {
             element.createSpan({
@@ -303,7 +289,6 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
             });
             return;
         }
-        console.log(element, this.data.calendars);
         for (let calendar of this.data.calendars) {
             console.log(
                 "🚀 ~ file: settings.ts ~ line 307 ~ calendar",
@@ -340,7 +325,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                         }
                         await this.plugin.saveCalendar();
 
-                        this.showCalendars(element, calendarsEl);
+                        this.showCalendars(element);
                     });
                 });
         }
