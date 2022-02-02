@@ -147,7 +147,7 @@ export default class FantasyCalendarView extends ItemView {
                     this.helper.goToNextCurrentDay();
                 }
                 this.calendar.date = current.valueOf();
-                this.plugin.saveSettings();
+                this.saveCalendars();
             }
             this.interval = window.setInterval(() => {
                 if (daysBetween(new Date(), current) >= 1) {
@@ -155,12 +155,17 @@ export default class FantasyCalendarView extends ItemView {
                     this.helper.current;
                     current = new Date();
                     this.calendar.date = current.valueOf();
-                    this.plugin.saveSettings();
+                    this.saveCalendars();
                 }
             }, 60 * 1000);
 
             this.registerInterval(this.interval);
         }
+    }
+
+    saveCalendars() {
+        this.updateMe = false;
+        this.plugin.saveCalendar();
     }
 
     interval: number;
@@ -185,7 +190,7 @@ export default class FantasyCalendarView extends ItemView {
             if (!modal.saved) return;
             this.calendar.events.push(modal.event);
 
-            this.plugin.saveSettings();
+            this.saveCalendars();
 
             this._app.$set({
                 calendar: this.helper
@@ -263,7 +268,7 @@ export default class FantasyCalendarView extends ItemView {
 
                         this.triggerHelperEvent("day-update");
 
-                        this.plugin.saveSettings();
+                        this.saveCalendars();
                     });
                 });
                 menu.addItem((item) =>
@@ -289,7 +294,7 @@ export default class FantasyCalendarView extends ItemView {
                     this._app.$set({
                         displayWeeks: this.calendar.displayWeeks
                     });
-                    this.plugin.saveSettings();
+                    this.saveCalendars();
                 });
             });
             menu.addItem((item) => {
@@ -314,7 +319,7 @@ export default class FantasyCalendarView extends ItemView {
                     this.dayNumber = !this.dayNumber;
                     this.calendar.static.displayDayNumber = this.dayNumber;
                     this._app.$set({ displayDayNumber: this.dayNumber });
-                    this.plugin.saveSettings();
+                    this.saveCalendars();
                 });
             });
             menu.addItem((item) => {
@@ -444,7 +449,7 @@ export default class FantasyCalendarView extends ItemView {
                                     `---\n${stringifyYaml(content)}\n---`
                                 );
                             }
-                            this.plugin.saveCalendar();
+                            this.saveCalendars();
 
                             if (file instanceof TFile) {
                                 const fileViews =
@@ -490,7 +495,7 @@ export default class FantasyCalendarView extends ItemView {
                                 modal.event
                             );
 
-                            this.plugin.saveSettings();
+                            this.saveCalendars();
 
                             this._app.$set({
                                 calendar: this.helper
@@ -524,7 +529,7 @@ export default class FantasyCalendarView extends ItemView {
                                 1
                             );
 
-                            this.plugin.saveSettings();
+                            this.saveCalendars();
 
                             this._app.$set({
                                 calendar: this.helper
@@ -580,7 +585,7 @@ export default class FantasyCalendarView extends ItemView {
                 this._app.$set({ calendar: this.helper });
             }
 
-            this.plugin.saveSettings();
+            this.saveCalendars();
         };
 
         modal.open();
