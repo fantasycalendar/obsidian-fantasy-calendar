@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { Calendar } from "src/@types";
+import { isValidDay, isValidMonth, isValidYear } from "src/utils/functions";
     import { getContext } from "svelte";
     import { Writable } from "svelte/store";
     import Details from "../Utilities/Details.svelte";
@@ -8,9 +9,6 @@
         invalidDayLabel,
         invalidMonthLabel,
         invalidYearLabel,
-        isValidDay,
-        isValidMonth,
-        isValidYear
     } from "../Utilities/utils";
 
     let calendar: Calendar;

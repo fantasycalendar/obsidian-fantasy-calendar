@@ -1,5 +1,6 @@
 import { setIcon } from "obsidian";
 import type { Calendar } from "src/@types";
+import { isValidDay, isValidMonth, isValidYear } from "src/utils/functions";
 
 export function warning(node: HTMLElement) {
     setIcon(node, "fantasy-calendar-warning");
@@ -108,19 +109,6 @@ export function getCanSave(calendar: Calendar) {
     }
     return false;
 }
-
-export function isValidDay(day: number, calendar: Calendar) {
-    if (day == null) return false;
-    if (calendar?.current?.month == null) return false;
-    if (day < 1) return false;
-    if (
-        day < 1 ||
-        day > calendar?.static?.months[calendar.current?.month]?.length ||
-        !calendar?.static?.months[calendar.current?.month]?.length
-    )
-        return false;
-    return true;
-}
 export function invalidDayLabel(day: number, calendar: Calendar) {
     if (day == null) return "No day specified";
     if (calendar?.current?.month == null) return "No month selected";
@@ -132,12 +120,6 @@ export function invalidDayLabel(day: number, calendar: Calendar) {
         return "Day does not exist in selected month";
 }
 
-export function isValidMonth(month: number, calendar: Calendar) {
-    if (month == null) return false;
-    if (!calendar?.static?.months?.length) return false;
-    if (month < 0 || month >= calendar?.static?.months?.length) return false;
-    return true;
-}
 export function invalidMonthLabel(month: number, calendar: Calendar) {
     if (month == null) return "No month specified";
     if (!calendar?.static?.months?.length) return "No months exist";
@@ -145,15 +127,6 @@ export function invalidMonthLabel(month: number, calendar: Calendar) {
         return "Selected month does not exist";
 }
 
-export function isValidYear(year: number, calendar: Calendar) {
-    if (year == null) return false;
-    if (year < 1 && !calendar.static?.useCustomYears) return false;
-    if (calendar?.static?.useCustomYears) {
-        if (!calendar?.static?.years?.length) return false;
-        if (year < 0 || year >= calendar?.static?.years?.length) return false;
-    }
-    return true;
-}
 export function invalidYearLabel(year: number, calendar: Calendar) {
     if (year == null) return "No year specified";
     if (year < 1 && !calendar.static?.useCustomYears) return "Years start at 1";

@@ -1,4 +1,4 @@
-import type { CurrentCalendarData, LeapDay, Month } from "../@types";
+import type { Calendar, CurrentCalendarData, LeapDay, Month } from "../@types";
 
 export function daysBetween(date1: Date, date2: Date) {
     const d1 = window.moment(date1);
@@ -118,4 +118,34 @@ export function dateString(
         return `${months[month].name} ${ordinal(day)} of every year`;
     }
     return `${ordinal(day)} of every month`;
+}
+
+export function isValidDay(day: number, calendar: Calendar) {
+    if (day == null) return false;
+    if (calendar?.current?.month == null) return false;
+    if (day < 1) return false;
+    if (
+        day < 1 ||
+        day > calendar?.static?.months[calendar.current?.month]?.length ||
+        !calendar?.static?.months[calendar.current?.month]?.length
+    )
+        return false;
+    return true;
+}
+
+export function isValidMonth(month: number, calendar: Calendar) {
+    if (month == null) return false;
+    if (!calendar?.static?.months?.length) return false;
+    if (month < 0 || month >= calendar?.static?.months?.length) return false;
+    return true;
+}
+
+export function isValidYear(year: number, calendar: Calendar) {
+    if (year == null) return false;
+    if (year < 1 && !calendar.static?.useCustomYears) return false;
+    if (calendar?.static?.useCustomYears) {
+        if (!calendar?.static?.years?.length) return false;
+        if (year < 0 || year >= calendar?.static?.years?.length) return false;
+    }
+    return true;
 }
