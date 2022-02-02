@@ -89,6 +89,8 @@ export interface LeapDay extends Day {
     timespan: number;
     intercalary: boolean;
     offset: number;
+    numbered?: boolean;
+    after?: number;
 }
 
 export interface Season {
