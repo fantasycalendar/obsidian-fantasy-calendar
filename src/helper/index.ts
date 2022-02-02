@@ -1,7 +1,13 @@
 import { Events, Notice } from "obsidian";
 import type FantasyCalendar from "src/main";
 import { MOON_PHASES, Phase } from "src/utils/constants";
-import { dateString, wrap } from "src/utils/functions";
+import {
+    dateString,
+    isValidDay,
+    isValidMonth,
+    isValidYear,
+    wrap
+} from "src/utils/functions";
 import type {
     Calendar,
     CurrentCalendarData,
@@ -311,6 +317,23 @@ export default class CalendarHelper extends Events {
     update(calendar?: Calendar) {
         this.calendar = calendar ?? this.calendar;
         this.maxDays = Math.max(...this.data.months.map((m) => m.length));
+
+        if (!calendar.current) {
+            calendar.current = {
+                day: null,
+                month: null,
+                year: null
+            };
+        }
+        if (!isValidYear(calendar.current.year, calendar)) {
+            calendar.current.year = 1;
+        }
+        if (!isValidMonth(calendar.current.month, calendar)) {
+            calendar.current.month = 0;
+        }
+        if (!isValidDay(calendar.current.day, calendar)) {
+            calendar.current.day = 1;
+        }
 
         this.trigger("month-update");
         this.trigger("day-update");
