@@ -8,7 +8,7 @@
     import { CreateLeapDayModal } from "src/settings/modals/leapday";
     import type FantasyCalendar from "src/main";
     import { Writable } from "svelte/store";
-import Details from "../Utilities/Details.svelte";
+    import Details from "../Utilities/Details.svelte";
 
     export let calendar: Calendar;
     export let plugin: FantasyCalendar;
@@ -17,7 +17,7 @@ import Details from "../Utilities/Details.svelte";
 
     store.subscribe((v) => (calendar = v));
 
-    let leapdays = calendar.static.leapDays;
+    $: leapdays = calendar.static.leapDays;
     let disabled =
         calendar.static.months?.filter((m) => m.name?.length).length == 0;
     $: {
