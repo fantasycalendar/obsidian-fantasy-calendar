@@ -48,7 +48,8 @@
         position: absolute;
         right: 0;
     }
-    .fantasy-calendar-nested-summary {
+    .fantasy-calendar-nested-summary,
+    .fantasy-calendar-nested-settings {
         position: relative;
     }
     .warning-label {
