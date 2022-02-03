@@ -4,7 +4,7 @@
 
     const dispatch = createEventDispatcher();
 
-    export let value: string;
+    export let value: string | number;
     export let name: string;
     export let warn: boolean = false;
     export let type = "text";
