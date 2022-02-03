@@ -35,16 +35,29 @@ export function getIntervalDescription(leapday: LeapDay) {
     const intervals = leapday.interval.sort((a, b) => a.interval - b.interval);
     let description = [];
     for (let interval of intervals) {
-        const length =
-            interval.interval + (interval.ignore ? 0 : leapday.offset);
+        const length = interval.interval;
+        const offset =
+            leapday.offset && !interval.ignore
+                ? ` (offset by ${leapday.offset})`
+                : "";
         if (interval.exclusive) {
-            description.push(`not every ${ordinal(length)} year`);
+            if (length == 1) {
+                description.push(`not every year${offset}`);
+            } else {
+                description.push(`not every ${ordinal(length)} year${offset}`);
+            }
         } else {
             const index = intervals.indexOf(interval);
             const also = index > 0 && intervals[index - 1].exclusive;
-            description.push(
-                `${also ? "also " : ""}every ${ordinal(length)} year`
-            );
+            if (length == 1) {
+                description.push(`${also ? "also " : ""}every year${offset}`);
+            } else {
+                description.push(
+                    `${also ? "also " : ""}every ${ordinal(
+                        length
+                    )} year${offset}`
+                );
+            }
         }
     }
     const join = description.join(", but ");
