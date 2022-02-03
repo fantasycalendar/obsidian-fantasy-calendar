@@ -2,6 +2,7 @@
     export let name: string;
     export let desc: string | DocumentFragment;
     export let value: boolean;
+    export let disabled = false;
     const descEl = (node: HTMLElement) => {
         node.append(desc);
     };
@@ -19,6 +20,11 @@
         {/if}
     </div>
     <div class="setting-item-control">
-        <div class="checkbox-container" class:is-enabled={value} on:click />
+        <div
+            class="checkbox-container"
+            class:is-disabled={disabled}
+            class:is-enabled={value}
+            on:click
+        />
     </div>
 </div>
