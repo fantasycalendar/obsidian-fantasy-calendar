@@ -5,7 +5,7 @@
     import LeapDayUI from "./LeapDayInstance.svelte";
     import AddNew from "../Utilities/AddNew.svelte";
     import NoExistingItems from "../Utilities/NoExistingItems.svelte";
-    import { CreateLeapDayModal } from "src/settings/modals/leapday";
+    import { CreateLeapDayModal } from "src/settings/modals/leapday/leapday";
     import type FantasyCalendar from "src/main";
     import { Writable } from "svelte/store";
     import Details from "../Utilities/Details.svelte";
@@ -25,16 +25,16 @@
             calendar.static.months?.filter((m) => m.name?.length).length == 0;
     }
 
-    const dispatch = createEventDispatcher();
     const deleteLeapDay = (item: LeapDay) => {
         leapdays = leapdays.filter((leapday) => leapday.id !== item.id);
-        dispatch("edit-leapdays", leapdays);
     };
 
     const add = (leapday?: LeapDay) => {
         const modal = new CreateLeapDayModal(plugin.app, calendar, leapday);
         modal.onClose = () => {
             if (!modal.saved) return;
+            if (!modal.leapday.interval.length) return;
+            if (!modal.leapday.name) return;
             if (modal.editing) {
                 const index = calendar.static.leapDays.findIndex(
                     (e) => e.id === modal.leapday.id
