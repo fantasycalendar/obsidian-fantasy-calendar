@@ -119,6 +119,13 @@
     border-bottom: 1px solid var(--background-modifier-border);
 }
 
+.fantasy-calendar-nested-settings .warning-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
 .fantasy-calendar-settings .fantasy-calendar-config .setting-item-name {
     display: flex;
     gap: 0.25rem;
