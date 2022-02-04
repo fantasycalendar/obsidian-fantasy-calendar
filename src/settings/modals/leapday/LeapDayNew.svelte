@@ -43,10 +43,6 @@
                 );
             }
             leapDay.interval = leapDay.interval;
-            console.log(
-                "🚀 ~ file: LeapDayNew.svelte ~ line 33 ~ leapDay.interval",
-                leapDay.interval
-            );
         };
         modal.open();
     };
@@ -112,7 +108,8 @@
                 <input
                     id="numbered"
                     type="checkbox"
-                    bind:value={leapDay.numbered}
+                    checked={leapDay.numbered}
+                    on:change={() => (leapDay.numbered = !leapDay.numbered)}
                 />
                 <label for="numbered">Numbered</label>
             </div>
