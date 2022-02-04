@@ -269,7 +269,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                         const calendar = await this.launchCalendarCreator();
                         if (calendar) {
                             await this.plugin.addNewCalendar(calendar);
-                            this.showCalendars();
+                            this.display();
                         }
                     })
             );
@@ -302,7 +302,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                                 edited
                             );
                             await this.plugin.saveCalendar();
-                            this.showCalendars();
+                            this.display();
                         }
                     });
                 })
