@@ -3,13 +3,12 @@ import type { Calendar } from "src/@types";
 export const PRESET_CALENDARS: Calendar[] = [
     {
         name: "Gregorian Calendar",
-        description:
-            "A calendar for the real world.",
+        description: "A calendar for the real world.",
         static: {
             displayDayNumber: false,
             incrementDay: true,
             displayMoons: true,
-            firstWeekDay: 6,
+            firstWeekDay: 1,
             overflow: true,
             weekdays: [
                 {
@@ -181,7 +180,7 @@ export const PRESET_CALENDARS: Calendar[] = [
                     }
                 }
             ],
-            offset: 2
+            offset: 0
         },
         current: {
             year: null,
