@@ -40,19 +40,11 @@ export class MonthHelper {
         if (!this.calendar.data.overflow) return 0;
         return this.days[0].weekday;
     }
-    get filteredDays() {
-        return this.days.filter(
-            (d) => !d.leapday || (d.leapday && d.leapday.numbered)
-        );
-    }
+
     //TODO: Had to add leapday to this to calculate padding correctly
     //TODO: Need to fix next month
     get lastWeekday() {
-        console.log(this.filteredDays, this.days);
-        return (
-            this.days[this.days.length - 1].weekday -
-            this.leapDays.filter((l) => l.numbered).length
-        );
+        return this.days[this.days.length - 1].weekday;
     }
 
     get type() {
@@ -144,7 +136,14 @@ export class DayHelper {
     }
     /** Days before this day in the year. */
     get daysBefore() {
-        return this.month.daysBefore + this.number - 1;
+        return (
+            this.month.daysBefore +
+            this.number -
+            1 -
+            this.month.leapDays.filter(
+                (l) => l.numbered && l.after < this.number - 1
+            ).length
+        );
     }
     get year() {
         return this.month.year;
@@ -343,21 +342,21 @@ export default class CalendarHelper extends Events {
         this.calendar = calendar ?? this.calendar;
         this.maxDays = Math.max(...this.data.months.map((m) => m.length));
 
-        if (!calendar.current) {
-            calendar.current = {
+        if (!this.calendar?.current) {
+            this.calendar.current = {
                 day: null,
                 month: null,
                 year: null
             };
         }
-        if (!isValidYear(calendar.current.year, calendar)) {
-            calendar.current.year = 1;
+        if (!isValidYear(this.calendar?.current.year, this.calendar)) {
+            this.calendar.current.year = 1;
         }
-        if (!isValidMonth(calendar.current.month, calendar)) {
-            calendar.current.month = 0;
+        if (!isValidMonth(this.calendar?.current.month, this.calendar)) {
+            this.calendar.current.month = 0;
         }
-        if (!isValidDay(calendar.current.day, calendar)) {
-            calendar.current.day = 1;
+        if (!isValidDay(this.calendar?.current.day, this.calendar)) {
+            this.calendar.current.day = 1;
         }
 
         this.trigger("month-update");
@@ -685,10 +684,6 @@ export default class CalendarHelper extends Events {
             this.displayed.year,
             1
         );
-        console.log(
-            "🚀 ~ file: index.ts ~ line 683 ~ month.lastWeekday",
-            month.lastWeekday
-        );
         if (
             month.lastWeekday < this.weekdays.length - 1 &&
             month.type == "month"
@@ -749,7 +744,10 @@ export default class CalendarHelper extends Events {
         return this.data.months
             .slice(0, month)
             .filter((m) => (all ? true : m.type == "month"))
-            .map((m, i) => m.length + this.leapDaysForMonth(i, year).length)
+            .map((m, i) => {
+                const leapdays = this.leapDaysForMonth(i, year);
+                return m.length + leapdays.filter((l) => !l.intercalary).length;
+            })
             .reduce((a, b) => a + b, 0);
     }
     /**
@@ -797,7 +795,9 @@ export default class CalendarHelper extends Events {
         const year = tester - 1;
         let total = 0;
         /** Iterate over each leap day. */
-        for (const { interval, offset } of this.leapdays) {
+        for (const { interval, offset } of this.leapdays.filter(
+            (l) => !l.intercalary
+        )) {
             let leapdays = 0;
 
             /** Iterate over each condition on each leapday. */
@@ -862,6 +862,7 @@ export default class CalendarHelper extends Events {
 
         //note: added 1 here to fix gregorian offset??
         //TODO: Figure out why.
+
         return wrap(
             (this.totalDaysBeforeYear(year) % this.data.weekdays.length) +
                 this.firstWeekday +
