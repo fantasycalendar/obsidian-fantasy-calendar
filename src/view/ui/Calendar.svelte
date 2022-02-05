@@ -6,6 +6,7 @@
     import DayView from "./DayView.svelte";
 
     import MonthView from "./Month.svelte";
+    import Day from "./Day.svelte";
     import Nav from "./Nav.svelte";
     import YearView from "./YearView.svelte";
     import YearViewBig from "./YearViewBig.svelte";
@@ -37,6 +38,8 @@
         year = calendar.displayed.year;
         yearDisplay = calendar.getNameForYear(calendar.displayed.year);
         month = calendar.currentMonth;
+        next = calendar.nextMonth;
+        prev = calendar.previousMonth;
         weeks = calendar.weeksOfMonth(month);
         firstWeek = calendar.weekNumbersOfMonth(month);
     });
@@ -45,6 +48,8 @@
     $: year = calendar.displayed.year;
     $: yearDisplay = calendar.getNameForYear(calendar.displayed.year);
     $: month = calendar.currentMonth;
+    $: next = calendar.nextMonth;
+    $: prev = calendar.previousMonth;
     $: firstWeek = calendar.weekNumbersOfMonth(month);
     $: weeks = calendar.weeksOfMonth(month);
 </script>
@@ -120,7 +125,21 @@
                     {/each}
                 </div>
                 <!-- {/if} -->
-
+                {#if prev.type == "intercalary"}
+                    <MonthView
+                        intercalary={true}
+                        columns={weekdays.length}
+                        {weeks}
+                        month={prev}
+                        {fullView}
+                        on:day-click
+                        on:day-doubleclick
+                        on:day-context-menu
+                        on:event-click
+                        on:event-mouseover
+                        on:event-context
+                    />
+                {/if}
                 <MonthView
                     columns={weekdays.length}
                     {weeks}
@@ -133,6 +152,21 @@
                     on:event-mouseover
                     on:event-context
                 />
+                {#if next.type == "intercalary"}
+                    <MonthView
+                        intercalary={true}
+                        columns={weekdays.length}
+                        {weeks}
+                        month={next}
+                        {fullView}
+                        on:day-click
+                        on:day-doubleclick
+                        on:day-context-menu
+                        on:event-click
+                        on:event-mouseover
+                        on:event-context
+                    />
+                {/if}
             </div>
         </div>
     {/if}
@@ -221,5 +255,19 @@
         flex-flow: row wrap;
         align-items: center;
         justify-content: center;
+    }
+    .intercalary-container {
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: center;
+        align-items: center;
+        border-top: 1px solid var(--background-modifier-border);
+        border-bottom: 1px solid var(--background-modifier-border);
+        color: var(--text-accent);
+    }
+    .intercalary-days {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
     }
 </style>

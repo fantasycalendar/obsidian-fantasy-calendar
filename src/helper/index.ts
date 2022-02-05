@@ -185,6 +185,7 @@ export class DayHelper {
 }
 
 export default class CalendarHelper extends Events {
+    standardMonths: Month[];
     /**
      * Get a day helper from cache for a given date calendar.
      */
@@ -341,6 +342,10 @@ export default class CalendarHelper extends Events {
     update(calendar?: Calendar) {
         this.calendar = calendar ?? this.calendar;
         this.maxDays = Math.max(...this.data.months.map((m) => m.length));
+
+        this.standardMonths = this.data.months.filter(
+            (m) => m.type != "intercalary"
+        );
 
         if (!this.calendar?.current) {
             this.calendar.current = {

@@ -9,6 +9,8 @@
     export let fullView: boolean = false;
     export let weeks: number;
 
+    export let intercalary = false;
+
     export let showPad: boolean = true;
 
     $: padded = month.calendar.getPaddedDaysForMonth(month);
@@ -31,12 +33,16 @@
 
 <div
     class="month"
+    class:intercalary
     class:full-view={fullView}
     data-id={month.id}
     id={`MONTH-${month.id}-${month.year}`}
 >
     {#if yearView}
         <h3 class="month-name">{month.name}</h3>
+    {/if}
+    {#if intercalary}
+        <span class="month">{month.name}</span>
     {/if}
     {#key current}
         <div
@@ -115,6 +121,24 @@
 
         grid-auto-rows: var(--calendar-rows);
     }
+    .intercalary {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+        border-top: 1px solid var(--background-modifier-border);
+        border-bottom: 1px solid var(--background-modifier-border);
+        border-radius: 0;
+        align-items: center;
+    }
+    .intercalary span.month {
+        text-align: center;
+    }
+    .intercalary .fantasy-month {
+        grid-template-columns: unset;
+        grid-auto-columns: var(--column-widths);
+        align-items: center;
+        justify-content: center;
+    }
     .leapday-container {
         grid-column: span var(--calendar-columns);
         display: flex;
@@ -131,7 +155,6 @@
     }
 
     .month {
-        border-radius: 1rem;
         padding: 0.25rem;
     }
 
