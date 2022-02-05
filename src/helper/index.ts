@@ -525,6 +525,7 @@ export default class CalendarHelper extends Events {
         this.displayed.year += 1;
         this.trigger("year-update");
     }
+    //TODO: This should skip intercalary months!
     /**
      * Get the index of the previous month to be displayed, wrapping as necessary.
      */
