@@ -98,7 +98,7 @@
         <Nav
             month={month.name}
             year={yearDisplay}
-            current={calendar.displayedDate}
+            current={calendar.currentDate}
             on:next={() => calendar.goToNext()}
             on:previous={() => calendar.goToPrevious()}
             on:reset
