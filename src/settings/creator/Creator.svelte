@@ -84,7 +84,7 @@
     $: canSave = getCanSave(calendar);
 
     const checkCanSave = () => {
-        if (!canSave && !plugin.data.exitWithoutSaving) {
+        if (!canSave && !plugin.data.exit.saving) {
             const modal = new ConfirmExitModal(plugin);
             modal.onClose = () => {
                 if (modal.confirmed) {

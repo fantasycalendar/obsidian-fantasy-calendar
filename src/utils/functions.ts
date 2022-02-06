@@ -162,3 +162,23 @@ export function isValidYear(year: number, calendar: Calendar) {
     }
     return true;
 }
+
+export function areDatesEqual(
+    date: CurrentCalendarData,
+    date2: CurrentCalendarData
+) {
+    if (date.day != date2.day) return false;
+    if (
+        date.month != date2.month &&
+        date.month != undefined &&
+        date2.month != undefined
+    )
+        return false;
+    if (
+        date.year != date2.year &&
+        date.year != undefined &&
+        date2.year != undefined
+    )
+        return false;
+    return true;
+}

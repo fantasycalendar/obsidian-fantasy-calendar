@@ -116,15 +116,6 @@
                 {/if}
             </div>
             <div class="month-view">
-                <!-- {#if month.type == "month"} -->
-                <div class="weekdays">
-                    {#each weekdays as day}
-                        <span class="weekday fantasy-weekday"
-                            >{day.name.slice(0, 3)}</span
-                        >
-                    {/each}
-                </div>
-                <!-- {/if} -->
                 {#if prev.type == "intercalary"}
                     <MonthView
                         intercalary={true}
@@ -140,6 +131,16 @@
                         on:event-context
                     />
                 {/if}
+                <!-- {#if month.type == "month"} -->
+                <div class="weekdays">
+                    {#each weekdays as day}
+                        <span class="weekday fantasy-weekday"
+                            >{day.name.slice(0, 3)}</span
+                        >
+                    {/each}
+                </div>
+                <!-- {/if} -->
+
                 <MonthView
                     columns={weekdays.length}
                     {weeks}

@@ -26,8 +26,8 @@ export const VIEW_TYPE = "FANTASY_CALENDAR";
 export const FULL_VIEW = "FANTASY_CALENDAR_FULL_VIEW";
 
 import CalendarUI from "./ui/Calendar.svelte";
-import { confirmWithModal } from "src/settings/modals/confirm";
-import { daysBetween } from "src/utils/functions";
+import { confirmEventDeletion } from "src/settings/modals/confirm";
+import { areDatesEqual, daysBetween } from "src/utils/functions";
 import { MODIFIER_KEY } from "../main";
 
 addIcon(
@@ -190,6 +190,8 @@ export default class FantasyCalendarView extends ItemView {
             if (!modal.saved) return;
             this.calendar.events.push(modal.event);
 
+            this.helper.addEvent(modal.event);
+
             this.saveCalendars();
 
             this._app.$set({
@@ -230,8 +232,8 @@ export default class FantasyCalendarView extends ItemView {
             if (!day.events.length) return;
 
             this.helper.viewing.day = day.number;
-            this.helper.viewing.month = this.helper.displayed.month;
-            this.helper.viewing.year = this.helper.displayed.year;
+            this.helper.viewing.month = day.month.number;
+            this.helper.viewing.year = day.month.year;
 
             this.yearView = false;
 
@@ -495,6 +497,26 @@ export default class FantasyCalendarView extends ItemView {
                                 modal.event
                             );
 
+                            this.helper.refreshMonth(
+                                modal.event.date.month,
+                                modal.event.date.year
+                            );
+                            console.log(
+                                modal.event.date.month,
+                                existing.date.month,
+                                modal.event.date.year,
+                                existing.date.year
+                            );
+                            if (
+                                modal.event.date.month != existing.date.month ||
+                                modal.event.date.year != existing.date.year
+                            ) {
+                                this.helper.refreshMonth(
+                                    existing.date.month,
+                                    existing.date.year
+                                );
+                            }
+
                             this.saveCalendars();
 
                             this._app.$set({
@@ -511,32 +533,31 @@ export default class FantasyCalendarView extends ItemView {
                 menu.addItem((item) => {
                     item.setTitle("Delete Event").onClick(async () => {
                         if (
-                            await confirmWithModal(
-                                this.app,
-                                "Are you sure you wish to delete this event?",
-                                {
-                                    cta: "Delete",
-                                    secondary: "Cancel"
-                                }
-                            )
-                        ) {
-                            const existing = this.calendar.events.find(
-                                (e) => e.id == event.id
-                            );
+                            !this.plugin.data.exit.event &&
+                            !(await confirmEventDeletion(this.plugin))
+                        )
+                            return;
+                        const existing = this.calendar.events.find(
+                            (e) => e.id == event.id
+                        );
 
-                            this.calendar.events.splice(
-                                this.calendar.events.indexOf(existing),
-                                1
-                            );
+                        this.calendar.events.splice(
+                            this.calendar.events.indexOf(existing),
+                            1
+                        );
 
-                            this.saveCalendars();
+                        this.helper.refreshMonth(
+                            existing.date.month,
+                            existing.date.year
+                        );
 
-                            this._app.$set({
-                                calendar: this.helper
-                            });
+                        this.saveCalendars();
 
-                            this.triggerHelperEvent("day-update");
-                        }
+                        this._app.$set({
+                            calendar: this.helper
+                        });
+
+                        this.triggerHelperEvent("day-update");
                     });
                 });
 

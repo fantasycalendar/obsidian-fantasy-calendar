@@ -165,8 +165,8 @@ export class DayHelper {
     get isDisplaying() {
         return (
             this.number == this.calendar.viewing.day &&
-            this.calendar.displayed.year == this.calendar.viewing.year &&
-            this.calendar.displayed.month == this.calendar.viewing.month
+            this.month.year == this.calendar.viewing.year &&
+            this.month.number == this.calendar.viewing.month
         );
     }
     private _moons: Array<[Moon, Phase]>;
@@ -185,6 +185,23 @@ export class DayHelper {
 }
 
 export default class CalendarHelper extends Events {
+    addEvent(event: Event) {
+        const year = event.date.year;
+        const month = event.date.month;
+
+        this.refreshMonth(month, year);
+    }
+    refreshMonth(month: number, year: number) {
+        if (!this._cache.has(year)) return;
+        if (!this._cache.get(year).has(month)) return;
+        this._cache.get(year).get(month).shouldUpdateEvents = true;
+        if (
+            (year == this.displayed.year && month == this.displayed.month) ||
+            (year == this.viewing.year && month == this.viewing.month)
+        ) {
+            this.trigger("month-update");
+        }
+    }
     standardMonths: Month[];
     /**
      * Get a day helper from cache for a given date calendar.
@@ -278,18 +295,7 @@ export default class CalendarHelper extends Events {
                     for (const [year, months] of years) {
                         if (!this._cache.has(year)) continue;
                         for (const month of months) {
-                            if (!this._cache.get(year).has(month)) continue;
-                            this._cache
-                                .get(year)
-                                .get(month).shouldUpdateEvents = true;
-                            if (
-                                (year == this.displayed.year &&
-                                    month == this.displayed.month) ||
-                                (year == this.viewing.year &&
-                                    month == this.viewing.month)
-                            ) {
-                                this.trigger("month-update");
-                            }
+                            this.refreshMonth(month, year);
                         }
                     }
                 }
@@ -453,12 +459,9 @@ export default class CalendarHelper extends Events {
      * Increment viewed day and overflow months and years as necessary.
      */
     goToNextDay() {
+        const day = this.getDayForDate(this.viewing);
         this.viewing.day += 1;
-        const currentMonth = this.getMonth(
-            this.displayed.month,
-            this.displayed.year
-        );
-        if (this.viewing.day > currentMonth.days.length) {
+        if (this.viewing.day > day.month.days.length) {
             this.goToNext();
             this.viewing.month = this.displayed.month;
             this.viewing.year = this.displayed.year;
@@ -503,11 +506,25 @@ export default class CalendarHelper extends Events {
     canGoToNextYear(year = this.displayed.year) {
         return !this.data.useCustomYears || year < this.data.years.length;
     }
+    getDirectionalStandardMonth(direction: 1 | -1) {
+        const current = this.data.months[this.displayed.month];
+        const standardIndex = this.standardMonths.indexOf(current);
+        const directionIndex = wrap(
+            standardIndex + direction,
+            this.standardMonths.length
+        );
+        const index = this.data.months.indexOf(
+            this.standardMonths[directionIndex]
+        );
+        return index;
+    }
     /**
      * Go to the next month index. Used to change months on the calendar.
      */
     goToNext() {
-        if (this.nextMonthIndex < this.displayed.month) {
+        const index = this.getDirectionalStandardMonth(1);
+
+        if (index < this.displayed.month) {
             if (!this.canGoToNextYear()) {
                 new Notice(
                     "This is the last year. Additional years can be created in settings."
@@ -516,7 +533,7 @@ export default class CalendarHelper extends Events {
             }
             this.goToNextYear();
         }
-        this.setCurrentMonth(this.nextMonthIndex);
+        this.setCurrentMonth(index);
     }
     /**
      * Go to the next year index. Used to change years on the calendar.
@@ -542,14 +559,16 @@ export default class CalendarHelper extends Events {
      * Go to the previous month index. Used to change months on the calendar.
      */
     goToPrevious() {
-        if (this.prevMonthIndex > this.displayed.month) {
+        const index = this.getDirectionalStandardMonth(-1);
+
+        if (index > this.displayed.month) {
             if (this.displayed.year == 1) {
                 new Notice("This is the earliest year.");
                 return;
             }
             this.goToPreviousYear();
         }
-        this.setCurrentMonth(this.prevMonthIndex);
+        this.setCurrentMonth(index);
     }
     /**
      * Go to the viewed previous day. Used to change days on the day view.
@@ -755,25 +774,6 @@ export default class CalendarHelper extends Events {
                 return m.length + leapdays.filter((l) => !l.intercalary).length;
             })
             .reduce((a, b) => a + b, 0);
-    }
-    /**
-     * Used to determine event sorting. Can remove.
-     */
-    areDatesEqual(date: CurrentCalendarData, date2: CurrentCalendarData) {
-        if (date.day != date2.day) return false;
-        if (
-            date.month != date2.month &&
-            date.month != undefined &&
-            date2.month != undefined
-        )
-            return false;
-        if (
-            date.year != date2.year &&
-            date.year != undefined &&
-            date2.year != undefined
-        )
-            return false;
-        return true;
     }
 
     dayNumberForDate(date: CurrentCalendarData) {

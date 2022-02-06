@@ -14,6 +14,7 @@ import { dateString, nanoid } from "../../utils/functions";
 
 import PathSuggestionModal from "../../suggester/path";
 import { confirmWithModal } from "./confirm";
+import copy from "fast-copy";
 
 export class CreateEventModal extends Modal {
     saved = false;
@@ -49,11 +50,11 @@ export class CreateEventModal extends Modal {
     ) {
         super(app);
         if (event) {
-            this.event = { ...event };
+            this.event = copy(event);
             this.editing = true;
         }
         if (date) {
-            this.event.date = { ...date };
+            this.event.date = copy(date);
         }
         this.containerEl.addClass("fantasy-calendar-create-event");
     }
