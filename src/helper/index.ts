@@ -116,9 +116,6 @@ export class MonthHelper {
         if (!this.calendar.data.overflow) return 0;
         return this.days[0].weekday;
     }
-
-    //TODO: Had to add leapday to this to calculate padding correctly
-    //TODO: Need to fix next month
     get lastWeekday() {
         return this.days[this.days.length - 1].weekday;
     }
@@ -321,7 +318,7 @@ export default class CalendarHelper extends Events {
         this.displayed = { ...this.current };
         this.update(this.calendar);
         window.calendar = this;
-        //TODO: Tell existing months / days to update.
+
         this.plugin.registerEvent(
             this.plugin.app.workspace.on(
                 "fantasy-calendars-event-update",
@@ -599,7 +596,7 @@ export default class CalendarHelper extends Events {
         this.displayed.year += 1;
         this.trigger("year-update");
     }
-    //TODO: This should skip intercalary months!
+
     /**
      * Get the index of the previous month to be displayed, wrapping as necessary.
      */
@@ -707,7 +704,7 @@ export default class CalendarHelper extends Events {
      *
      * Will prioritize pulling a MonthHelper from the cache.
      *
-     * TODO: What is the intercalary behavior? Need to document this, because I can't remember.
+     * Direction is used to skip intercalary months.
      */
     getMonth(number: number, year: number, direction: number = 0): MonthHelper {
         const months = this.data.months;
@@ -928,9 +925,6 @@ export default class CalendarHelper extends Events {
         if (!this.data.overflow) return 0;
         if (year == 1) return this.firstWeekday;
 
-        //note: added 1 here to fix gregorian offset??
-        //TODO: Figure out why.
-
         return wrap(
             (this.totalDaysBeforeYear(year) % this.data.weekdays.length) +
                 this.firstWeekday +
@@ -947,8 +941,6 @@ export default class CalendarHelper extends Events {
     }
     /**
      * Get the moons and their phases for a given month.
-     *
-     * TODO: This seems to be a little off? +/- 1 day in Gregorian?
      */
     getMoonsForMonth(month: MonthHelper): Array<[Moon, Phase]>[] {
         const phases: Array<[Moon, Phase]>[] = [];
