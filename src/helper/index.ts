@@ -17,96 +17,9 @@ import type {
     Moon
 } from "../@types";
 
-export class MonthHelper {
-    days: DayHelper[] = [];
-    daysBefore: number;
-    leapDays: LeapDay[] = [];
-    shouldUpdateEvents: boolean = false;
-
-    get id() {
-        return this.data.id;
-    }
-    get index() {
-        return this.calendar.data.months.indexOf(this.data);
-    }
-    get name() {
-        return this.data.name;
-    }
-    get length() {
-        return this.days.length;
-    }
-
-    get firstWeekday() {
-        if (!this.calendar.data.overflow) return 0;
-        return this.days[0].weekday;
-    }
-
-    //TODO: Had to add leapday to this to calculate padding correctly
-    //TODO: Need to fix next month
-    get lastWeekday() {
-        return this.days[this.days.length - 1].weekday;
-    }
-
-    get type() {
-        return this.data.type;
-    }
-    events: Event[];
-    getEventsOnDay(day: CurrentCalendarData) {
-        if (!this.events || !this.events.length || this.shouldUpdateEvents) {
-            this.events = this.calendar.eventsForMonth(this);
-        }
-        return this.events.filter((event) => {
-            if (event.date.day == day.day) return true;
-            if (!event.end) return false;
-            const start = { ...event.date };
-            const end = { ...event.end };
-
-            if (!start.year) start.year = end.year = this.year;
-            if (!start.month) start.month = end.month = this.number;
-            const hash = Number(this.calendar.hash(day));
-            if (
-                Number(this.calendar.hash(start)) <= hash &&
-                hash <= Number(this.calendar.hash(end))
-            )
-                return true;
-        });
-    }
-    shouldUpdateMoons = false;
-    moons: Array<[Moon, Phase]>[];
-    getMoonsForDay(day: CurrentCalendarData) {
-        if (!this.moons || !this.moons.length || this.shouldUpdateMoons) {
-            this.moons = this.calendar.getMoonsForMonth(this);
-        }
-        return this.moons[day.day - 1];
-    }
-    constructor(
-        public data: Month,
-        public number: number,
-        public year: number,
-        public calendar: CalendarHelper
-    ) {
-        this.leapDays = this.calendar.leapDaysForMonth(this.number, year);
-        this.daysBefore = this.calendar.daysBeforeMonth(this.number, this.year);
-
-        this.days = [
-            ...new Array(
-                data.length +
-                    this.leapDays.filter(
-                        (l) => !l.intercalary || (l.intercalary && l.numbered)
-                    ).length
-            ).keys()
-        ].map((k) => {
-            return new DayHelper(
-                this,
-                k + 1,
-                this.leapDays.find((leapday) => leapday.after == k)
-            );
-        });
-    }
-}
-
 export class DayHelper {
     private _events: Event[];
+    shouldUpdate: boolean = false;
     get calendar() {
         return this.month.calendar;
     }
@@ -118,11 +31,7 @@ export class DayHelper {
         };
     }
     get events(): Event[] {
-        if (
-            !this._events ||
-            !this._events.length ||
-            this.month.shouldUpdateEvents
-        ) {
+        if (!this._events || !this._events.length || this.shouldUpdate) {
             this._events = this.month.getEventsOnDay(this.date);
         }
         return this._events;
@@ -184,6 +93,102 @@ export class DayHelper {
     ) {}
 }
 
+export class MonthHelper {
+    days: DayHelper[] = [];
+    daysBefore: number;
+    leapDays: LeapDay[] = [];
+    shouldUpdate = false;
+
+    get id() {
+        return this.data.id;
+    }
+    get index() {
+        return this.calendar.data.months.indexOf(this.data);
+    }
+    get name() {
+        return this.data.name;
+    }
+    get length() {
+        return this.days.length;
+    }
+
+    get firstWeekday() {
+        if (!this.calendar.data.overflow) return 0;
+        return this.days[0].weekday;
+    }
+
+    //TODO: Had to add leapday to this to calculate padding correctly
+    //TODO: Need to fix next month
+    get lastWeekday() {
+        return this.days[this.days.length - 1].weekday;
+    }
+
+    get type() {
+        return this.data.type;
+    }
+    events: Event[];
+    getEventsOnDay(day: CurrentCalendarData) {
+        if (!this.events || !this.events.length || this.shouldUpdate) {
+            this.days.forEach((day) => (day.shouldUpdate = true));
+            this.events = this.calendar.getEventsForMonth(this);
+            this.shouldUpdate = false;
+        }
+        return this.events.filter((event) => {
+            if (event.date.day == day.day) return true;
+            if (!event.end) return false;
+            const start = { ...event.date };
+            const end = { ...event.end };
+
+            if (!start.year) start.year = end.year = this.year;
+            if (!start.month) start.month = end.month = this.number;
+            const hash = Number(this.calendar.hash(day));
+            if (
+                Number(this.calendar.hash(start)) <= hash &&
+                hash <= Number(this.calendar.hash(end))
+            )
+                return true;
+        });
+    }
+    shouldUpdateMoons = false;
+    moons: Array<[Moon, Phase]>[];
+    getMoonsForDay(day: CurrentCalendarData) {
+        if (!this.moons || !this.moons.length || this.shouldUpdateMoons) {
+            this.moons = this.calendar.getMoonsForMonth(this);
+        }
+        return this.moons[day.day - 1];
+    }
+    constructor(
+        public data: Month,
+        public number: number,
+        public year: number,
+        public calendar: CalendarHelper
+    ) {
+        this.leapDays = this.calendar.leapDaysForMonth(this.number, year);
+        this.daysBefore = this.calendar.daysBeforeMonth(this.number, this.year);
+
+        this.days = [
+            ...new Array(
+                data.length +
+                    this.leapDays.filter(
+                        (l) => !l.intercalary || (l.intercalary && l.numbered)
+                    ).length
+            ).keys()
+        ].map((k) => {
+            return new DayHelper(
+                this,
+                k + 1,
+                this.leapDays.find((leapday) => leapday.after == k)
+            );
+        });
+    }
+}
+
+interface YearEventCache {
+    events: Event[];
+    shouldUpdate: boolean;
+    months: Map<number, MonthHelper>;
+}
+
 export default class CalendarHelper extends Events {
     addEvent(event: Event) {
         const year = event.date.year;
@@ -193,8 +198,11 @@ export default class CalendarHelper extends Events {
     }
     refreshMonth(month: number, year: number) {
         if (!this._cache.has(year)) return;
-        if (!this._cache.get(year).has(month)) return;
-        this._cache.get(year).get(month).shouldUpdateEvents = true;
+        if (!this._cache.get(year).months.has(month)) return;
+        this._cache.get(year).shouldUpdate = true;
+        this._cache
+            .get(year)
+            .months.forEach((month) => (month.shouldUpdate = true));
         if (
             (year == this.displayed.year && month == this.displayed.month) ||
             (year == this.viewing.year && month == this.viewing.month)
@@ -214,12 +222,42 @@ export default class CalendarHelper extends Events {
     /**
      * Get all the events that occur in a given month.
      */
-    eventsForMonth(helper: MonthHelper): Event[] {
+    getEventsForMonth(helper: MonthHelper): Event[] {
         //get from cache first
 
         //else
         const { year, number: month } = helper;
-        const events = this.calendar.events.filter((event) => {
+
+        if (!this._cache.has(year)) {
+            this._cache.set(year, {
+                events: [],
+                shouldUpdate: true,
+                months: new Map()
+            });
+        }
+        if (this._cache.get(year).shouldUpdate) {
+            const events = this.calendar.events.filter((event) => {
+                const date = { ...event.date };
+                const end = { ...event.end };
+                //Year and Month match
+                if (date.year == year || date.year == undefined) return true;
+                //Event is after the month
+                if (date.year > year) return false;
+                //No end date and event is before the month
+                if (!end && date.year < year) return false;
+
+                if (date.year <= year && end.year >= year) return true;
+
+                return false;
+            });
+            this._cache.set(year, {
+                months: this._cache.get(year).months,
+                events,
+                shouldUpdate: false
+            });
+        }
+
+        const events = this._cache.get(year).events.filter((event) => {
             const date = { ...event.date };
             const end = { ...event.end };
             //No-month events are on every month.
@@ -308,24 +346,25 @@ export default class CalendarHelper extends Events {
     /**
      * Cache used to store built month helpers.
      */
-    private _cache: Map<number, Map<number, MonthHelper>> = new Map();
+    private _cache: Map<number, YearEventCache> = new Map();
 
     /**
      * Get an array of month helpers for an entire year.
      */
     getMonthsForYear(year: number) {
         if (!this._cache.has(year)) {
-            this._cache.set(
-                year,
-                new Map(
+            this._cache.set(year, {
+                events: [],
+                shouldUpdate: true,
+                months: new Map(
                     this.data.months.map((m, i) => [
                         i,
                         new MonthHelper(m, i, year, this)
                     ])
                 )
-            );
+            });
         }
-        return Array.from(this._cache.get(year).values());
+        return Array.from(this._cache.get(year).months.values());
     }
     /**
      * Get a hash of a given date.
@@ -662,11 +701,15 @@ export default class CalendarHelper extends Events {
         if (number >= months.length) year += 1;
 
         if (this._cache.has(year)) {
-            if (this._cache.get(year)!.has(index)) {
-                return this._cache.get(year)!.get(index);
+            if (this._cache.get(year)!.months.has(index)) {
+                return this._cache.get(year)!.months.get(index);
             }
         } else {
-            this._cache.set(year, new Map());
+            this._cache.set(year, {
+                events: [],
+                shouldUpdate: true,
+                months: new Map()
+            });
         }
 
         if (months[index].type == "intercalary" && direction != 0) {
@@ -674,7 +717,8 @@ export default class CalendarHelper extends Events {
         }
 
         const helper = new MonthHelper(months[index], index, year, this);
-        this._cache.set(year, this._cache.get(year).set(index, helper));
+        this._cache.get(year).months.set(index, helper);
+        this._cache.set(year, this._cache.get(year));
         return helper;
     }
     /**
