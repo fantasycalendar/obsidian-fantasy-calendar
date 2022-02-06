@@ -364,6 +364,17 @@ export default class CalendarHelper extends Events {
                 )
             });
         }
+        if (this._cache.get(year).months.size != this.data.months.length) {
+            this._cache.set(year, {
+                ...this._cache.get(year),
+                months: new Map(
+                    this.data.months.map((m, i) => [
+                        i,
+                        new MonthHelper(m, i, year, this)
+                    ])
+                )
+            });
+        }
         return Array.from(this._cache.get(year).months.values());
     }
     /**
@@ -544,6 +555,13 @@ export default class CalendarHelper extends Events {
      */
     canGoToNextYear(year = this.displayed.year) {
         return !this.data.useCustomYears || year < this.data.years.length;
+    }
+    getDirectionalStandardMonthHelper(
+        direction: 1 | -1,
+        year = this.displayed.year
+    ) {
+        const index = this.getDirectionalStandardMonth(direction);
+        return this.getMonth(index, year);
     }
     getDirectionalStandardMonth(direction: 1 | -1) {
         const current = this.data.months[this.displayed.month];
