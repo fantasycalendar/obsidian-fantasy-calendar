@@ -106,7 +106,10 @@ export const DEFAULT_DATA: FantasyCalendarData = {
         calendars: false,
         events: false
     },
-    exitWithoutSaving: false
+    exit: {
+        saving: false,
+        event: false
+    }
 };
 
 export default class FantasyCalendar extends Plugin {
