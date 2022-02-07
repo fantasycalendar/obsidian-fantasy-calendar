@@ -23,7 +23,7 @@
         }
         return a.date.day - b.date.day;
     });
-    $: events = sorted.slice(0, 25 * sliced);
+    $: events = sorted.slice(0, 100 * sliced);
     $: months = calendar.static.months;
 
     const deleteEvent = (item: Event) => {
@@ -61,31 +61,44 @@
     };
 </script>
 
-<Details name={"Events"}>
-    {#if !events.length}
-        <AddNew on:click={() => add()} />
-        <NoExistingItems message={"Create a new event to see it here."} />
-    {:else}
-        <ButtonComponent
-            name="Delete All Events"
-            icon="trash"
-            on:click={() => deleteAll()}
-        />
-        <AddNew on:click={() => add()} />
-        <div class="existing-items">
-            {#each events as event}
-                <EventInstance
-                    {event}
-                    category={getCategory(event.category)}
-                    date={dateString(event.date, months, event.end)}
-                    on:edit={() => add(event)}
-                    on:delete={() => deleteEvent(event)}
+<Details name={"Events"} desc={`Displaying ${events.length} events.`}>
+    <ButtonComponent
+        name="Delete All Events"
+        icon="trash"
+        on:click={() => deleteAll()}
+    />
+    <AddNew on:click={() => add()} />
+    <div class="existing-items">
+        {#each events as event}
+            <EventInstance
+                {event}
+                category={getCategory(event.category)}
+                date={dateString(event.date, months, event.end)}
+                on:edit={() => add(event)}
+                on:delete={() => deleteEvent(event)}
+            />
+        {:else}
+            <div />
+            <div class="setting-item">
+                <NoExistingItems
+                    message={"Create a new event to see it here."}
                 />
-            {/each}
+            </div>
+        {/each}
+    </div>
+    {#if events.length < calendar.events.length}
+        <div class="more" on:click={() => sliced++}>
+            <small>Load More Events...</small>
         </div>
-        <div class="more" on:click={() => sliced++}>Load More Events...</div>
     {/if}
 </Details>
 
 <style>
+    .more {
+        text-align: center;
+        padding-top: 10px;
+        text-decoration: underline;
+        font-style: italic;
+        cursor: pointer;
+    }
 </style>

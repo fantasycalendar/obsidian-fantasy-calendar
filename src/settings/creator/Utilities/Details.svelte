@@ -4,6 +4,7 @@
 
     export let open = !Platform.isMobile;
     export let name: string;
+    export let desc: string = "";
     export let warn: boolean = false;
     export let label: string = null;
     const details = (node: HTMLElement) => {
@@ -19,7 +20,7 @@
         <div class="setting-item setting-item-heading">
             <div class="setting-item-info">
                 <div class="setting-item-name">{name}</div>
-                <div class="setting-item-description" />
+                <div class="setting-item-description">{desc}</div>
             </div>
         </div>
         <div class="collapser">
@@ -42,6 +43,9 @@
 </details>
 
 <style>
+    .fantasy-calendar-nested-settings {
+        position: relative;
+    }
     .warning-label-container {
         display: flex;
         justify-content: flex-end;
