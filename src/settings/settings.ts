@@ -258,9 +258,10 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                             data.push(JSON.parse(await file.text()));
                         }
                         const calendars = Importer.import(data);
-                        this.plugin.data.calendars.push(...calendars);
-                        await this.plugin.saveCalendar();
-                        this.showCalendars();
+                        for (const calendar of calendars) {
+                            await this.plugin.addNewCalendar(calendar);
+                        }
+                        this.display();
                     } catch (e) {
                         new Notice(
                             `There was an error while importing the calendar${
@@ -344,7 +345,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                         }
                         await this.plugin.saveCalendar();
 
-                        this.showCalendars();
+                        this.display();
                     });
                 });
         }
@@ -573,7 +574,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
         /* this.containerEl.empty(); */
         const clone = copy(calendar);
 
-        if (Platform.isMobile || true) {
+        if (Platform.isMobile) {
             const modal = new MobileCreatorModal(this.plugin, clone);
             return new Promise((resolve, reject) => {
                 try {
@@ -607,8 +608,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                     props: {
                         calendar: clone,
                         plugin: this.plugin,
-                        width: this.contentEl.clientWidth,
-                        top
+                        width: this.contentEl.clientWidth
                     }
                 });
                 const observer = new ResizeObserver(() => {
@@ -655,8 +655,7 @@ class MobileCreatorModal extends Modal {
             props: {
                 calendar: this.calendar,
                 plugin: this.plugin,
-                width: this.contentEl.clientWidth,
-                top: 0
+                width: this.contentEl.clientWidth
             }
         });
         $app.$on(
