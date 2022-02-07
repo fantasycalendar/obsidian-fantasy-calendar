@@ -570,15 +570,6 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
         } else {
             this.containerEl.addClass("fantasy-calendar-creator-open");
             return new Promise((resolve) => {
-                const top =
-                    -1 *
-                    Number(
-                        getComputedStyle(this.containerEl).paddingTop.replace(
-                            /[^\d]/g,
-                            ""
-                        )
-                    );
-
                 const $app = new CalendarCreator({
                     target: this.containerEl,
                     props: {
