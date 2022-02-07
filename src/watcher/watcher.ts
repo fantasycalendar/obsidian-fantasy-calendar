@@ -28,7 +28,7 @@ declare global {
     }
 }
 
-export type CalendarEventTree = Map<string, Map<number, Set<number>>>;
+export type CalendarEventTree = Map<string, Set<number>>;
 
 export class Watcher extends Component {
     parsing: Set<string> = new Set();
@@ -94,7 +94,6 @@ export class Watcher extends Component {
             })
         );
         /** A file has been renamed and should be checked for events.
-         * Could this be hashed?
          */
         //TODO: Refactor
         this.registerEvent(
@@ -117,15 +116,17 @@ export class Watcher extends Component {
         this.registerEvent(
             this.vault.on("delete", (abstractFile) => {
                 if (!(abstractFile instanceof TFile)) return;
-
+                const start = Date.now();
+                console.log("Start", start);
                 for (let calendar of this.calendars) {
-                    for (let event of calendar.events) {
-                        if (!event.note) continue;
-                        if (event.note === abstractFile.path) {
-                            event.note = null;
-                        }
-                    }
+                    const events = calendar.events.filter(
+                        (event) => event.note === abstractFile.path
+                    );
+                    calendar.events = calendar.events.filter(
+                        (event) => event.note != abstractFile.path
+                    );
                 }
+                console.log("End", Date.now() - start);
                 this.plugin.saveCalendar();
             })
         );
@@ -180,6 +181,11 @@ export class Watcher extends Component {
             }
         );
 
+        this.worker.addEventListener("message", async (evt: MessageEvent) => {
+            if (evt.data.type == "delete") {
+            }
+        });
+
         /** The worker has parsed all files in its queue. */
         this.worker.addEventListener(
             "message",
@@ -203,20 +209,19 @@ export class Watcher extends Component {
     }
     addToTree(calendar: Calendar, event: Event) {
         if (!this.tree.has(calendar.id)) {
-            this.tree.set(calendar.id, new Map());
+            this.tree.set(calendar.id, new Set());
         }
         const calendarTree = this.tree.get(calendar.id);
 
-        if (!calendarTree.has(event.date.year)) {
-            calendarTree.set(event.date.year, new Set());
+        if (calendarTree.has(event.date.year)) return;
+
+        calendarTree.add(event.date.year);
+
+        if (event.end && event.end.year != event.date.year) {
+            for (let i = event.date.year + 1; i <= event.end.year; i++) {
+                calendarTree.add(event.date.year);
+            }
         }
-
-        const yearSet = calendarTree.get(event.date.year);
-
-        this.tree.set(
-            calendar.id,
-            calendarTree.set(event.date.year, yearSet.add(event.date.month))
-        );
     }
     startParsing(paths: string[]) {
         this.worker.postMessage<QueueMessage>({
