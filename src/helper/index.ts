@@ -171,6 +171,11 @@ export class MonthHelper {
                     ).length
             ).keys()
         ].map((k) => {
+            console.log(
+                "🚀 ~ file: index.ts ~ line 174 ~ k",
+                k,
+                ...this.leapDays
+            );
             return new DayHelper(
                 this,
                 k + 1,
@@ -333,17 +338,12 @@ export default class CalendarHelper extends Events {
             this.plugin.app.workspace.on(
                 "fantasy-calendars-event-update",
                 (tree) => {
-                    console.log("🚀 ~ file: index.ts ~ line 336 ~ tree", tree);
                     if (!tree.has(this.calendar.id)) return;
 
                     const years = tree.get(this.calendar.id);
 
                     for (const year of years) {
                         if (!this._cache.has(year)) continue;
-                        console.log(
-                            "🚀 ~ file: index.ts ~ line 342 ~ year",
-                            year
-                        );
                         this.refreshYear(year);
                     }
                 }
