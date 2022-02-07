@@ -316,10 +316,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                             calendar
                         );
                         if (edited) {
-                            this.plugin.addNewCalendar(
-                                edited,
-                                this.data.calendars.indexOf(calendar)
-                            );
+                            this.plugin.addNewCalendar(edited, calendar);
                             await this.plugin.saveCalendar();
                             this.display();
                         }

@@ -117,16 +117,25 @@ export const DEFAULT_DATA: FantasyCalendarData = {
 export default class FantasyCalendar extends Plugin {
     api = new API(this);
     settingsLoaded: boolean;
-    async addNewCalendar(calendar: Calendar, index?: number) {
-        if (index == null) {
+    async addNewCalendar(calendar: Calendar, existing?: Calendar) {
+        let shouldParse =
+            !existing ||
+            calendar.name != existing?.name ||
+            (calendar.autoParse && !existing?.autoParse) ||
+            calendar.path != existing?.path;
+        if (existing == null) {
             this.data.calendars.push(calendar);
         } else {
-            this.data.calendars.splice(index, 1, calendar);
+            this.data.calendars.splice(
+                this.data.calendars.indexOf(existing),
+                1,
+                calendar
+            );
         }
         if (!this.data.defaultCalendar) {
             this.data.defaultCalendar = calendar.id;
         }
-        this.watcher.start(calendar);
+        if (shouldParse) this.watcher.start(calendar);
         await this.saveCalendar();
         /* this.watcher.registerCalendar(calendar); */
     }
@@ -333,6 +342,15 @@ export default class FantasyCalendar extends Plugin {
             )
         ) {
             this.data.defaultCalendar = this.data.calendars[0].id;
+        }
+
+        if ((this.data as any).autoParse && this.data.calendars.length) {
+            for (const calendar of this.data.calendars) {
+                calendar.autoParse = (this.data as any).autoParse;
+                calendar.path = (this.data as any).path;
+            }
+            delete (this.data as any).autoParse;
+            delete (this.data as any).path;
         }
         /* if ((this.data.version?.major ?? 0) < 2 && this.data.calendars.length) {
             new Notice(
