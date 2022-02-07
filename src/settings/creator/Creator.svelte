@@ -32,7 +32,7 @@
     export let width: number;
     export let calendar: Calendar;
     export let plugin: FantasyCalendar;
-    
+
     const store = writable<Calendar>(calendar);
     store.subscribe((v) => {
         calendar = v;
@@ -164,7 +164,7 @@
             </div>
             <div class="fantasy-creator-app">
                 <div use:preset />
-                <Info {calendar} />
+                <Info {calendar} {plugin} />
                 <WeekdayContainer {calendar} />
                 <MonthContainer />
                 <YearContainer {calendar} app={plugin.app} />

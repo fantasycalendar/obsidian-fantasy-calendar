@@ -23,32 +23,34 @@
     </div>
     <div class="setting-item-control">
         <div class="warning-container">
-            {#if warn}
-                <div use:warning />
-            {/if}
-            {#if type == "text"}
-                <input
-                    type="text"
-                    spellcheck="false"
-                    {placeholder}
-                    class:warn
-                    bind:value
-                    on:blur={() => {
-                        dispatch("blur", value);
-                    }}
-                />
-            {:else if type == "number"}
-                <input
-                    type="number"
-                    spellcheck="false"
-                    {placeholder}
-                    class:warn
-                    bind:value
-                    on:blur={() => {
-                        dispatch("blur", value);
-                    }}
-                />
-            {/if}
+            <slot>
+                {#if warn}
+                    <div use:warning />
+                {/if}
+                {#if type == "text"}
+                    <input
+                        type="text"
+                        spellcheck="false"
+                        {placeholder}
+                        class:warn
+                        bind:value
+                        on:blur={() => {
+                            dispatch("blur", value);
+                        }}
+                    />
+                {:else if type == "number"}
+                    <input
+                        type="number"
+                        spellcheck="false"
+                        {placeholder}
+                        class:warn
+                        bind:value
+                        on:blur={() => {
+                            dispatch("blur", value);
+                        }}
+                    />
+                {/if}
+            </slot>
         </div>
     </div>
 </div>

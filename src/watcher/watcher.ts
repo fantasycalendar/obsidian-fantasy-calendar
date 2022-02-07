@@ -18,8 +18,7 @@ import Worker, {
     OptionsMessage,
     QueueMessage,
     UpdateEventMessage,
-    SaveMessage,
-    RenameMessage
+    SaveMessage
 } from "./watcher.worker";
 
 declare global {
@@ -66,6 +65,7 @@ export class Watcher extends Component {
         this.worker.postMessage<OptionsMessage>({
             type: "options",
             parseTitle: this.plugin.data.parseDates,
+            addToDefaultIfMissing: this.plugin.data.addToDefaultIfMissing,
             format: this.plugin.format,
             defaultCalendar: this.plugin.defaultCalendar?.name,
             supportsTimelines: this.plugin.data.supportTimelines,
@@ -205,13 +205,25 @@ export class Watcher extends Component {
         );
         this.start();
     }
-    start() {
-        if (!this.calendars.length) return;
-        //TODO: Add per-calendar root path.
-        const folder = this.vault.getAbstractFileByPath(this.plugin.data.path);
-        if (!folder || !(folder instanceof TFolder)) return;
-        /* for (const path of this.getFiles(folder)) parsing.add(path); */
-        this.startParsing(folder.children.map((f) => f.path));
+    start(calendar?: Calendar) {
+        const calendars = calendar ? [calendar] : this.calendars;
+        if (!calendars.length) return;
+        let folders: Set<string> = new Set();
+
+        for (const calendar of calendars) {
+            if (!calendar) continue;
+            if (!calendar.autoParse) continue;
+            const folder = this.vault.getAbstractFileByPath(calendar.path);
+            if (!folder || !(folder instanceof TFolder)) continue;
+            for (const child of folder.children) {
+                folders.add(child.path);
+            }
+        }
+
+        console.log("🚀 ~ file: watcher.ts ~ line 212 ~ folders", folders);
+
+        if (!folders.size) return;
+        this.startParsing([...folders]);
     }
     addToTree(calendar: Calendar, event: Event) {
         if (!this.tree.has(calendar.id)) {
@@ -235,20 +247,6 @@ export class Watcher extends Component {
             paths
         });
     }
-    /*     getFiles(folder: TAbstractFile): string[] {
-        if (!this.plugin.data.autoParse) return [];
-        let files = [];
-        if (folder instanceof TFolder) {
-            for (const child of folder.children) {
-                files.push(...this.getFiles(child));
-            }
-        }
-        if (folder instanceof TFile) {
-            files.push(folder.path);
-        }
-        return files;
-    } */
-
     onunload() {
         this.worker.terminate();
         this.worker = null;

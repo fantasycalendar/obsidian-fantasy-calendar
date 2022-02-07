@@ -1,5 +1,12 @@
 <script lang="ts">
     import type { Calendar } from "src/@types";
+    import type FantasyCalendar from "src/main";
+    import {
+        normalizePath,
+        TextComponent as ObsidianTextComponent,
+        TFolder
+    } from "obsidian";
+    import { FolderSuggestionModal } from "src/suggester/folder";
     import { getContext } from "svelte";
     import { Writable } from "svelte/store";
     import TextAreaComponent from "../Settings/TextAreaComponent.svelte";
@@ -7,6 +14,7 @@
     import ToggleComponent from "../Settings/ToggleComponent.svelte";
     import Details from "../Utilities/Details.svelte";
 
+    export let plugin: FantasyCalendar;
     export let calendar: Calendar;
 
     const store = getContext<Writable<Calendar>>("store");
@@ -16,6 +24,34 @@
     $: incrementDay = calendar.static.incrementDay;
 
     $: validName = calendar.name != null && calendar.name.length;
+
+    $: autoParse = calendar.autoParse;
+
+    const folder = (node: HTMLElement) => {
+        let folders = plugin.app.vault
+            .getAllLoadedFiles()
+            .filter((f) => f instanceof TFolder);
+        const text = new ObsidianTextComponent(node);
+        if (!calendar.path) calendar.path = "/";
+        text.setPlaceholder(calendar.path ?? "/");
+        const modal = new FolderSuggestionModal(plugin.app, text, [
+            ...(folders as TFolder[])
+        ]);
+
+        modal.onClose = async () => {
+            const v = text.inputEl.value?.trim()
+                ? text.inputEl.value.trim()
+                : "/";
+            calendar.path = normalizePath(v);
+        };
+
+        text.inputEl.onblur = async () => {
+            const v = text.inputEl.value?.trim()
+                ? text.inputEl.value.trim()
+                : "/";
+            calendar.path = normalizePath(v);
+        };
+    };
 </script>
 
 <Details
@@ -56,6 +92,23 @@
                 calendar.static.incrementDay = !calendar.static.incrementDay;
             }}
         />
+        <ToggleComponent
+            name={"Parse Files for Events"}
+            desc={"The plugin will automatically parse files in the vault for events."}
+            value={autoParse}
+            on:click={() => {
+                calendar.autoParse = !calendar.autoParse;
+            }}
+        />
+        {#if autoParse}
+            <TextComponent
+                name={"Events Folder"}
+                desc={"The plugin will only parse files in this folder for events."}
+                value={calendar.path}
+            >
+                <div use:folder />
+            </TextComponent>
+        {/if}
     </div>
 </Details>
 

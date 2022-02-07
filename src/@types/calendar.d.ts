@@ -12,8 +12,8 @@ export interface Calendar {
     categories: EventCategory[];
     date?: number;
     displayWeeks?: boolean;
-    autoParse?: boolean;
-    path?: boolean;
+    autoParse: boolean;
+    path: string;
 }
 export interface StaticCalendarData {
     firstWeekDay: number;

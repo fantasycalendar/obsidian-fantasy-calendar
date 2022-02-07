@@ -80,7 +80,9 @@ export const DEFAULT_CALENDAR: Calendar = {
         day: null
     },
     events: [],
-    categories: []
+    categories: [],
+    autoParse: false,
+    path: "/"
 };
 
 export const DEFAULT_DATA: FantasyCalendarData = {
@@ -88,8 +90,8 @@ export const DEFAULT_DATA: FantasyCalendarData = {
     currentCalendar: null,
     defaultCalendar: null,
     eventPreview: false,
+    addToDefaultIfMissing: true,
     configDirectory: null,
-    path: "/",
     parseDates: false,
     dateFormat: "YYYY-MM-DD",
     dailyNotes: false,
@@ -101,7 +103,6 @@ export const DEFAULT_DATA: FantasyCalendarData = {
     supportTimelines: false,
     timelineTag: "#timeline",
     syncTimelines: true,
-    autoParse: true,
     settingsToggleState: {
         calendars: false,
         events: false
@@ -116,12 +117,16 @@ export const DEFAULT_DATA: FantasyCalendarData = {
 export default class FantasyCalendar extends Plugin {
     api = new API(this);
     settingsLoaded: boolean;
-    async addNewCalendar(calendar: Calendar) {
-        this.data.calendars.push(calendar);
+    async addNewCalendar(calendar: Calendar, index?: number) {
+        if (index == null) {
+            this.data.calendars.push(calendar);
+        } else {
+            this.data.calendars.splice(index, 1, calendar);
+        }
         if (!this.data.defaultCalendar) {
             this.data.defaultCalendar = calendar.id;
         }
-        this.watcher.start();
+        this.watcher.start(calendar);
         await this.saveCalendar();
         /* this.watcher.registerCalendar(calendar); */
     }
