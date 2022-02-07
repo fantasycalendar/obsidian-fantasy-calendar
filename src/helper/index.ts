@@ -171,11 +171,6 @@ export class MonthHelper {
                     ).length
             ).keys()
         ].map((k) => {
-            console.log(
-                "🚀 ~ file: index.ts ~ line 174 ~ k",
-                k,
-                ...this.leapDays
-            );
             return new DayHelper(
                 this,
                 k + 1,
