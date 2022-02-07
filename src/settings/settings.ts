@@ -570,12 +570,16 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
         } else {
             this.containerEl.addClass("fantasy-calendar-creator-open");
             return new Promise((resolve) => {
+                const color = getComputedStyle(
+                    this.containerEl
+                ).backgroundColor;
                 const $app = new CalendarCreator({
                     target: this.containerEl,
                     props: {
                         calendar: clone,
                         plugin: this.plugin,
-                        width: this.contentEl.clientWidth
+                        width: this.contentEl.clientWidth,
+                        color
                     }
                 });
                 const observer = new ResizeObserver(() => {

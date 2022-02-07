@@ -32,6 +32,7 @@
     export let width: number;
     export let calendar: Calendar;
     export let plugin: FantasyCalendar;
+    export let color: string = null;
 
     const store = writable<Calendar>(calendar);
     store.subscribe((v) => {
@@ -110,7 +111,7 @@
         !mobile ? fly(node, args) : null;
 </script>
 
-<div class="fantasy-calendar-creator">
+<div class="fantasy-calendar-creator" style="--creator-background-color: {color}">
     {#if ready}
         <div
             class="inherit fantasy-calendar-creator-inner"
@@ -180,16 +181,18 @@
 
 <style>
     :global(body:not(.is-mobile)) .fantasy-calendar-creator {
-        height: 100%;
         position: absolute;
         top: 0;
+        bottom: 0;
     }
     :global(body:not(.is-mobile)) .fantasy-calendar-creator-inner {
         position: absolute;
         top: 0;
         left: -2px;
-        height: 100%;
+        bottom: 0;
         overflow: auto;
+        display: grid;
+        grid-template-rows: auto 1fr;
     }
 
     .fantasy-calendar-creator,
@@ -203,6 +206,7 @@
     }
     .fantasy-creator-app {
         overflow: auto;
+        height: 100%;
     }
     .fantasy-calendar-creator-header {
         margin: 0;

@@ -48,10 +48,10 @@
         position: absolute;
         right: 0;
     }
-    .fantasy-calendar-nested-summary,
+    /* .fantasy-calendar-nested-summary,
     .fantasy-calendar-nested-settings {
         position: relative;
-    }
+    } */
     .warning-label {
         color: var(--text-error);
     }
@@ -64,6 +64,10 @@
         border-top-left-radius: 0.1rem;
         border-top-right-radius: 0.1rem;
         cursor: pointer;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background-color: var(--creator-background-color);
     }
 
     summary::-webkit-details-marker,
