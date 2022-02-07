@@ -109,6 +109,7 @@ export function getCanSave(calendar: Calendar) {
     }
     return false;
 }
+
 export function invalidDayLabel(day: number, calendar: Calendar) {
     if (day == null) return "No day specified";
     if (calendar?.current?.month == null) return "No month selected";
