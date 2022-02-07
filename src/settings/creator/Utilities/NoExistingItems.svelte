@@ -7,6 +7,9 @@
 </div>
 
 <style>
+    .no-existing-items {
+        width: 100%;
+    }
     .no-existing-items span {
         width: 100%;
         text-align: center;
