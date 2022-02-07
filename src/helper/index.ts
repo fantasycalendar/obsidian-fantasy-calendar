@@ -207,6 +207,16 @@ export default class CalendarHelper extends Events {
             this.trigger("month-update");
         }
     }
+    refreshYear(year: number) {
+        if (!this._cache.has(year)) return;
+        this._cache.get(year).shouldUpdate = true;
+        this._cache
+            .get(year)
+            .months.forEach((month) => (month.shouldUpdate = true));
+        if (year == this.displayed.year || year == this.viewing.year) {
+            this.trigger("month-update");
+        }
+    }
     standardMonths: Month[];
     /**
      * Get a day helper from cache for a given date calendar.
@@ -323,25 +333,26 @@ export default class CalendarHelper extends Events {
             this.plugin.app.workspace.on(
                 "fantasy-calendars-event-update",
                 (tree) => {
+                    console.log("🚀 ~ file: index.ts ~ line 336 ~ tree", tree);
                     if (!tree.has(this.calendar.id)) return;
 
                     const years = tree.get(this.calendar.id);
 
-                    for (const [year, months] of years) {
+                    for (const year of years) {
                         if (!this._cache.has(year)) continue;
-                        for (const month of months) {
-                            this.refreshMonth(month, year);
-                        }
+                        console.log(
+                            "🚀 ~ file: index.ts ~ line 342 ~ year",
+                            year
+                        );
+                        this.refreshYear(year);
                     }
                 }
             )
         );
-
-        /* window.calendar = this; */
     }
 
     /**
-     * Cache used to store built month helpers.
+     * Cache used to store built month helpers, events, and whether a year should update.
      */
     private _cache: Map<number, YearEventCache> = new Map();
 

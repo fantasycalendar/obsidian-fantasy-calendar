@@ -1,10 +1,11 @@
 import type { Recurring } from "src/settings/settings";
-import type Calendar__SvelteComponent_ from "src/view/day/Calendar.svelte";
 
 export * from "./calendar";
 export * from "./leapday";
 export * from "./event";
 export * from "./moons";
+
+import type { Calendar } from "./calendar";
 
 export interface FantasyCalendarData {
     calendars: Calendar[];
