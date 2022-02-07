@@ -10,6 +10,7 @@
     import Details from "../Utilities/Details.svelte";
     import ButtonComponent from "../Settings/ButtonComponent.svelte";
     import { confirmWithModal } from "src/settings/modals/confirm";
+    import { Setting, prepareQuery, fuzzySearch } from "obsidian";
 
     export let calendar: Calendar;
     export let plugin: FantasyCalendar;
@@ -59,6 +60,15 @@
             calendar.events = [];
         }
     };
+    $: search = prepareQuery(calendar.events.map((e) => e.name).join("|"));
+    const filter = (node: HTMLElement) => {
+        node.createDiv();
+        new Setting(node).setName("Filter events").addSearch((s) => {
+            s.onChange((v) => {
+                console.log(search, fuzzySearch(search, v));
+            });
+        });
+    };
 </script>
 
 <Details name={"Events"} desc={`Displaying ${events.length} events.`}>
@@ -67,6 +77,7 @@
         icon="trash"
         on:click={() => deleteAll()}
     />
+    <div class="filter" use:filter />
     <AddNew on:click={() => add()} />
     <div class="existing-items">
         {#each events as event}
