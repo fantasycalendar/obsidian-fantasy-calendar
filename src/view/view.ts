@@ -501,12 +501,6 @@ export default class FantasyCalendarView extends ItemView {
                                 modal.event.date.month,
                                 modal.event.date.year
                             );
-                            console.log(
-                                modal.event.date.month,
-                                existing.date.month,
-                                modal.event.date.year,
-                                existing.date.year
-                            );
                             if (
                                 modal.event.date.month != existing.date.month ||
                                 modal.event.date.year != existing.date.year
