@@ -95,29 +95,27 @@ export class Watcher extends Component {
         );
         /** A file has been renamed and should be checked for events.
          */
-        //TODO: Refactor
         this.registerEvent(
-            this.vault.on("rename", (abstractFile, oldPath) => {
+            this.vault.on("rename", async (abstractFile, oldPath) => {
                 if (!this.calendars.length) return;
                 if (!(abstractFile instanceof TFile)) return;
-                this.worker.postMessage<RenameMessage>({
-                    type: "rename",
-                    file: {
-                        path: abstractFile.path,
-                        basename: abstractFile.basename,
-                        oldPath
-                    },
-                    sourceCalendars: this.calendars
+                for (const calendar of this.calendars) {
+                    calendar.events = calendar.events.filter(
+                        (event) => event.note != oldPath
+                    );
+                }
+                this.worker.postMessage<CalendarsMessage>({
+                    type: "calendars",
+                    calendars: this.calendars
                 });
+                this.startParsing([abstractFile.path]);
             })
         );
         /** A file has been deleted and should be checked for events to unlink. */
-        //TODO: Refactor
         this.registerEvent(
             this.vault.on("delete", (abstractFile) => {
                 if (!(abstractFile instanceof TFile)) return;
                 const start = Date.now();
-                console.log("Start", start);
                 for (let calendar of this.calendars) {
                     const events = calendar.events.filter(
                         (event) => event.note === abstractFile.path
@@ -125,9 +123,16 @@ export class Watcher extends Component {
                     calendar.events = calendar.events.filter(
                         (event) => event.note != abstractFile.path
                     );
+                    for (const event of events) {
+                        this.addToTree(calendar, event);
+                    }
                 }
-                console.log("End", Date.now() - start);
                 this.plugin.saveCalendar();
+                this.plugin.app.workspace.trigger(
+                    "fantasy-calendars-event-update",
+                    this.tree
+                );
+                this.tree = new Map();
             })
         );
 
@@ -144,8 +149,6 @@ export class Watcher extends Component {
                         const cache = this.metadataCache.getFileCache(file);
                         const allTags = getAllTags(cache);
                         const data = await this.vault.cachedRead(file);
-                        //TODO: Add in file data parsing for events
-                        //TODO: E.g., timelines
                         this.worker.postMessage<FileCacheMessage>({
                             type: "file",
                             path,
@@ -200,6 +203,9 @@ export class Watcher extends Component {
                 }
             }
         );
+        this.start();
+    }
+    start() {
         if (!this.calendars.length) return;
         //TODO: Add per-calendar root path.
         const folder = this.vault.getAbstractFileByPath(this.plugin.data.path);
