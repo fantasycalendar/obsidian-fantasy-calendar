@@ -2,10 +2,10 @@
     import type { Calendar } from "src/@types";
     import type FantasyCalendar from "src/main";
     import copy from "fast-copy";
-    import { ExtraButtonComponent, setIcon, Setting } from "obsidian";
+    import { ExtraButtonComponent, Platform, setIcon, Setting } from "obsidian";
     import { CalendarPresetModal } from "../modals/preset";
     import { createEventDispatcher, setContext } from "svelte";
-    import { fly } from "svelte/transition";
+    import { fly, FlyParams } from "svelte/transition";
     import { onMount } from "svelte";
     import CurrentDate from "./Containers/CurrentDate.svelte";
     import Info from "./Containers/Info.svelte";
@@ -20,7 +20,8 @@
     import { getCanSave, getMissingNotice, warning } from "./Utilities/utils";
     import { ConfirmExitModal } from "../modals/confirm";
 
-    let ready = false;
+    const mobile = Platform.isMobile;
+    let ready = mobile;
 
     onMount(() => {
         ready = true;
@@ -90,6 +91,9 @@
                 if (modal.confirmed) {
                     ready = false;
                 }
+                if (mobile) {
+                    dispatch("exit", { saved, calendar });
+                }
             };
             modal.open();
         } else {
@@ -104,14 +108,17 @@
             warning(node);
         }
     };
+
+    const animation = (node: HTMLElement, args: FlyParams) =>
+        !mobile ? fly(node, args) : null;
 </script>
 
 <div class="fantasy-calendar-creator">
     {#if ready}
         <div
             class="inherit fantasy-calendar-creator-inner"
-            style="width: {width}px;"
-            transition:fly={{ x: width * 1.5, opacity: 1 }}
+            style={mobile ? `width: ${width + 2}px;` : ""}
+            transition:animation={{ x: width * 1.5, opacity: 1 }}
             on:introend={() => dispatch("flown")}
             on:outroend={() => dispatch("exit", { saved, calendar })}
         >
@@ -175,20 +182,28 @@
 </div>
 
 <style>
-    .fantasy-calendar-creator {
+    :global(body:not(.is-mobile)) .fantasy-calendar-creator {
         height: 100%;
         position: absolute;
         top: 0;
     }
-    .fantasy-calendar-creator-inner {
+    :global(body:not(.is-mobile)) .fantasy-calendar-creator-inner {
         position: absolute;
         top: 0;
-        left: 0;
+        left: -2px;
+        height: 100%;
     }
+
     .fantasy-calendar-creator,
-    .fantasy-calendar-creator-inner,
-    .fantasy-creator-app {
+    .fantasy-calendar-creator .fantasy-calendar-creator-inner,
+    .fantasy-calendar-creator .fantasy-creator-app {
         background-color: inherit;
+    }
+    :global(body:not(.is-mobile)) .fantasy-calendar-creator,
+    :global(body:not(.is-mobile))
+        .fantasy-calendar-creator
+        .fantasy-creator-app {
+        padding: 0px 10px;
     }
     .fantasy-creator-app {
         overflow: auto;

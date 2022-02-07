@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { Setting } from "obsidian";
+    import { Platform, Setting } from "obsidian";
     import { warning } from "./utils";
 
-    export let open = true;
+    export let open = !Platform.isMobile;
     export let name: string;
     export let warn: boolean = false;
     export let label: string = null;

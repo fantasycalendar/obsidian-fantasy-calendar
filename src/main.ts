@@ -108,7 +108,8 @@ export const DEFAULT_DATA: FantasyCalendarData = {
     },
     exit: {
         saving: false,
-        event: false
+        event: false,
+        calendar: false
     }
 };
 

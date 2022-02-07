@@ -57,6 +57,67 @@ export class ConfirmModal extends Modal {
         this.display();
     }
 }
+export async function confirmDeleteCalendar(
+    plugin: FantasyCalendar
+): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+        try {
+            const modal = new ConfirmDeleteCalendarModal(plugin);
+            modal.onClose = () => {
+                resolve(modal.confirmed);
+            };
+            modal.open();
+        } catch (e) {
+            reject();
+        }
+    });
+}
+class ConfirmDeleteCalendarModal extends Modal {
+    confirmed: boolean = false;
+    constructor(public plugin: FantasyCalendar) {
+        super(plugin.app);
+    }
+    async display() {
+        this.contentEl.empty();
+        this.contentEl.addClass("confirm-modal");
+        this.contentEl.createEl("p", {
+            text: "Are you sure you want to delete this calendar?"
+        });
+
+        const buttonContainerEl = this.contentEl.createDiv(
+            "fantasy-calendar-confirm-buttons-container"
+        );
+        buttonContainerEl.createEl("a").createEl("small", {
+            cls: "dont-ask",
+            text: "Delete and don't ask again"
+        }).onclick = () => {
+            this.confirmed = true;
+            this.plugin.data.exit.calendar = true;
+            this.plugin.saveSettings();
+            this.close();
+        };
+
+        const buttonEl = buttonContainerEl.createDiv(
+            "fantasy-calendar-confirm-buttons"
+        );
+        new ButtonComponent(buttonEl)
+            .setButtonText("Delete")
+            .setCta()
+            .onClick(() => {
+                this.confirmed = true;
+                this.close();
+            });
+        buttonEl.createEl("a").createEl("small", {
+            cls: "dont-ask",
+            text: "Cancel"
+        }).onclick = () => {
+            this.close();
+        };
+    }
+    onOpen() {
+        this.display();
+    }
+}
 
 export class ConfirmExitModal extends Modal {
     confirmed: boolean = false;
