@@ -1,8 +1,10 @@
 import {
     addIcon,
     ButtonComponent,
+    Modal,
     normalizePath,
     Notice,
+    Platform,
     PluginSettingTab,
     setIcon,
     Setting,
@@ -19,7 +21,7 @@ import CalendarCreator from "./creator/Creator.svelte";
 
 import type { Calendar } from "src/@types";
 
-import { confirmWithModal } from "./modals/confirm";
+import { confirmDeleteCalendar, confirmWithModal } from "./modals/confirm";
 import { FolderSuggestionModal } from "src/suggester/folder";
 
 export enum Recurring {
@@ -96,6 +98,22 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
     }
     buildInfo(containerEl: HTMLElement) {
         containerEl.empty();
+
+        new Setting(containerEl)
+            .setName(`Reset "Don't Ask Again" Prompts`)
+            .setDesc(
+                `All confirmations set to "Don't Ask Again" will be reset.`
+            )
+            .addButton((b) => {
+                b.setIcon("reset").onClick(() => {
+                    this.plugin.data.exit = {
+                        saving: false,
+                        event: false,
+                        calendar: false
+                    };
+                    this.plugin.saveSettings();
+                });
+            });
 
         new Setting(containerEl)
             .setName(
@@ -310,16 +328,11 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                 .addExtraButton((b) => {
                     b.setIcon("trash").onClick(async () => {
                         if (
-                            !(await confirmWithModal(
-                                this.app,
-                                "Are you sure you want to delete this calendar?",
-                                {
-                                    cta: "Delete",
-                                    secondary: "Cancel"
-                                }
-                            ))
+                            !this.plugin.data.exit.calendar &&
+                            !(await confirmDeleteCalendar(this.plugin))
                         )
                             return;
+
                         this.plugin.data.calendars =
                             this.plugin.data.calendars.filter(
                                 (c) => c.id != calendar.id
@@ -558,54 +571,110 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
         calendar: Calendar = DEFAULT_CALENDAR
     ): Promise<Calendar | void> {
         /* this.containerEl.empty(); */
-        return new Promise((resolve) => {
-            const clone = copy(calendar);
+        const clone = copy(calendar);
 
-            const top =
-                -1 *
-                Number(
-                    getComputedStyle(this.containerEl).paddingTop.replace(
-                        /[^\d]/g,
-                        ""
-                    )
-                );
+        if (Platform.isMobile || true) {
+            const modal = new MobileCreatorModal(this.plugin, clone);
+            return new Promise((resolve, reject) => {
+                try {
+                    modal.onClose = () => {
+                        if (modal.saved) {
+                            calendar = copy(modal.calendar);
+                            resolve(calendar);
+                        }
+                        resolve();
+                    };
 
-            const $app = new CalendarCreator({
-                target: this.containerEl,
-                props: {
-                    calendar: clone,
-                    plugin: this.plugin,
-                    width: this.contentEl.clientWidth,
-                    top
+                    modal.open();
+                } catch (e) {
+                    reject();
                 }
             });
-            const observer = new ResizeObserver(() => {
-                $app.$set({ width: this.contentEl.clientWidth });
-            });
-            observer.observe(this.contentEl);
-            $app.$on(
-                "exit",
-                (evt: CustomEvent<{ saved: boolean; calendar: Calendar }>) => {
-                    this.display();
-                    if (evt.detail.saved) {
-                        //saved
-                        calendar = copy(evt.detail.calendar);
-                        observer.disconnect();
-                        resolve(calendar);
+        } else {
+            this.containerEl.addClass("fantasy-calendar-creator-open");
+            return new Promise((resolve) => {
+                const top =
+                    -1 *
+                    Number(
+                        getComputedStyle(this.containerEl).paddingTop.replace(
+                            /[^\d]/g,
+                            ""
+                        )
+                    );
+
+                const $app = new CalendarCreator({
+                    target: this.containerEl,
+                    props: {
+                        calendar: clone,
+                        plugin: this.plugin,
+                        width: this.contentEl.clientWidth,
+                        top
                     }
-                    resolve();
-                }
-            );
-            $app.$on("destroy", (evt: CustomEvent<boolean>) => {
-                this.display();
-                if (evt.detail) {
-                    //saved
-                    calendar = copy(clone);
-                    observer.disconnect();
-                    resolve(calendar);
-                }
-                resolve();
+                });
+                const observer = new ResizeObserver(() => {
+                    $app.$set({ width: this.contentEl.clientWidth });
+                });
+                observer.observe(this.contentEl);
+                $app.$on(
+                    "exit",
+                    (
+                        evt: CustomEvent<{ saved: boolean; calendar: Calendar }>
+                    ) => {
+                        this.containerEl.removeClass(
+                            "fantasy-calendar-creator-open"
+                        );
+                        $app.$destroy();
+                        if (evt.detail.saved) {
+                            //saved
+                            calendar = copy(evt.detail.calendar);
+                            observer.disconnect();
+                            resolve(calendar);
+                        }
+                        resolve();
+                    }
+                );
             });
+        }
+    }
+}
+
+class MobileCreatorModal extends Modal {
+    calendar: Calendar;
+    saved = false;
+    constructor(public plugin: FantasyCalendar, calendar: Calendar) {
+        super(plugin.app);
+        this.calendar = copy(calendar);
+    }
+    onOpen() {
+        this.contentEl.setAttr(
+            "style",
+            "background-color: inherit; padding-top: 0px; width: min-content;"
+        );
+        const $app = new CalendarCreator({
+            target: this.contentEl,
+            props: {
+                calendar: this.calendar,
+                plugin: this.plugin,
+                width: this.contentEl.clientWidth,
+                top: 0
+            }
         });
+        $app.$on(
+            "exit",
+            (
+                evt: CustomEvent<{
+                    saved: boolean;
+                    calendar: Calendar;
+                }>
+            ) => {
+                if (evt.detail.saved) {
+                    //saved
+                    this.calendar = copy(evt.detail.calendar);
+                    this.saved = true;
+                }
+                this.close();
+                $app.$destroy();
+            }
+        );
     }
 }
