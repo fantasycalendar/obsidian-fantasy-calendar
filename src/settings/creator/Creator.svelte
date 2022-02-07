@@ -30,7 +30,6 @@
     const dispatch = createEventDispatcher();
 
     export let width: number;
-    export let top: number;
     export let calendar: Calendar;
     export let plugin: FantasyCalendar;
 
@@ -117,12 +116,12 @@
     {#if ready}
         <div
             class="inherit fantasy-calendar-creator-inner"
-            style={mobile ? `width: ${width + 2}px;` : ""}
+            style={!mobile ? `width: ${width + 2}px;` : ""}
             transition:animation={{ x: width * 1.5, opacity: 1 }}
             on:introend={() => dispatch("flown")}
             on:outroend={() => dispatch("exit", { saved, calendar })}
         >
-            <div class="top-nav" style="--top: {top}px;">
+            <div class="top-nav">
                 <div class="icons">
                     <div class="left">
                         <div
@@ -192,6 +191,7 @@
         top: 0;
         left: -2px;
         height: 100%;
+        overflow: auto;
     }
 
     .fantasy-calendar-creator,
@@ -199,10 +199,8 @@
     .fantasy-calendar-creator .fantasy-creator-app {
         background-color: inherit;
     }
-    :global(body:not(.is-mobile)) .fantasy-calendar-creator,
-    :global(body:not(.is-mobile))
-        .fantasy-calendar-creator
-        .fantasy-creator-app {
+    :global(body.is-mobile) .fantasy-calendar-creator,
+    :global(body.is-mobile) .fantasy-calendar-creator .fantasy-creator-app {
         padding: 0px 10px;
     }
     .fantasy-creator-app {
@@ -213,7 +211,7 @@
     }
     .top-nav {
         position: sticky;
-        top: var(--top, 0);
+        top: 0;
         padding: 10px 0px;
         background-color: inherit;
         z-index: 1;
