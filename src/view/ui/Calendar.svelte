@@ -116,7 +116,7 @@
                 {/if}
             </div>
             <div class="month-view">
-                {#if prev.type == "intercalary"}
+                {#if prev && prev.type == "intercalary"}
                     <MonthView
                         intercalary={true}
                         columns={weekdays.length}
@@ -153,7 +153,7 @@
                     on:event-mouseover
                     on:event-context
                 />
-                {#if next.type == "intercalary"}
+                {#if next && next.type == "intercalary"}
                     <MonthView
                         intercalary={true}
                         columns={weekdays.length}
