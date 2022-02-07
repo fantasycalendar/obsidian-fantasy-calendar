@@ -257,7 +257,7 @@
         align-items: center;
         justify-content: center;
     }
-    .intercalary-container {
+    /* .intercalary-container {
         display: flex;
         flex-flow: column nowrap;
         justify-content: center;
@@ -265,10 +265,10 @@
         border-top: 1px solid var(--background-modifier-border);
         border-bottom: 1px solid var(--background-modifier-border);
         color: var(--text-accent);
-    }
-    .intercalary-days {
+    } */
+    /* .intercalary-days {
         display: flex;
         align-items: center;
         gap: 0.25rem;
-    }
+    } */
 </style>
