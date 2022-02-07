@@ -9,6 +9,7 @@
     import { CreateEventModal } from "src/settings/modals/event";
     import Details from "../Utilities/Details.svelte";
     import ButtonComponent from "../Settings/ButtonComponent.svelte";
+    import { confirmWithModal } from "src/settings/modals/confirm";
 
     export let calendar: Calendar;
     export let plugin: FantasyCalendar;
@@ -48,6 +49,16 @@
         };
         modal.open();
     };
+    const deleteAll = async () => {
+        if (
+            await confirmWithModal(
+                plugin.app,
+                "Are you sure you want to delete all events from this calendar?"
+            )
+        ) {
+            calendar.events = [];
+        }
+    };
 </script>
 
 <Details name={"Events"}>
@@ -55,7 +66,11 @@
         <AddNew on:click={() => add()} />
         <NoExistingItems message={"Create a new event to see it here."} />
     {:else}
-        <ButtonComponent name="Delete All Events" icon="trash" />
+        <ButtonComponent
+            name="Delete All Events"
+            icon="trash"
+            on:click={() => deleteAll()}
+        />
         <AddNew on:click={() => add()} />
         <div class="existing-items">
             {#each events as event}
