@@ -194,7 +194,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                     d.addOption(calendar.id, calendar.name);
                 }
                 d.setValue(this.plugin.data.defaultCalendar);
-                d.onChange((v) => {
+                d.onChange(async (v) => {
                     if (v === "none") {
                         this.plugin.data.defaultCalendar = null;
                         this.plugin.saveSettings();
@@ -202,7 +202,8 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                     }
 
                     this.plugin.data.defaultCalendar = v;
-                    this.plugin.saveSettings();
+                    await this.plugin.saveSettings();
+                    this.plugin.watcher.start();
                 });
             });
         new Setting(this.calendarsEl)
@@ -326,6 +327,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                         if (calendar.id == this.data.defaultCalendar) {
                             this.plugin.data.defaultCalendar =
                                 this.plugin.data.calendars[0]?.id;
+                            this.plugin.watcher.start();
                         }
                         await this.plugin.saveCalendar();
 
