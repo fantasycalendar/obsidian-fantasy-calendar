@@ -15,6 +15,7 @@ export interface Event {
     note: string;
     category: string;
     timestamp?: number;
+    auto?: boolean;
 }
 
 export interface ColorEvent extends Event {
@@ -27,6 +28,4 @@ export interface EventCategory {
     id: string;
 }
 
-export interface EventCondition {
-    
-}
+export interface EventCondition {}

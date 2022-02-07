@@ -150,7 +150,7 @@ class Parser {
         if (this.addToDefaultIfMissing && (!name || !name.length)) {
             name = this.defaultCalendar;
         }
-        name = name.toLowerCase();
+        name = name?.toLowerCase();
         const calendar = this.calendars.find(
             (calendar) => name == calendar.name.toLowerCase()
         );

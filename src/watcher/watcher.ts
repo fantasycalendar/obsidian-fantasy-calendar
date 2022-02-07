@@ -78,6 +78,8 @@ export class Watcher extends Component {
                     this.worker.postMessage<OptionsMessage>({
                         type: "options",
                         parseTitle: this.plugin.data.parseDates,
+                        addToDefaultIfMissing:
+                            this.plugin.data.addToDefaultIfMissing,
                         format: this.plugin.format,
                         defaultCalendar: this.plugin.defaultCalendar?.name,
                         supportsTimelines: this.plugin.data.supportTimelines,
@@ -219,8 +221,6 @@ export class Watcher extends Component {
                 folders.add(child.path);
             }
         }
-
-        console.log("🚀 ~ file: watcher.ts ~ line 212 ~ folders", folders);
 
         if (!folders.size) return;
         this.startParsing([...folders]);
