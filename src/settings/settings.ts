@@ -316,10 +316,9 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                             calendar
                         );
                         if (edited) {
-                            this.plugin.data.calendars.splice(
-                                this.data.calendars.indexOf(calendar),
-                                1,
-                                edited
+                            this.plugin.addNewCalendar(
+                                edited,
+                                this.data.calendars.indexOf(calendar)
                             );
                             await this.plugin.saveCalendar();
                             this.display();
@@ -362,6 +361,23 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
         summary.createDiv("collapser").createDiv("handle");
 
         new Setting(containerEl)
+            .setName("Add Events to Default Calendar")
+            .setDesc(
+                createFragment((e) => {
+                    e.createSpan({
+                        text: "Add events found in notes to the default calendar if the "
+                    });
+                    e.createEl("code", { text: "fc-calendar" });
+                    e.createSpan({ text: " frontmatter tag is not present." });
+                })
+            )
+            .addToggle((t) => {
+                t.setValue(this.data.addToDefaultIfMissing).onChange((v) => {
+                    this.data.addToDefaultIfMissing = v;
+                    this.plugin.saveSettings();
+                });
+            });
+        new Setting(containerEl)
             .setName("Display Event Previews")
             .setDesc(
                 "Use the core Note Preview plugin to display event notes when hovered."
@@ -372,44 +388,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                     this.plugin.saveSettings();
                 });
             });
-        new Setting(containerEl)
-            .setName("Automatically Parse for Events")
-            .setDesc(
-                "The plugin will automatically parse files in the vault for events."
-            )
-            .addToggle((t) => {
-                t.setValue(this.data.autoParse).onChange((v) => {
-                    this.data.autoParse = v;
-                    this.plugin.saveSettings();
-                });
-            });
-        new Setting(containerEl)
-            .setName("Events Folder")
-            .setDesc("The plugin will only watch for changes in this folder.")
-            .addText((text) => {
-                let folders = this.app.vault
-                    .getAllLoadedFiles()
-                    .filter((f) => f instanceof TFolder);
 
-                text.setPlaceholder(this.plugin.data.path ?? "/");
-                const modal = new FolderSuggestionModal(this.app, text, [
-                    ...(folders as TFolder[])
-                ]);
-
-                modal.onClose = async () => {
-                    const v = text.inputEl.value?.trim()
-                        ? text.inputEl.value.trim()
-                        : "/";
-                    this.plugin.data.path = normalizePath(v);
-                };
-
-                text.inputEl.onblur = async () => {
-                    const v = text.inputEl.value?.trim()
-                        ? text.inputEl.value.trim()
-                        : "/";
-                    this.plugin.data.path = normalizePath(v);
-                };
-            });
         new Setting(containerEl)
             .setName("Parse Note Titles for Event Dates")
             .setDesc("The plugin will parse note titles for event dates.")

@@ -10,6 +10,7 @@ export interface QueueMessage {
 export interface OptionsMessage {
     type: "options";
     defaultCalendar: string;
+    addToDefaultIfMissing: boolean;
     format: string;
     parseTitle: boolean;
     supportsTimelines: boolean;
@@ -60,6 +61,7 @@ class Parser {
     parseTitle: boolean = false;
     supportsTimelines: boolean;
     timelineTag: string;
+    addToDefaultIfMissing: boolean;
 
     constructor() {
         //Register Options Changer
@@ -69,11 +71,13 @@ class Parser {
                 if (event.data.type == "options") {
                     const {
                         defaultCalendar,
+                        addToDefaultIfMissing,
                         format,
                         parseTitle,
                         supportsTimelines,
                         timelineTag
                     } = event.data;
+                    this.addToDefaultIfMissing = addToDefaultIfMissing;
                     this.defaultCalendar = defaultCalendar;
                     this.format = format;
                     this.parseTitle = parseTitle;
@@ -143,7 +147,7 @@ class Parser {
             name = frontmatter?.["fc-calendar"];
             fcCategory = frontmatter?.["fc-category"];
         }
-        if (!name || !name.length) {
+        if (this.addToDefaultIfMissing && (!name || !name.length)) {
             name = this.defaultCalendar;
         }
         name = name.toLowerCase();
@@ -269,7 +273,8 @@ class Parser {
                 date,
                 end,
                 category: category?.id,
-                description: ""
+                description: "",
+                auto: true
             }
         ];
     }
@@ -346,7 +351,8 @@ class Parser {
                 end,
                 timestamp,
                 category: category?.id,
-                description: element.content
+                description: element.content,
+                auto: true
             });
         }
         return events;
