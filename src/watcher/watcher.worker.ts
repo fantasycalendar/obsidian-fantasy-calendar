@@ -143,6 +143,7 @@ class Parser {
     }
     getDataFromFrontmatter(frontmatter: FrontMatterCache) {
         let name: string, fcCategory: string;
+        if (frontmatter && "fc-ignore" in frontmatter) return;
         if (frontmatter) {
             name = frontmatter?.["fc-calendar"];
             fcCategory = frontmatter?.["fc-category"];
