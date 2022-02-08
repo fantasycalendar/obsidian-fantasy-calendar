@@ -207,6 +207,7 @@
     :global(body.is-mobile) .fantasy-calendar-creator,
     :global(body.is-mobile) .fantasy-calendar-creator .fantasy-creator-app {
         padding: 0px 10px;
+        width:100%;
     }
     .fantasy-creator-app {
         overflow: auto;
@@ -220,7 +221,7 @@
         top: 0;
         padding: 10px 0px;
         background-color: inherit;
-        z-index: 1;
+        z-index: 3;
     }
     .icons {
         display: flex;

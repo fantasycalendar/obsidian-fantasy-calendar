@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { Calendar } from "src/@types";
-import { isValidDay, isValidMonth, isValidYear } from "src/utils/functions";
+    import { isValidDay, isValidMonth, isValidYear } from "src/utils/functions";
     import { getContext } from "svelte";
     import { Writable } from "svelte/store";
     import Details from "../Utilities/Details.svelte";
@@ -8,7 +8,7 @@ import { isValidDay, isValidMonth, isValidYear } from "src/utils/functions";
         warning,
         invalidDayLabel,
         invalidMonthLabel,
-        invalidYearLabel,
+        invalidYearLabel
     } from "../Utilities/utils";
 
     let calendar: Calendar;
@@ -103,8 +103,9 @@ import { isValidDay, isValidMonth, isValidYear } from "src/utils/functions";
 </Details>
 
 <style>
-    .fantasy-calendar-date-field-container {
+    .fantasy-calendar-date-field-container.fantasy-calendar-date-field-container {
         display: flex;
+        flex-direction: row;
         gap: 1rem;
         border: 0;
     }

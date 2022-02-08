@@ -624,7 +624,7 @@ class MobileCreatorModal extends Modal {
     onOpen() {
         this.contentEl.setAttr(
             "style",
-            "background-color: inherit; padding-top: 0px; width: min-content;"
+            "background-color: inherit; padding-top: 0px;"
         );
         const $app = new CalendarCreator({
             target: this.contentEl,
