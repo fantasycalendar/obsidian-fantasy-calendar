@@ -33,6 +33,7 @@
     export let calendar: Calendar;
     export let plugin: FantasyCalendar;
     export let color: string = null;
+    export let top: number;
 
     const store = writable<Calendar>(calendar);
     store.subscribe((v) => {
@@ -111,11 +112,14 @@
         !mobile ? fly(node, args) : null;
 </script>
 
-<div class="fantasy-calendar-creator" style="--creator-background-color: {color}">
+<div
+    class="fantasy-calendar-creator"
+    style="--creator-background-color: {color}; --top: {top}px;"
+>
     {#if ready}
         <div
             class="inherit fantasy-calendar-creator-inner"
-            style={!mobile ? `width: ${width + 2}px;` : ""}
+            style={!mobile ? `width: ${width + 4}px;` : ""}
             transition:animation={{ x: width * 1.5, opacity: 1 }}
             on:introend={() => dispatch("flown")}
             on:outroend={() => dispatch("exit", { saved, calendar })}
@@ -182,8 +186,8 @@
 <style>
     :global(body:not(.is-mobile)) .fantasy-calendar-creator {
         position: absolute;
-        top: 0;
-        bottom: 0;
+        top: var(--top, 0);
+        height: 100%;
     }
     :global(body:not(.is-mobile)) .fantasy-calendar-creator-inner {
         position: absolute;

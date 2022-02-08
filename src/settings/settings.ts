@@ -573,13 +573,20 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                 const color = getComputedStyle(
                     this.containerEl
                 ).backgroundColor;
+                const top = this.contentEl.scrollTop;
+                console.log(
+                    "🚀 ~ file: settings.ts ~ line 577 ~ top",
+                    this.containerEl.scrollTop,
+                    top
+                );
                 const $app = new CalendarCreator({
                     target: this.containerEl,
                     props: {
                         calendar: clone,
                         plugin: this.plugin,
                         width: this.contentEl.clientWidth,
-                        color
+                        color,
+                        top: this.containerEl.scrollTop
                     }
                 });
                 const observer = new ResizeObserver(() => {
