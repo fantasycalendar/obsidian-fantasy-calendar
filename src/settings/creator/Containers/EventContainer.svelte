@@ -14,7 +14,8 @@
         Setting,
         prepareFuzzySearch,
         FuzzyMatch,
-        debounce
+        debounce,
+        SearchComponent
     } from "obsidian";
 
     export let calendar: Calendar;
@@ -68,9 +69,11 @@
     };
     const filter = (node: HTMLElement) => {
         node.createDiv();
+        let search: SearchComponent;
         new Setting(node)
             .setName("Filter events")
             .addSearch((s) => {
+                search = s;
                 s.onChange(
                     debounce((v) => {
                         if (!v) {
@@ -112,6 +115,7 @@
                             calendar.events = calendar.events.filter(
                                 (e) => !sorted.includes(e)
                             );
+                            search.setValue("");
                         }
                     });
             });
