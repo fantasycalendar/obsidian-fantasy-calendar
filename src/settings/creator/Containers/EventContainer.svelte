@@ -10,11 +10,17 @@
     import Details from "../Utilities/Details.svelte";
     import ButtonComponent from "../Settings/ButtonComponent.svelte";
     import { confirmWithModal } from "src/settings/modals/confirm";
-    import { Setting, prepareQuery, fuzzySearch } from "obsidian";
+    import {
+        Setting,
+        prepareFuzzySearch,
+        FuzzyMatch,
+        debounce
+    } from "obsidian";
 
     export let calendar: Calendar;
     export let plugin: FantasyCalendar;
     let sliced = 1;
+    let filtered = false;
     $: sorted = calendar.events.sort((a, b) => {
         if (a.date.year != b.date.year) {
             return a.date.year - b.date.year;
@@ -60,20 +66,64 @@
             calendar.events = [];
         }
     };
-    $: search = prepareQuery(calendar.events.map((e) => e.name).join("|"));
     const filter = (node: HTMLElement) => {
         node.createDiv();
-        new Setting(node).setName("Filter events").addSearch((s) => {
-            s.onChange((v) => {
-                console.log(search, fuzzySearch(search, v));
+        new Setting(node)
+            .setName("Filter events")
+            .addSearch((s) => {
+                s.onChange(
+                    debounce((v) => {
+                        if (!v) {
+                            sorted = calendar.events.sort((a, b) => {
+                                if (a.date.year != b.date.year) {
+                                    return a.date.year - b.date.year;
+                                }
+                                if (a.date.month != b.date.month) {
+                                    return a.date.month - b.date.month;
+                                }
+                                return a.date.day - b.date.day;
+                            });
+                            filtered = false;
+                            return;
+                        }
+                        const results = [];
+                        for (const event of sorted) {
+                            const result = prepareFuzzySearch(v)(event.name);
+                            if (result) {
+                                results.push(event);
+                            }
+                        }
+                        console.log(results.filter((r) => r));
+                        sorted = results;
+                        filtered = true;
+                    }, 250)
+                );
+            })
+            .addExtraButton((b) => {
+                b.setIcon("trash")
+                    .setTooltip("Delete Filtered Events")
+                    .onClick(async () => {
+                        if (
+                            await confirmWithModal(
+                                plugin.app,
+                                "Are you sure you want to delete the filtered events from this calendar?"
+                            )
+                        ) {
+                            calendar.events = calendar.events.filter(
+                                (e) => !sorted.includes(e)
+                            );
+                        }
+                    });
             });
-        });
     };
 </script>
 
-<Details name={"Events"} desc={`Displaying ${events.length} events.`}>
+<Details
+    name={"Events"}
+    desc={`Displaying ${events.length}/${calendar.events.length} events.`}
+>
     <ButtonComponent
-        name="Delete All Events"
+        name={"Delete All Events"}
         icon="trash"
         on:click={() => deleteAll()}
     />
@@ -97,7 +147,7 @@
             </div>
         {/each}
     </div>
-    {#if events.length < calendar.events.length}
+    {#if !filtered && events.length < calendar.events.length}
         <div class="more" on:click={() => sliced++}>
             <small>Load More Events...</small>
         </div>
