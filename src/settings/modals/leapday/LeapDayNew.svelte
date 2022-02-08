@@ -22,8 +22,6 @@
         ? [...Array(selected.length).keys()].map((k) => k + 1)
         : [];
 
-    window.leapday = leapDay;
-
     const add = (interval?: LeapDayCondition) => {
         const modal = new IntervalModal(
             app,
@@ -116,7 +114,9 @@
             <div class="after intercalary-field">
                 <label for="after">After</label>
                 <select class="dropdown" bind:value={leapDay.after}>
-                    <option selected={leapDay.after == 0} value=0>Before 1</option>
+                    <option selected={leapDay.after == 0} value="0"
+                        >Before 1</option
+                    >
                     {#each days as day}
                         <option selected={leapDay.after == day}>{day}</option>
                     {/each}

@@ -327,7 +327,6 @@ export default class CalendarHelper extends Events {
         super();
         this.displayed = { ...this.current };
         this.update(this.calendar);
-        window.calendar = this;
 
         this.plugin.registerEvent(
             this.plugin.app.workspace.on(
