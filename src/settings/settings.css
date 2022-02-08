@@ -5,6 +5,12 @@ body:not(.is-mobile)
     overflow: hidden;
 }
 
+.fantasy-calendar-settings,
+.fantasy-calendar-settings-content {
+    background-color: inherit;
+    position: relative;
+}
+
 .fantasy-calendar-confirm-buttons-container {
     display: flex;
     justify-content: space-between;
@@ -32,7 +38,8 @@ body:not(.is-mobile)
 
 .modal.mod-settings
     .vertical-tab-content.fantasy-calendar-settings
-    > h2:first-child {
+    .fantasy-calendar-settings-content
+    h2:first-child {
     margin-top: initial;
 }
 
