@@ -167,7 +167,7 @@ class Parser {
         for (const calendar of this.calendars) {
             for (let i = 0; i < calendar.events.length; i++) {
                 const event = calendar.events[i];
-                if (!event.note || event.note != path) continue;
+                if (!event || !event.note || event.note != path) continue;
                 ctx.postMessage<DeleteEventMessage>({
                     event,
                     id: calendar.id,
@@ -255,7 +255,10 @@ class Parser {
             frontmatter,
             this.parseTitle ? file.basename : ""
         );
-        if (!date) return [];
+        if (!date) {
+            this.removeEventsFromFile(file.path);
+            return [];
+        }
 
         if (date?.month && typeof date?.month == "string") {
             let month = calendar.static.months.find(

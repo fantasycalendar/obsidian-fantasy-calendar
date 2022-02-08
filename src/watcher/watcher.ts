@@ -176,8 +176,17 @@ export class Watcher extends Component {
                     const { id, index, event, original } = evt.data;
 
                     const calendar = this.calendars.find((c) => c.id == id);
+
                     if (!calendar) return;
-                    calendar.events.splice(index, index >= 0 ? 1 : 0, event);
+                    if (index == -1) {
+                        calendar.events.push(event);
+                    } else {
+                        calendar.events.splice(
+                            index,
+                            index >= 0 ? 1 : 0,
+                            event
+                        );
+                    }
 
                     this.addToTree(calendar, event);
                     if (original) {
@@ -191,12 +200,15 @@ export class Watcher extends Component {
             "message",
             async (evt: MessageEvent<DeleteEventMessage>) => {
                 if (evt.data.type == "delete") {
+                    const { id, index, event } = evt.data;
+                    if (!event) return;
+                    const calendar = this.calendars.find((c) => c.id == id);
+                    if (!calendar) return;
+                    calendar.events = calendar.events.filter(
+                        (e) => e.id != event.id
+                    );
+                    this.addToTree(calendar, event);
                 }
-                const { id, index, event } = evt.data;
-                const calendar = this.calendars.find((c) => c.id == id);
-                if (!calendar) return;
-                calendar.events.splice(index, 1);
-                this.addToTree(calendar, event);
             }
         );
 
