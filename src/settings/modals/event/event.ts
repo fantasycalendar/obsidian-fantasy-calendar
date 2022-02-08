@@ -8,12 +8,12 @@ import {
     TextAreaComponent,
     TFile
 } from "obsidian";
-import type { Calendar, Event } from "../../@types";
+import type { Calendar, Event } from "../../../@types";
 
-import { dateString, nanoid } from "../../utils/functions";
+import { dateString, nanoid } from "../../../utils/functions";
 
-import PathSuggestionModal from "../../suggester/path";
-import { confirmWithModal } from "./confirm";
+import PathSuggestionModal from "../../../suggester/path";
+
 import copy from "fast-copy";
 
 export class CreateEventModal extends Modal {

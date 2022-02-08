@@ -19,7 +19,7 @@ import {
 import type { Calendar, CurrentCalendarData, Event } from "src/@types";
 import type { DayHelper } from "src/helper";
 import CalendarHelper from "src/helper";
-import { CreateEventModal } from "src/settings/modals/event";
+import { CreateEventModal } from "src/settings/modals/event/event";
 import type FantasyCalendar from "../main";
 
 export const VIEW_TYPE = "FANTASY_CALENDAR";

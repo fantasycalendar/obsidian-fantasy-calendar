@@ -67,6 +67,7 @@
                     {/each}
                     <div class="leapday-container">
                         {#if day.leapday.numbered}
+                            {day.leapday.name}
                             <Day
                                 {day}
                                 adjacent={false}

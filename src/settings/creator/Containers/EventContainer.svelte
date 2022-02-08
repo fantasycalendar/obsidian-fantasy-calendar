@@ -6,7 +6,7 @@
     import AddNew from "../Utilities/AddNew.svelte";
     import NoExistingItems from "../Utilities/NoExistingItems.svelte";
     import type FantasyCalendar from "src/main";
-    import { CreateEventModal } from "src/settings/modals/event";
+    import { CreateEventModal } from "src/settings/modals/event/event";
     import Details from "../Utilities/Details.svelte";
     import ButtonComponent from "../Settings/ButtonComponent.svelte";
     import { confirmWithModal } from "src/settings/modals/confirm";

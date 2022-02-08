@@ -30,6 +30,7 @@
     };
 
     const add = (leapday?: LeapDay) => {
+    console.log("🚀 ~ file: LeapDayContainer.svelte ~ line 33 ~ leapday", leapday);
         const modal = new CreateLeapDayModal(plugin.app, calendar, leapday);
         modal.onClose = () => {
             if (!modal.saved) return;
