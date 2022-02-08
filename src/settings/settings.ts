@@ -369,10 +369,13 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                 })
             )
             .addToggle((t) => {
-                t.setValue(this.data.addToDefaultIfMissing).onChange((v) => {
-                    this.data.addToDefaultIfMissing = v;
-                    this.plugin.saveSettings();
-                });
+                t.setValue(this.data.addToDefaultIfMissing).onChange(
+                    async (v) => {
+                        this.data.addToDefaultIfMissing = v;
+                        await this.plugin.saveSettings();
+                        this.plugin.watcher.start();
+                    }
+                );
             });
         new Setting(containerEl)
             .setName("Display Event Previews")
@@ -390,9 +393,10 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
             .setName("Parse Note Titles for Event Dates")
             .setDesc("The plugin will parse note titles for event dates.")
             .addToggle((t) => {
-                t.setValue(this.data.parseDates).onChange((v) => {
+                t.setValue(this.data.parseDates).onChange(async (v) => {
                     this.data.parseDates = v;
-                    this.plugin.saveSettings();
+                    await this.plugin.saveSettings();
+                    this.plugin.watcher.start();
                 });
             });
         new Setting(containerEl)
@@ -574,11 +578,6 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                     this.containerEl
                 ).backgroundColor;
                 const top = this.contentEl.scrollTop;
-                console.log(
-                    "🚀 ~ file: settings.ts ~ line 577 ~ top",
-                    this.containerEl.scrollTop,
-                    top
-                );
                 const $app = new CalendarCreator({
                     target: this.containerEl,
                     props: {
