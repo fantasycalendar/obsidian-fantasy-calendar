@@ -577,7 +577,6 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                 const color = getComputedStyle(
                     this.containerEl
                 ).backgroundColor;
-                const top = this.contentEl.scrollTop;
                 const $app = new CalendarCreator({
                     target: this.containerEl,
                     props: {
@@ -632,7 +631,8 @@ class MobileCreatorModal extends Modal {
             props: {
                 calendar: this.calendar,
                 plugin: this.plugin,
-                width: this.contentEl.clientWidth
+                width: this.contentEl.clientWidth,
+                top: 0
             }
         });
         $app.$on(
