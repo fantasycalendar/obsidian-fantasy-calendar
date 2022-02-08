@@ -39,6 +39,12 @@ export interface UpdateEventMessage {
     event: Event;
     original: Event;
 }
+export interface DeleteEventMessage {
+    type: "delete";
+    id: string;
+    index: number;
+    event: Event;
+}
 
 export interface SaveMessage {
     type: "save";
@@ -143,7 +149,7 @@ class Parser {
     }
     getDataFromFrontmatter(frontmatter: FrontMatterCache) {
         let name: string, fcCategory: string;
-        if (frontmatter && "fc-ignore" in frontmatter) return;
+        if (frontmatter && "fc-ignore" in frontmatter) return {};
         if (frontmatter) {
             name = frontmatter?.["fc-calendar"];
             fcCategory = frontmatter?.["fc-category"];
@@ -157,6 +163,20 @@ class Parser {
         );
         return { calendar, fcCategory };
     }
+    removeEventsFromFile(path: string) {
+        for (const calendar of this.calendars) {
+            for (let i = 0; i < calendar.events.length; i++) {
+                const event = calendar.events[i];
+                if (!event.note || event.note != path) continue;
+                ctx.postMessage<DeleteEventMessage>({
+                    event,
+                    id: calendar.id,
+                    index: i,
+                    type: "delete"
+                });
+            }
+        }
+    }
     parseFileForEvents(
         data: string,
         cache: CachedMetadata,
@@ -168,7 +188,10 @@ class Parser {
 
         const { calendar, fcCategory } =
             this.getDataFromFrontmatter(frontmatter);
-        if (!calendar) return;
+        if (!calendar) {
+            this.removeEventsFromFile(file.path);
+            return;
+        }
 
         if (
             this.supportsTimelines &&

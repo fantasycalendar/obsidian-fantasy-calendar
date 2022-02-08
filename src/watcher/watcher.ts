@@ -18,7 +18,8 @@ import Worker, {
     OptionsMessage,
     QueueMessage,
     UpdateEventMessage,
-    SaveMessage
+    SaveMessage,
+    DeleteEventMessage
 } from "./watcher.worker";
 
 declare global {
@@ -186,10 +187,18 @@ export class Watcher extends Component {
             }
         );
 
-        this.worker.addEventListener("message", async (evt: MessageEvent) => {
-            if (evt.data.type == "delete") {
+        this.worker.addEventListener(
+            "message",
+            async (evt: MessageEvent<DeleteEventMessage>) => {
+                if (evt.data.type == "delete") {
+                }
+                const { id, index, event } = evt.data;
+                const calendar = this.calendars.find((c) => c.id == id);
+                if (!calendar) return;
+                calendar.events.splice(index, 1);
+                this.addToTree(calendar, event);
             }
-        });
+        );
 
         /** The worker has parsed all files in its queue. */
         this.worker.addEventListener(
