@@ -96,7 +96,6 @@
                                 results.push(event);
                             }
                         }
-                        console.log(results.filter((r) => r));
                         sorted = results;
                         filtered = true;
                     }, 250)
