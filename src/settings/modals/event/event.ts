@@ -14,7 +14,10 @@ import { dateString, nanoid } from "../../../utils/functions";
 
 import PathSuggestionModal from "../../../suggester/path";
 
+import EventCreator from "./EventCreator.svelte";
+
 import copy from "fast-copy";
+import FantasyCalendar from "src/main";
 
 export class CreateEventModal extends Modal {
     saved = false;
@@ -43,12 +46,12 @@ export class CreateEventModal extends Modal {
     startEl: HTMLDivElement;
     endEl: HTMLDivElement;
     constructor(
-        app: App,
+        public plugin: FantasyCalendar,
         public calendar: Calendar,
         event?: Event,
         date?: { month: number; day: number; year: number }
     ) {
-        super(app);
+        super(plugin.app);
         if (event) {
             this.event = copy(event);
             this.editing = true;
@@ -61,15 +64,22 @@ export class CreateEventModal extends Modal {
 
     async display() {
         this.contentEl.empty();
-        this.contentEl.createEl("h3", {
-            text: this.editing ? "Edit Event" : "New Event"
+        this.titleEl.setText(this.editing ? "Edit Event" : "New Event");
+
+        new EventCreator({
+            target: this.contentEl,
+            props: {
+                event: this.event,
+                calendar: this.calendar,
+                plugin: this.plugin
+            }
         });
 
-        this.infoEl = this.contentEl.createDiv("event-info");
+        /* this.infoEl = this.contentEl.createDiv("event-info");
         this.buildInfo();
 
         this.dateEl = this.contentEl.createDiv("event-date");
-        this.buildDate();
+        this.buildDate(); */
 
         new Setting(this.contentEl)
             .addButton((b) => {

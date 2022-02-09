@@ -184,7 +184,12 @@ export default class FantasyCalendarView extends ItemView {
         this.build();
     }
     createEventForDay(date: CurrentCalendarData) {
-        const modal = new CreateEventModal(this.app, this.calendar, null, date);
+        const modal = new CreateEventModal(
+            this.plugin,
+            this.calendar,
+            null,
+            date
+        );
 
         modal.onClose = () => {
             if (!modal.saved) return;
@@ -479,7 +484,7 @@ export default class FantasyCalendarView extends ItemView {
                 menu.addItem((item) => {
                     item.setTitle("Edit Event").onClick(() => {
                         const modal = new CreateEventModal(
-                            this.app,
+                            this.plugin,
                             this.calendar,
                             event
                         );

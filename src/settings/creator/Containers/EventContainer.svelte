@@ -41,7 +41,7 @@
         return calendar.categories.find(({ id }) => id == category);
     };
     const add = (event?: Event) => {
-        const modal = new CreateEventModal(plugin.app, calendar, event);
+        const modal = new CreateEventModal(plugin, calendar, event);
         modal.onClose = () => {
             if (!modal.saved) return;
             if (modal.editing) {
