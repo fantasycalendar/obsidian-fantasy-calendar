@@ -14,7 +14,7 @@ import { dateString, nanoid } from "../../../utils/functions";
 
 import PathSuggestionModal from "../../../suggester/path";
 
-import EventCreator from "./EventCreator.svelte";
+/* import EventCreator from "./EventCreator.svelte"; */
 
 import copy from "fast-copy";
 import FantasyCalendar from "src/main";
@@ -66,20 +66,20 @@ export class CreateEventModal extends Modal {
         this.contentEl.empty();
         this.titleEl.setText(this.editing ? "Edit Event" : "New Event");
 
-        new EventCreator({
+/*         new EventCreator({
             target: this.contentEl,
             props: {
                 event: this.event,
                 calendar: this.calendar,
                 plugin: this.plugin
             }
-        });
+        }); */
 
-        /* this.infoEl = this.contentEl.createDiv("event-info");
+        this.infoEl = this.contentEl.createDiv("event-info");
         this.buildInfo();
 
         this.dateEl = this.contentEl.createDiv("event-date");
-        this.buildDate(); */
+        this.buildDate();
 
         new Setting(this.contentEl)
             .addButton((b) => {
