@@ -17,12 +17,12 @@
         calendar = v;
     });
 
-    let previous = calendar.getDirectionalStandardMonthHelper(-1);
-    let next = calendar.getDirectionalStandardMonthHelper(1);
+    let previous = calendar.getPreviousMonth();
+    let next = calendar.getNextMonth();
 
     calendar.on("month-update", () => {
-        previous = calendar.getDirectionalStandardMonthHelper(-1);
-        next = calendar.getDirectionalStandardMonthHelper(1);
+        previous = calendar.getPreviousMonth();
+        next = calendar.getNextMonth();
     });
 
     const left = (node: HTMLElement) => {

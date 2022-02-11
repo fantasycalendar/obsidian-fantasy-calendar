@@ -6,7 +6,6 @@
     import DayView from "./DayView.svelte";
 
     import MonthView from "./Month.svelte";
-    import Day from "./Day.svelte";
     import Nav from "./Nav.svelte";
     import YearView from "./YearView.svelte";
     import YearViewBig from "./YearViewBig.svelte";
@@ -33,6 +32,8 @@
     $: dayViewStore.set(dayView);
     $: moonStore.set(moons);
     $: calendarStore.set(calendar);
+
+    $: showIntercalary = calendar.plugin.data.showIntercalary;
 
     calendar.on("month-update", () => {
         year = calendar.displayed.year;
@@ -116,7 +117,7 @@
                 {/if}
             </div>
             <div class="month-view">
-                {#if prev && prev.type == "intercalary"}
+                {#if prev && prev.type == "intercalary" && !showIntercalary}
                     <MonthView
                         intercalary={true}
                         columns={weekdays.length}
@@ -131,15 +132,15 @@
                         on:event-context
                     />
                 {/if}
-                <!-- {#if month.type == "month"} -->
-                <div class="weekdays">
-                    {#each weekdays as day}
-                        <span class="weekday fantasy-weekday"
-                            >{day.name.slice(0, 3)}</span
-                        >
-                    {/each}
-                </div>
-                <!-- {/if} -->
+                {#if month.type == "month"}
+                    <div class="weekdays">
+                        {#each weekdays as day}
+                            <span class="weekday fantasy-weekday"
+                                >{day.name.slice(0, 3)}</span
+                            >
+                        {/each}
+                    </div>
+                {/if}
 
                 <MonthView
                     columns={weekdays.length}
@@ -153,7 +154,7 @@
                     on:event-mouseover
                     on:event-context
                 />
-                {#if next && next.type == "intercalary"}
+                {#if next && next.type == "intercalary" && !showIntercalary}
                     <MonthView
                         intercalary={true}
                         columns={weekdays.length}

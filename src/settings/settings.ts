@@ -204,6 +204,17 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
         summary.createDiv("collapser").createDiv("handle");
 
         new Setting(this.calendarsEl)
+            .setName("Show Intercalary Months Separately")
+            .setDesc(
+                "Intercalary months will appear a distinct months in the calendar."
+            )
+            .addToggle((t) => {
+                t.setValue(this.data.showIntercalary).onChange((v) => {
+                    this.data.showIntercalary = v;
+                    this.plugin.saveCalendar();
+                });
+            });
+        new Setting(this.calendarsEl)
             .setName("Default Calendar")
             .setDesc("Views will open to this calendar by default.")
             .addDropdown((d) => {

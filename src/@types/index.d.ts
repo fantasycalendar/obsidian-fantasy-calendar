@@ -10,28 +10,29 @@ import type { Calendar } from "./calendar";
 export interface FantasyCalendarData {
     addToDefaultIfMissing: boolean;
     calendars: Calendar[];
+    configDirectory: string;
     currentCalendar: string;
+    dailyNotes: boolean;
+    dateFormat: string;
     defaultCalendar: string;
     eventPreview: boolean;
-    configDirectory: string;
-    version: {
-        major: number;
-        minor: number;
-        patch: number;
-    };
-    parseDates: boolean;
-    dateFormat: string;
-    dailyNotes: boolean;
-    supportTimelines: boolean;
-    timelineTag: string;
-    syncTimelines: boolean;
-    settingsToggleState: {
-        calendars: boolean;
-        events: boolean;
-    };
     exit: {
         saving: boolean;
         event: boolean;
         calendar: boolean;
+    };
+    parseDates: boolean;
+    settingsToggleState: {
+        calendars: boolean;
+        events: boolean;
+    };
+    showIntercalary: boolean;
+    supportTimelines: boolean;
+    syncTimelines: boolean;
+    timelineTag: string;
+    version: {
+        major: number;
+        minor: number;
+        patch: number;
     };
 }

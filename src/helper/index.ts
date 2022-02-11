@@ -558,6 +558,28 @@ export default class CalendarHelper extends Events {
     canGoToNextYear(year = this.displayed.year) {
         return !this.data.useCustomYears || year < this.data.years.length;
     }
+    getNextMonth() {
+        if (this.plugin.data.showIntercalary) {
+            return this.getMonth(this.displayed.month + 1, this.displayed.year);
+        } else {
+            return this.getDirectionalStandardMonthHelper(1);
+        }
+    }
+    getNextMonthIndex() {
+        const month = this.getNextMonth();
+        return this.data.months.indexOf(month.data);
+    }
+    getPreviousMonth() {
+        if (this.plugin.data.showIntercalary) {
+            return this.getMonth(this.displayed.month - 1, this.displayed.year);
+        } else {
+            return this.getDirectionalStandardMonthHelper(-1);
+        }
+    }
+    getPreviousMonthIndex() {
+        const month = this.getPreviousMonth();
+        return this.data.months.indexOf(month.data);
+    }
     getDirectionalStandardMonthHelper(
         direction: 1 | -1,
         year = this.displayed.year
@@ -581,7 +603,7 @@ export default class CalendarHelper extends Events {
      * Go to the next month index. Used to change months on the calendar.
      */
     goToNext() {
-        const index = this.getDirectionalStandardMonth(1);
+        const index = this.getNextMonthIndex();
 
         if (index < this.displayed.month) {
             if (!this.canGoToNextYear()) {
@@ -618,7 +640,7 @@ export default class CalendarHelper extends Events {
      * Go to the previous month index. Used to change months on the calendar.
      */
     goToPrevious() {
-        const index = this.getDirectionalStandardMonth(-1);
+        const index = this.getPreviousMonthIndex();
 
         if (index > this.displayed.month) {
             if (this.displayed.year == 1) {

@@ -86,31 +86,32 @@ export const DEFAULT_CALENDAR: Calendar = {
 };
 
 export const DEFAULT_DATA: FantasyCalendarData = {
+    addToDefaultIfMissing: true,
     calendars: [],
+    configDirectory: null,
     currentCalendar: null,
+    dailyNotes: false,
+    dateFormat: "YYYY-MM-DD",
     defaultCalendar: null,
     eventPreview: false,
-    addToDefaultIfMissing: true,
-    configDirectory: null,
-    parseDates: false,
-    dateFormat: "YYYY-MM-DD",
-    dailyNotes: false,
-    version: {
-        major: null,
-        minor: null,
-        patch: null
-    },
-    supportTimelines: false,
-    timelineTag: "#timeline",
-    syncTimelines: true,
-    settingsToggleState: {
-        calendars: false,
-        events: false
-    },
     exit: {
         saving: false,
         event: false,
         calendar: false
+    },
+    parseDates: false,
+    settingsToggleState: {
+        calendars: false,
+        events: false
+    },
+    showIntercalary: false,
+    supportTimelines: false,
+    syncTimelines: true,
+    timelineTag: "#timeline",
+    version: {
+        major: null,
+        minor: null,
+        patch: null
     }
 };
 
