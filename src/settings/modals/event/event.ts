@@ -14,7 +14,7 @@ import { dateString, nanoid } from "../../../utils/functions";
 
 import PathSuggestionModal from "../../../suggester/path";
 
-import EventCreator from "./EventCreator.svelte";
+/* import EventCreator from "./EventCreator.svelte"; */
 
 import copy from "fast-copy";
 import FantasyCalendar from "src/main";
@@ -66,20 +66,20 @@ export class CreateEventModal extends Modal {
         this.contentEl.empty();
         this.titleEl.setText(this.editing ? "Edit Event" : "New Event");
 
-        new EventCreator({
+        /* new EventCreator({
             target: this.contentEl,
             props: {
                 event: this.event,
                 calendar: this.calendar,
                 plugin: this.plugin
             }
-        });
+        }); */
 
-        /* this.infoEl = this.contentEl.createDiv("event-info");
+        this.infoEl = this.contentEl.createDiv("event-info");
         this.buildInfo();
 
         this.dateEl = this.contentEl.createDiv("event-date");
-        this.buildDate(); */
+        this.buildDate();
 
         new Setting(this.contentEl)
             .addButton((b) => {
@@ -129,6 +129,7 @@ export class CreateEventModal extends Modal {
                                 this.event.date = { ...temp };
                             }
                         }
+                        console.log(this.event.note);
                         this.saved = true;
                         this.close();
                     });
@@ -251,11 +252,17 @@ export class CreateEventModal extends Modal {
                 let files = this.app.vault.getFiles();
                 text.setPlaceholder("Path");
                 if (this.event.note) {
-                    const note = this.app.vault.getAbstractFileByPath(
-                        this.event.note
+                    const [path, subpath] = this.event.note.split(/[#^]/);
+                    const note = this.app.metadataCache.getFirstLinkpathDest(
+                        path,
+                        ""
                     );
                     if (note && note instanceof TFile) {
-                        text.setValue(note.basename);
+                        text.setValue(
+                            `${note.basename}${subpath ? "#" : ""}${
+                                subpath ? subpath : ""
+                            }`
+                        );
                     }
                 }
 
@@ -266,7 +273,7 @@ export class CreateEventModal extends Modal {
                 modal.onClose = async () => {
                     text.inputEl.blur();
 
-                    this.event.note = modal.file.path;
+                    this.event.note = modal.link;
 
                     this.tryParse(modal.file);
                 };
