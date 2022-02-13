@@ -90,6 +90,7 @@ export const DEFAULT_DATA: FantasyCalendarData = {
     currentCalendar: null,
     defaultCalendar: null,
     eventPreview: false,
+    eventFrontmatter: false,
     addToDefaultIfMissing: true,
     configDirectory: null,
     parseDates: false,

@@ -2,7 +2,6 @@ import {
     addIcon,
     ButtonComponent,
     Modal,
-    normalizePath,
     Notice,
     Platform,
     PluginSettingTab,
@@ -385,6 +384,17 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
             .addToggle((t) => {
                 t.setValue(this.data.eventPreview).onChange((v) => {
                     this.data.eventPreview = v;
+                    this.plugin.saveSettings();
+                });
+            });
+        new Setting(containerEl)
+            .setName("Write Event Data to Frontmatter")
+            .setDesc(
+                "Events linked to notes will write their data to the note frontmatter."
+            )
+            .addToggle((t) => {
+                t.setValue(this.data.eventFrontmatter).onChange((v) => {
+                    this.data.eventFrontmatter = v;
                     this.plugin.saveSettings();
                 });
             });

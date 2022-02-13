@@ -13,6 +13,7 @@ export interface FantasyCalendarData {
     currentCalendar: string;
     defaultCalendar: string;
     eventPreview: boolean;
+    eventFrontmatter: boolean;
     configDirectory: string;
     version: {
         major: number;
