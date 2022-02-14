@@ -14,6 +14,9 @@ export interface Calendar {
     displayWeeks?: boolean;
     autoParse: boolean;
     path: string;
+    supportTimelines: boolean;
+    syncTimelines: boolean;
+    timelineTag: string;
 }
 export interface StaticCalendarData {
     firstWeekDay: number;

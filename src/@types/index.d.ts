@@ -28,9 +28,6 @@ export interface FantasyCalendarData {
         events: boolean;
     };
     showIntercalary: boolean;
-    supportTimelines: boolean;
-    syncTimelines: boolean;
-    timelineTag: string;
     version: {
         major: number;
         minor: number;

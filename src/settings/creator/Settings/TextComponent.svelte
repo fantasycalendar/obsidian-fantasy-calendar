@@ -9,9 +9,12 @@
     export let warn: boolean = false;
     export let type = "text";
 
-    export let desc = "";
+    export let desc: string | DocumentFragment;
 
     export let placeholder = name;
+    const descEl = (node: HTMLElement) => {
+        node.append((desc as DocumentFragment).cloneNode(true));
+    };
 </script>
 
 <div class="setting-item">
@@ -19,7 +22,13 @@
         <div class="setting-item-name">
             {name}
         </div>
-        <div class="setting-item-description">{desc}</div>
+        {#if desc}
+            {#if typeof desc == "string"}
+                <div class="setting-item-description">{desc}</div>
+            {:else}
+                <div class="setting-item-description" use:descEl />
+            {/if}
+        {/if}
     </div>
     <div class="setting-item-control">
         <div class="warning-container">

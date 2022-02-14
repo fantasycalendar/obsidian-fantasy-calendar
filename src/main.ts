@@ -82,7 +82,10 @@ export const DEFAULT_CALENDAR: Calendar = {
     events: [],
     categories: [],
     autoParse: false,
-    path: "/"
+    path: "/",
+    supportTimelines: false,
+    syncTimelines: true,
+    timelineTag: "#timeline"
 };
 
 export const DEFAULT_DATA: FantasyCalendarData = {
@@ -106,9 +109,6 @@ export const DEFAULT_DATA: FantasyCalendarData = {
         events: false
     },
     showIntercalary: false,
-    supportTimelines: false,
-    syncTimelines: true,
-    timelineTag: "#timeline",
     version: {
         major: null,
         minor: null,
@@ -157,15 +157,15 @@ export default class FantasyCalendar extends Plugin {
     get canUseTimelines() {
         return this.app.plugins.getPlugin("obsidian-timelines") != null;
     }
-    get syncTimelines() {
-        return this.data.syncTimelines && this.canUseTimelines;
+    syncTimelines(calendar: Calendar) {
+        return calendar.syncTimelines && this.canUseTimelines;
     }
-    get timelineTag() {
+    timelineTag(calendar: Calendar) {
         if (this.syncTimelines) {
             return this.app.plugins.getPlugin("obsidian-timelines").settings
                 .timelineTag;
         } else {
-            return this.data.timelineTag;
+            return calendar.timelineTag;
         }
     }
     get format() {

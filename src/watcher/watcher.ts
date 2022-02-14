@@ -68,9 +68,7 @@ export class Watcher extends Component {
             parseTitle: this.plugin.data.parseDates,
             addToDefaultIfMissing: this.plugin.data.addToDefaultIfMissing,
             format: this.plugin.format,
-            defaultCalendar: this.plugin.defaultCalendar?.name,
-            supportsTimelines: this.plugin.data.supportTimelines,
-            timelineTag: this.plugin.data.timelineTag
+            defaultCalendar: this.plugin.defaultCalendar?.name
         });
         this.registerEvent(
             this.plugin.app.workspace.on(
@@ -82,9 +80,7 @@ export class Watcher extends Component {
                         addToDefaultIfMissing:
                             this.plugin.data.addToDefaultIfMissing,
                         format: this.plugin.format,
-                        defaultCalendar: this.plugin.defaultCalendar?.name,
-                        supportsTimelines: this.plugin.data.supportTimelines,
-                        timelineTag: this.plugin.data.timelineTag
+                        defaultCalendar: this.plugin.defaultCalendar?.name
                     });
                 }
             )

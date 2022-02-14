@@ -2,6 +2,7 @@
     import type { Calendar } from "src/@types";
     import type FantasyCalendar from "src/main";
     import {
+        ExtraButtonComponent,
         normalizePath,
         TextComponent as ObsidianTextComponent,
         TFolder
@@ -27,6 +28,8 @@
 
     $: autoParse = calendar.autoParse;
 
+    $: timelines = calendar.supportTimelines;
+
     const folder = (node: HTMLElement) => {
         let folders = plugin.app.vault
             .getAllLoadedFiles()
@@ -51,6 +54,69 @@
                 : "/";
             calendar.path = normalizePath(v);
         };
+    };
+
+    $: timelinesDesc = createFragment((e) => {
+        e.createSpan({
+            text: "Support "
+        });
+        e.createEl("code", { text: "<span>" });
+        e.createSpan({ text: " elements used by the " });
+        e.createEl("a", {
+            text: "Obsidian Timelines",
+            href: "obsidian://show-plugin?id=obsidian-timelines"
+        });
+        e.createSpan({
+            text: " plugin (by Darakah)."
+        });
+    });
+    $: timelinesTagDesc = createFragment((e) => {
+        e.createSpan({
+            text: "Tag to specify which notes to include in created timelines, e.g. "
+        });
+        e.createEl("code", { text: "timeline" });
+        e.createSpan({
+            text: " to use the "
+        });
+        e.createEl("code", { text: "#timeline" });
+        e.createSpan({
+            text: " tag."
+        });
+    });
+
+    const timelinesTagSetting = (node: HTMLElement) => {
+        const text = new ObsidianTextComponent(node);
+        text.setValue(`${calendar.timelineTag ?? ""}`.replace("#", ""))
+            .setDisabled(calendar.syncTimelines)
+            .onChange((v) => {
+                calendar.timelineTag = v.startsWith("#") ? v : `#${v}`;
+                plugin.saveSettings();
+            });
+        const b = new ExtraButtonComponent(node);
+        if (!plugin.canUseTimelines) {
+            calendar.syncTimelines = false;
+            b.extraSettingsEl.detach();
+            return;
+        }
+        if (calendar.syncTimelines) {
+            b.setIcon("checkmark")
+                .setTooltip("Unsync from Timelines Plugin")
+                .onClick(async () => {
+                    calendar.syncTimelines = false;
+                    await plugin.saveSettings();
+                });
+        } else {
+            b.setIcon("sync")
+                .setTooltip("Sync with Timelines Plugin")
+                .onClick(async () => {
+                    calendar.syncTimelines = true;
+                    calendar.timelineTag =
+                        plugin.app.plugins.getPlugin(
+                            "obsidian-timelines"
+                        ).settings.timelineTag;
+                    await plugin.saveSettings();
+                });
+        }
     };
 </script>
 
@@ -108,6 +174,26 @@
             >
                 <div use:folder />
             </TextComponent>
+        {/if}
+
+        <ToggleComponent
+            name={"Support Timelines Event"}
+            desc={timelinesDesc}
+            value={timelines}
+            on:click={() => {
+                calendar.supportTimelines = !calendar.supportTimelines;
+            }}
+        />
+        {#if timelines}
+            {#key calendar.syncTimelines}
+                <TextComponent
+                    name={"Default Timelines Tag"}
+                    desc={timelinesTagDesc}
+                    value={""}
+                >
+                    <div use:timelinesTagSetting class="setting-item-control" />
+                </TextComponent>
+            {/key}
         {/if}
     </div>
 </Details>

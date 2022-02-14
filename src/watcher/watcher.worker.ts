@@ -13,8 +13,6 @@ export interface OptionsMessage {
     addToDefaultIfMissing: boolean;
     format: string;
     parseTitle: boolean;
-    supportsTimelines: boolean;
-    timelineTag: string;
 }
 export interface CalendarsMessage {
     type: "calendars";
@@ -65,8 +63,6 @@ class Parser {
     calendars: Calendar[];
     format: string;
     parseTitle: boolean = false;
-    supportsTimelines: boolean;
-    timelineTag: string;
     addToDefaultIfMissing: boolean;
 
     constructor() {
@@ -80,15 +76,11 @@ class Parser {
                         addToDefaultIfMissing,
                         format,
                         parseTitle,
-                        supportsTimelines,
-                        timelineTag
                     } = event.data;
                     this.addToDefaultIfMissing = addToDefaultIfMissing;
                     this.defaultCalendar = defaultCalendar;
                     this.format = format;
                     this.parseTitle = parseTitle;
-                    this.supportsTimelines = supportsTimelines;
-                    this.timelineTag = timelineTag;
                 }
             }
         );
@@ -194,9 +186,9 @@ class Parser {
         }
 
         if (
-            this.supportsTimelines &&
+            calendar.supportTimelines &&
             allTags &&
-            allTags.includes(this.timelineTag)
+            allTags.includes(calendar.timelineTag)
         ) {
             events.push(
                 ...this.parseTimelineEvents(calendar, data, file, fcCategory)
