@@ -14,6 +14,7 @@
     import TextComponent from "../Settings/TextComponent.svelte";
     import ToggleComponent from "../Settings/ToggleComponent.svelte";
     import Details from "../Utilities/Details.svelte";
+    import { DEFAULT_CALENDAR } from "src/main";
 
     export let plugin: FantasyCalendar;
     export let calendar: Calendar;
@@ -29,6 +30,9 @@
     $: autoParse = calendar.autoParse;
 
     $: timelines = calendar.supportTimelines;
+
+    if (!calendar.timelineTag)
+        calendar.timelineTag = DEFAULT_CALENDAR.timelineTag;
 
     const folder = (node: HTMLElement) => {
         let folders = plugin.app.vault
@@ -174,26 +178,28 @@
             >
                 <div use:folder />
             </TextComponent>
-        {/if}
-
-        <ToggleComponent
-            name={"Support Timelines Event"}
-            desc={timelinesDesc}
-            value={timelines}
-            on:click={() => {
-                calendar.supportTimelines = !calendar.supportTimelines;
-            }}
-        />
-        {#if timelines}
-            {#key calendar.syncTimelines}
-                <TextComponent
-                    name={"Default Timelines Tag"}
-                    desc={timelinesTagDesc}
-                    value={""}
-                >
-                    <div use:timelinesTagSetting class="setting-item-control" />
-                </TextComponent>
-            {/key}
+            <ToggleComponent
+                name={"Support Timelines Events"}
+                desc={timelinesDesc}
+                value={timelines}
+                on:click={() => {
+                    calendar.supportTimelines = !calendar.supportTimelines;
+                }}
+            />
+            {#if timelines}
+                {#key calendar.syncTimelines}
+                    <TextComponent
+                        name={"Default Timelines Tag"}
+                        desc={timelinesTagDesc}
+                        value={""}
+                    >
+                        <div
+                            use:timelinesTagSetting
+                            class="setting-item-control"
+                        />
+                    </TextComponent>
+                {/key}
+            {/if}
         {/if}
     </div>
 </Details>

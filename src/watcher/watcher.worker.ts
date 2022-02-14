@@ -75,7 +75,7 @@ class Parser {
                         defaultCalendar,
                         addToDefaultIfMissing,
                         format,
-                        parseTitle,
+                        parseTitle
                     } = event.data;
                     this.addToDefaultIfMissing = addToDefaultIfMissing;
                     this.defaultCalendar = defaultCalendar;
