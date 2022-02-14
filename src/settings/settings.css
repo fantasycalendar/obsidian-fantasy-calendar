@@ -206,3 +206,8 @@ body:not(.is-mobile)
     align-items: center;
     gap: 0.5rem;
 }
+
+/** Event Modal */
+.fantasy-calendar-event-formula .setting-item-control {
+    gap: 0.25rem;
+}

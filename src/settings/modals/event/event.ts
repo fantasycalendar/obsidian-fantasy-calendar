@@ -66,7 +66,7 @@ export class CreateEventModal extends Modal {
         this.contentEl.empty();
         this.titleEl.setText(this.editing ? "Edit Event" : "New Event");
 
-/*         new EventCreator({
+        /*         new EventCreator({
             target: this.contentEl,
             props: {
                 event: this.event,
@@ -130,10 +130,6 @@ export class CreateEventModal extends Modal {
                             }
                         }
                         this.saved = true;
-                        console.log(
-                            this.plugin.data.eventFrontmatter,
-                            this.event.note
-                        );
                         if (
                             this.plugin.data.eventFrontmatter &&
                             this.event.note
@@ -170,11 +166,6 @@ export class CreateEventModal extends Modal {
                                 )?.name;
                                 frontmatter.push(`fc-category: ${category}`);
                             }
-                            console.log(
-                                "🚀 ~ file: event.ts ~ line 154 ~ frontmatter",
-                                frontmatter,
-                                note
-                            );
                             if (note) {
                                 let content = await this.app.vault.read(note);
                                 if (
@@ -211,6 +202,10 @@ export class CreateEventModal extends Modal {
                             }
                         }
 
+                        if (!this.event.name) {
+                            this.event.name = "Event";
+                        }
+
                         this.close();
                     });
             })
@@ -233,6 +228,18 @@ export class CreateEventModal extends Modal {
         } else {
             this.buildEndDate();
         }
+        const formulas = this.dateEl.createDiv(
+            "fantasy-calendar-event-formula"
+        );
+        if (!this.event.formulas?.length) {
+            new Setting(formulas).setName("Add Interval").addToggle((t) => {
+                t.setValue(false).onChange((v) =>
+                    this.buildEventFormulas(formulas)
+                );
+            });
+        } else {
+            this.buildEventFormulas(formulas);
+        }
 
         /* this.buildDateFields(this.endDateEl); */
 
@@ -240,6 +247,25 @@ export class CreateEventModal extends Modal {
             "event-date-string setting-item-description"
         );
         this.buildDateString();
+    }
+    buildEventFormulas(formulas: HTMLDivElement): any {
+        formulas.empty();
+        this.event.formulas = this.event.formulas ?? [
+            { type: "interval", number: 1, timespan: "days" }
+        ];
+
+        new Setting(formulas)
+            .setName("Event Interval")
+            .addText((t) => {
+                t.setValue(`${this.event.formulas[0].number}`)
+                    .onChange((v) => {
+                        this.event.formulas[0].number = Number(v);
+                    })
+                    .inputEl.setAttr("type", "number");
+            })
+            .addDropdown((d) => {
+                d.addOption("days", "days");
+            });
     }
     buildStartDate() {
         this.startEl = this.dateEl.createDiv("fantasy-calendar-event-date");

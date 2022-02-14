@@ -16,6 +16,14 @@ export interface Event {
     category: string;
     timestamp?: number;
     auto?: boolean;
+    formulas?: EventFormula[];
+}
+
+type EventFormula = FormulaInterval;
+interface FormulaInterval {
+    type: "interval";
+    number: number;
+    timespan: "days";
 }
 
 export interface ColorEvent extends Event {

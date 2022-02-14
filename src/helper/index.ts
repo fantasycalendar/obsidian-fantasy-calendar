@@ -131,19 +131,51 @@ export class MonthHelper {
             this.shouldUpdate = false;
         }
         return this.events.filter((event) => {
-            if (event.date.day == day.day) return true;
-            if (!event.end) return false;
+            if (
+                (!event.date.year || event.date.year == day.year) &&
+                (!event.date.month || event.date.month == day.month) &&
+                event.date.day == day.day
+            )
+                return true;
+            if (!event.end && !event.formulas?.length) return false;
             const start = { ...event.date };
-            const end = { ...event.end };
+            const end = {
+                ...(event.end ?? {})
+            };
 
             if (!start.year) start.year = end.year = this.year;
             if (!start.month) start.month = end.month = this.number;
+
             const hash = Number(this.calendar.hash(day));
             if (
                 Number(this.calendar.hash(start)) <= hash &&
-                hash <= Number(this.calendar.hash(end))
-            )
-                return true;
+                hash <= Number(this.calendar.hash(end) ?? Infinity)
+            ) {
+                if (!event.formulas?.length) {
+                    return true;
+                } else {
+                    const startDays =
+                        this.calendar.totalDaysBeforeYear(start.year) +
+                        this.calendar.daysBeforeMonth(
+                            start.month,
+                            start.year,
+                            true
+                        ) +
+                        start.day;
+                    const currentDays =
+                        this.calendar.totalDaysBeforeYear(day.year) +
+                        this.calendar.daysBeforeMonth(
+                            day.month,
+                            day.year,
+                            true
+                        ) +
+                        day.day;
+                    const daysBetween = currentDays - startDays;
+                    
+                    return daysBetween % event.formulas[0].number == 0;
+                }
+            }
+            return false;
         });
     }
     shouldUpdateMoons = false;
@@ -246,14 +278,22 @@ export default class CalendarHelper extends Events {
             const events = this.calendar.events.filter((event) => {
                 const date = { ...event.date };
                 const end = { ...event.end };
+
                 //Year and Month match
                 if (date.year == year || date.year == undefined) return true;
+
                 //Event is after the month
                 if (date.year > year) return false;
-                //No end date and event is before the month
-                if (!end && date.year < year) return false;
 
-                if (date.year <= year && end.year >= year) return true;
+                //No end date and event is before the month
+                if (!end && !event.formulas?.length && date.year < year)
+                    return false;
+
+                if (
+                    date.year <= year &&
+                    (end?.year >= year || event.formulas?.length)
+                )
+                    return true;
 
                 return false;
             });
@@ -267,25 +307,34 @@ export default class CalendarHelper extends Events {
         const events = this._cache.get(year).events.filter((event) => {
             const date = { ...event.date };
             const end = { ...event.end };
+
             //No-month events are on every month.
             if (date.month == undefined) return true;
+
             //Year and Month match
             if (
                 (date.year == year || date.year == undefined) &&
                 date.month == month
             )
                 return true;
+
             //Event is after the month
             if (date.year > year || (date.year == year && date.month > month))
                 return false;
+
             //No end date and event is before the month
-            if (!end && (date.month != month || date.year < year)) return false;
+            if (
+                !end &&
+                !event.formulas?.length &&
+                (date.month != month || date.year < year)
+            )
+                return false;
 
             if (date.year == undefined) end.year = date.year = year;
             if (
                 (date.year <= year || date.month <= month) &&
-                end.year >= year &&
-                end.month >= month
+                (event.formulas?.length ||
+                    (end.year >= year && end.month >= month))
             )
                 return true;
 
@@ -384,7 +433,7 @@ export default class CalendarHelper extends Events {
      *
      * Hash takes the form of `YYYYMMDD`, with months and days padded to the maximum value.
      */
-    hash(date: CurrentCalendarData) {
+    hash(date: Partial<CurrentCalendarData>) {
         if (date.year == null || date.month == null || date.day == null)
             return null;
         const months = `${this.data.months.length}`.length;
