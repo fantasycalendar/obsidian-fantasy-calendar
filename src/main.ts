@@ -99,6 +99,7 @@ export const DEFAULT_DATA: FantasyCalendarData = {
         event: false,
         calendar: false
     },
+    eventFrontmatter: false,
     parseDates: false,
     settingsToggleState: {
         calendars: false,

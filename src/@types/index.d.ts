@@ -15,6 +15,7 @@ export interface FantasyCalendarData {
     dailyNotes: boolean;
     dateFormat: string;
     defaultCalendar: string;
+    eventFrontmatter: boolean;
     eventPreview: boolean;
     exit: {
         saving: boolean;

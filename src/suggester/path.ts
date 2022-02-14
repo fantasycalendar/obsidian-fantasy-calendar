@@ -87,6 +87,7 @@ export default class PathSuggestionModal extends SuggestionModal<
             );
         }
     }
+    link: string;
     selectSuggestion({ item }: FuzzyMatch<TFile | BlockCache | HeadingCache>) {
         let link: string;
         if (item instanceof TFile) {
@@ -96,6 +97,12 @@ export default class PathSuggestionModal extends SuggestionModal<
             link = this.file.basename + "#" + (<HeadingCache>item).heading;
         } else if (Object.prototype.hasOwnProperty.call(item, "id")) {
             link = this.file.basename + "^" + (<BlockCache>item).id;
+        }
+        const path = this.file.path.split("/").slice(0, -1);
+        if (path.length) {
+            this.link = path.join("/") + "/" + link;
+        } else {
+            this.link = link;
         }
         this.text.setValue(link);
 

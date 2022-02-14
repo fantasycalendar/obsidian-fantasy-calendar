@@ -85,7 +85,7 @@ export class CreateEventModal extends Modal {
             .addButton((b) => {
                 b.setButtonText("Save")
                     .setCta()
-                    .onClick(() => {
+                    .onClick(async () => {
                         if (!this.event.name?.length) {
                             new Notice("The event must have a name.");
                             return;
@@ -130,6 +130,87 @@ export class CreateEventModal extends Modal {
                             }
                         }
                         this.saved = true;
+                        console.log(
+                            this.plugin.data.eventFrontmatter,
+                            this.event.note
+                        );
+                        if (
+                            this.plugin.data.eventFrontmatter &&
+                            this.event.note
+                        ) {
+                            const [path, subpath] =
+                                this.event.note.split(/[#^]/);
+                            const note =
+                                this.app.metadataCache.getFirstLinkpathDest(
+                                    path,
+                                    ""
+                                );
+                            const date = this.plugin.format
+                                .replace(/[Yy]+/g, `${this.event.date.year}`)
+                                .replace(/[Mm]+/g, `${this.event.date.month}`)
+                                .replace(/[Dd]+/g, `${this.event.date.day}`);
+
+                            const frontmatter = [
+                                `fc-calendar: ${this.calendar.name}`,
+                                `fc-date: ${date}`
+                            ];
+                            if (this.event.end) {
+                                const end = this.plugin.format
+                                    .replace(/[Yy]+/g, `${this.event.end.year}`)
+                                    .replace(
+                                        /[Mm]+/g,
+                                        `${this.event.end.month}`
+                                    )
+                                    .replace(/[Dd]+/g, `${this.event.end.day}`);
+                                frontmatter.push(`fc-end: ${end}`);
+                            }
+                            if (this.event.category) {
+                                const category = this.calendar.categories.find(
+                                    (c) => c.id == this.event.category
+                                )?.name;
+                                frontmatter.push(`fc-category: ${category}`);
+                            }
+                            console.log(
+                                "🚀 ~ file: event.ts ~ line 154 ~ frontmatter",
+                                frontmatter,
+                                note
+                            );
+                            if (note) {
+                                let content = await this.app.vault.read(note);
+                                if (
+                                    /^\-\-\-$\n[\s\S]*?^\-\-\-$/m.test(content)
+                                ) {
+                                    const [, existingString] = content.match(
+                                        /^\-\-\-$\n([\s\S]*?)^\-\-\-$/m
+                                    );
+                                    const existing = existingString
+                                        .split("\n")
+                                        .filter(
+                                            (e) =>
+                                                !/^fc-calendar/.test(e) &&
+                                                !/^fc-date/.test(e) &&
+                                                !/^fc-end/.test(e) &&
+                                                !/^fc-category/.test(e)
+                                        );
+                                    existing.unshift(...frontmatter);
+                                    content = content.replace(
+                                        /^\-\-\-$\n[\s\S]*?^\-\-\-$/m,
+                                        `---\n${existing.join("\n")}---`
+                                    );
+                                } else {
+                                    content = `---\n${frontmatter.join(
+                                        "\n"
+                                    )}\n---\n${content}`;
+                                }
+                                await this.app.vault.modify(note, content);
+                            } else {
+                                await this.app.vault.create(
+                                    this.event.note,
+                                    `---${frontmatter.join("\n")}---`
+                                );
+                            }
+                        }
+
                         this.close();
                     });
             })
@@ -251,11 +332,17 @@ export class CreateEventModal extends Modal {
                 let files = this.app.vault.getFiles();
                 text.setPlaceholder("Path");
                 if (this.event.note) {
-                    const note = this.app.vault.getAbstractFileByPath(
-                        this.event.note
+                    const [path, subpath] = this.event.note.split(/[#^]/);
+                    const note = this.app.metadataCache.getFirstLinkpathDest(
+                        path,
+                        ""
                     );
                     if (note && note instanceof TFile) {
-                        text.setValue(note.basename);
+                        text.setValue(
+                            `${note.basename}${subpath ? "#" : ""}${
+                                subpath ? subpath : ""
+                            }`
+                        );
                     }
                 }
 
@@ -266,7 +353,7 @@ export class CreateEventModal extends Modal {
                 modal.onClose = async () => {
                     text.inputEl.blur();
 
-                    this.event.note = modal.file.path;
+                    this.event.note = modal.link;
 
                     this.tryParse(modal.file);
                 };
