@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.0.7...2.1.0) (2022-02-14)
+
+
+### Features
+
+* can now link to sub paths (close [#21](https://github.com/valentine195/obsidian-fantasy-calendar/issues/21)) ([af0d763](https://github.com/valentine195/obsidian-fantasy-calendar/commit/af0d76337dd6b668c772cf0b0a018ede08ba9726))
+* can now set calendar to write frontmatter on event creation ([624d47a](https://github.com/valentine195/obsidian-fantasy-calendar/commit/624d47af55e2076c4104ea27d8c1603a41effdd0))
+
+
+### Bug Fixes
+
+* fixes presets to match spec ([a4c08c8](https://github.com/valentine195/obsidian-fantasy-calendar/commit/a4c08c8895d8fb9e85d2d14e8ab472b01ba8c6d7))
+* removed logs ([8e3ab43](https://github.com/valentine195/obsidian-fantasy-calendar/commit/8e3ab435b61c798dde97b031a2e5985dec8e309d))
+
 ### [2.0.5](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.0.4...2.0.5) (2022-01-31)
 
 
