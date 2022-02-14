@@ -8,7 +8,7 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 const config = {
     title: "My Site",
     tagline: "Dinosaurs are cool",
-    url: "git@github.com:valentine195/obsidian-fantasy-calendar.git",
+    url: "https://github.com/valentine195/obsidian-fantasy-calendar",
     trailingSlash: false,
     baseUrl: "/",
     onBrokenLinks: "throw",
