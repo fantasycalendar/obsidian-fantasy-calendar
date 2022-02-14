@@ -10,7 +10,7 @@ const config = {
     tagline: "Dinosaurs are cool",
     url: "https://valentine195.github.io/",
     trailingSlash: false,
-    baseUrl: "/",
+    baseUrl: "/obsidian-fantasy-calendar/",
     onBrokenLinks: "throw",
     onBrokenMarkdownLinks: "warn",
     favicon: "img/favicon.ico",
