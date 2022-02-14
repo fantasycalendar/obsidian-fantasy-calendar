@@ -18,7 +18,7 @@ jobs:
       - name: Build docs
         working-directory: docs
         run: |
-          npm ci
+          npm i
           npm run build
 
       # Popular action to deploy to GitHub Pages:
