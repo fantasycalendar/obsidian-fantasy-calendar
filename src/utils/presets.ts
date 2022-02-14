@@ -4,6 +4,11 @@ export const PRESET_CALENDARS: Calendar[] = [
     {
         name: "Gregorian Calendar",
         description: "A calendar for the real world.",
+        autoParse: false,
+        path: "/",
+        supportTimelines: false,
+        syncTimelines: false,
+        timelineTag: "#timeline",
         static: {
             displayDayNumber: false,
             incrementDay: true,
@@ -429,6 +434,11 @@ export const PRESET_CALENDARS: Calendar[] = [
     {
         name: "Calendar of Greyhawk",
         description: "Calendar of the world of Greyhawk.",
+        autoParse: false,
+        path: "/",
+        supportTimelines: false,
+        syncTimelines: false,
+        timelineTag: "#timeline",
         static: {
             displayDayNumber: false,
             incrementDay: false,
@@ -836,6 +846,11 @@ export const PRESET_CALENDARS: Calendar[] = [
     {
         name: "Calendar of Golarion",
         description: "Calendar for the world of Pathfinder.",
+        autoParse: false,
+        path: "/",
+        supportTimelines: false,
+        syncTimelines: false,
+        timelineTag: "#timeline",
         static: {
             displayDayNumber: false,
             firstWeekDay: 0,
@@ -2134,6 +2149,11 @@ export const PRESET_CALENDARS: Calendar[] = [
     {
         name: "Calendar of Galifar",
         description: "Calendar of the world of Eberron.",
+        autoParse: false,
+        path: "/",
+        supportTimelines: false,
+        syncTimelines: false,
+        timelineTag: "#timeline",
         static: {
             displayDayNumber: false,
             firstWeekDay: 0,
@@ -2767,6 +2787,11 @@ export const PRESET_CALENDARS: Calendar[] = [
     {
         name: "Barovian Calendar",
         description: "Calendar of the realm of Barovia, home of Strahd.",
+        autoParse: false,
+        path: "/",
+        supportTimelines: false,
+        syncTimelines: false,
+        timelineTag: "#timeline",
         static: {
             displayDayNumber: false,
             firstWeekDay: 0,
@@ -3040,6 +3065,11 @@ export const PRESET_CALENDARS: Calendar[] = [
     {
         name: "Exandrian Calendar",
         description: "Calendar of the world of Wildemount.",
+        autoParse: false,
+        path: "/",
+        supportTimelines: false,
+        syncTimelines: false,
+        timelineTag: "#timeline",
         static: {
             displayDayNumber: false,
             firstWeekDay: 2,
@@ -3562,6 +3592,11 @@ export const PRESET_CALENDARS: Calendar[] = [
     {
         name: "Calendar of Harptos",
         description: "Calendar of Faerûn of the Forgotten Realms.",
+        autoParse: false,
+        path: "/",
+        supportTimelines: false,
+        syncTimelines: false,
+        timelineTag: "#timeline",
         static: {
             displayDayNumber: false,
             firstWeekDay: 0,
