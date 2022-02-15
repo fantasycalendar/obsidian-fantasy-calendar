@@ -9,6 +9,7 @@
         "build": "node ./esbuild.config.mjs production",
         "dev": "node ./esbuild.config.mjs",
         "test": "jest",
+        "deploy": "python -m mkdocs gh-deploy",
         "release": "standard-version"
     },
     "standard-version": {
