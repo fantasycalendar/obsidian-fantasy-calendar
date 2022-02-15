@@ -21,6 +21,7 @@
     "devDependencies": {
         "@babel/core": "^7.15.8",
         "@babel/preset-env": "^7.15.8",
+        "@docusaurus/types": "^2.0.0-beta.15",
         "@testing-library/jest-dom": "^5.14.1",
         "@testing-library/svelte": "^3.0.3",
         "@tsconfig/svelte": "^2.0.1",

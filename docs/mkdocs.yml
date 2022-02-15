@@ -1,0 +1,24 @@
+site_name: Obsidian Fantasy Calendar
+repo_url: https://github.com/valentine195/obsidian-fantasy-calendar
+markdown_extensions:
+  - abbr
+  - admonition
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - pymdownx.tasklist
+theme:
+  font:
+    text: Quicksand
+    code: Roboto Mono
+  name: material
+  palette:
+    primary: blue grey
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.indexes
