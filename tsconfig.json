@@ -6,7 +6,7 @@
 
         "inlineSources": true,
         "module": "ESNext",
-        "target": "es6",
+        "target": "es2020",
         "allowJs": true,
         "noImplicitAny": true,
         "moduleResolution": "node",

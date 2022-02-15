@@ -3,13 +3,17 @@ import type { Calendar } from "src/@types";
 export const PRESET_CALENDARS: Calendar[] = [
     {
         name: "Gregorian Calendar",
-        description:
-            "A calendar for the real world. Note: May not be 100% accurate.",
+        description: "A calendar for the real world.",
+        autoParse: false,
+        path: "/",
+        supportTimelines: false,
+        syncTimelines: false,
+        timelineTag: "#timeline",
         static: {
-displayDayNumber:false,
+            displayDayNumber: false,
             incrementDay: true,
             displayMoons: true,
-            firstWeekDay: 6,
+            firstWeekDay: 1,
             overflow: true,
             weekdays: [
                 {
@@ -181,7 +185,7 @@ displayDayNumber:false,
                     }
                 }
             ],
-            offset: 2
+            offset: 0
         },
         current: {
             year: null,
@@ -430,8 +434,13 @@ displayDayNumber:false,
     {
         name: "Calendar of Greyhawk",
         description: "Calendar of the world of Greyhawk.",
+        autoParse: false,
+        path: "/",
+        supportTimelines: false,
+        syncTimelines: false,
+        timelineTag: "#timeline",
         static: {
-displayDayNumber:false,
+            displayDayNumber: false,
             incrementDay: false,
             displayMoons: true,
             firstWeekDay: 0,
@@ -837,8 +846,13 @@ displayDayNumber:false,
     {
         name: "Calendar of Golarion",
         description: "Calendar for the world of Pathfinder.",
+        autoParse: false,
+        path: "/",
+        supportTimelines: false,
+        syncTimelines: false,
+        timelineTag: "#timeline",
         static: {
-displayDayNumber:false,
+            displayDayNumber: false,
             firstWeekDay: 0,
             incrementDay: false,
             displayMoons: true,
@@ -2135,8 +2149,13 @@ displayDayNumber:false,
     {
         name: "Calendar of Galifar",
         description: "Calendar of the world of Eberron.",
+        autoParse: false,
+        path: "/",
+        supportTimelines: false,
+        syncTimelines: false,
+        timelineTag: "#timeline",
         static: {
-displayDayNumber:false,
+            displayDayNumber: false,
             firstWeekDay: 0,
             incrementDay: false,
             displayMoons: true,
@@ -2768,8 +2787,13 @@ displayDayNumber:false,
     {
         name: "Barovian Calendar",
         description: "Calendar of the realm of Barovia, home of Strahd.",
+        autoParse: false,
+        path: "/",
+        supportTimelines: false,
+        syncTimelines: false,
+        timelineTag: "#timeline",
         static: {
-displayDayNumber:false,
+            displayDayNumber: false,
             firstWeekDay: 0,
             incrementDay: false,
             displayMoons: true,
@@ -3041,8 +3065,13 @@ displayDayNumber:false,
     {
         name: "Exandrian Calendar",
         description: "Calendar of the world of Wildemount.",
+        autoParse: false,
+        path: "/",
+        supportTimelines: false,
+        syncTimelines: false,
+        timelineTag: "#timeline",
         static: {
-displayDayNumber:false,
+            displayDayNumber: false,
             firstWeekDay: 2,
             incrementDay: false,
             displayMoons: true,
@@ -3563,8 +3592,13 @@ displayDayNumber:false,
     {
         name: "Calendar of Harptos",
         description: "Calendar of Faerûn of the Forgotten Realms.",
+        autoParse: false,
+        path: "/",
+        supportTimelines: false,
+        syncTimelines: false,
+        timelineTag: "#timeline",
         static: {
-displayDayNumber:false,
+            displayDayNumber: false,
             firstWeekDay: 0,
             incrementDay: false,
             displayMoons: true,

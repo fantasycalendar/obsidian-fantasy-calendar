@@ -1,4 +1,4 @@
-import type { CurrentCalendarData, LeapDay, Month } from "../@types";
+import type { Calendar, CurrentCalendarData, LeapDay, Month } from "../@types";
 
 export function daysBetween(date1: Date, date2: Date) {
     const d1 = window.moment(date1);
@@ -35,16 +35,29 @@ export function getIntervalDescription(leapday: LeapDay) {
     const intervals = leapday.interval.sort((a, b) => a.interval - b.interval);
     let description = [];
     for (let interval of intervals) {
-        const length =
-            interval.interval + (interval.ignore ? 0 : leapday.offset);
+        const length = interval.interval;
+        const offset =
+            leapday.offset && !interval.ignore
+                ? ` (offset by ${leapday.offset})`
+                : "";
         if (interval.exclusive) {
-            description.push(`not every ${ordinal(length)} year`);
+            if (length == 1) {
+                description.push(`not every year${offset}`);
+            } else {
+                description.push(`not every ${ordinal(length)} year${offset}`);
+            }
         } else {
             const index = intervals.indexOf(interval);
             const also = index > 0 && intervals[index - 1].exclusive;
-            description.push(
-                `${also ? "also " : ""}every ${ordinal(length)} year`
-            );
+            if (length == 1) {
+                description.push(`${also ? "also " : ""}every year${offset}`);
+            } else {
+                description.push(
+                    `${also ? "also " : ""}every ${ordinal(
+                        length
+                    )} year${offset}`
+                );
+            }
         }
     }
     const join = description.join(", but ");
@@ -119,6 +132,53 @@ export function dateString(
     }
     return `${ordinal(day)} of every month`;
 }
-function LeapDay(leapday: any, LeapDay: any) {
-    throw new Error("Function not implemented.");
+
+export function isValidDay(day: number, calendar: Calendar) {
+    if (day == null) return false;
+    if (calendar?.current?.month == null) return false;
+    if (day < 1) return false;
+    if (
+        day < 1 ||
+        day > calendar?.static?.months[calendar.current?.month]?.length ||
+        !calendar?.static?.months[calendar.current?.month]?.length
+    )
+        return false;
+    return true;
+}
+
+export function isValidMonth(month: number, calendar: Calendar) {
+    if (month == null) return false;
+    if (!calendar?.static?.months?.length) return false;
+    if (month < 0 || month >= calendar?.static?.months?.length) return false;
+    return true;
+}
+
+export function isValidYear(year: number, calendar: Calendar) {
+    if (year == null) return false;
+    if (year < 1 && !calendar.static?.useCustomYears) return false;
+    if (calendar?.static?.useCustomYears) {
+        if (!calendar?.static?.years?.length) return false;
+        if (year < 0 || year >= calendar?.static?.years?.length) return false;
+    }
+    return true;
+}
+
+export function areDatesEqual(
+    date: CurrentCalendarData,
+    date2: CurrentCalendarData
+) {
+    if (date.day != date2.day) return false;
+    if (
+        date.month != date2.month &&
+        date.month != undefined &&
+        date2.month != undefined
+    )
+        return false;
+    if (
+        date.year != date2.year &&
+        date.year != undefined &&
+        date2.year != undefined
+    )
+        return false;
+    return true;
 }

@@ -1,14 +1,29 @@
 <script lang="ts">
     import { ExtraButtonComponent } from "obsidian";
-    import CalendarHelper from "src/helper";
+    import type CalendarHelper from "src/helper";
 
-    import { createEventDispatcher } from "svelte";
+    import { createEventDispatcher, getContext } from "svelte";
+    import { get, Writable } from "svelte/store";
 
     const dispatch = createEventDispatcher();
 
     export let month: string;
     export let year: string;
     export let current: string;
+
+    const calendarStore = getContext<Writable<CalendarHelper>>("calendar");
+    let calendar: CalendarHelper;
+    calendarStore.subscribe((v) => {
+        calendar = v;
+    });
+
+    let previous = calendar.getPreviousMonth();
+    let next = calendar.getNextMonth();
+
+    calendar.on("month-update", () => {
+        previous = calendar.getPreviousMonth();
+        next = calendar.getNextMonth();
+    });
 
     const left = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("left-arrow");
@@ -33,7 +48,7 @@
             <div
                 class="arrow calendar-clickable"
                 use:left
-                aria-label="Previous Month"
+                aria-label={previous.name}
                 on:click={() => dispatch("previous")}
             />
             <div
@@ -46,7 +61,7 @@
             <div
                 class="arrow right calendar-clickable"
                 use:right
-                aria-label="Next Month"
+                aria-label={next.name}
                 on:click={(evt) => dispatch("next")}
             />
             <div

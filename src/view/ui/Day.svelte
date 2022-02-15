@@ -22,7 +22,7 @@
         }
     }
     $: moons = day.moons;
-    $: categories = day.calendar.object.categories;
+    $: categories = day.calendar.categories;
     $: date = day.date;
     $: today = day.isCurrentDay;
     $: displaying = day.isDisplaying;
@@ -39,6 +39,7 @@
     day.calendar.on("month-update", () => {
         today = day.isCurrentDay;
         displaying = day.isDisplaying;
+        events = day.events;
     });
     day.calendar.on("day-update", () => {
         today = day.isCurrentDay;

@@ -13,9 +13,10 @@ import distinct from "distinct-colors";
 import { nanoid } from "../../utils/functions";
 
 import { decode } from "he";
+import type { ImportedCalendar } from "src/@types/import";
 
 export default class Import {
-    static import(objects: any[]) {
+    static import(objects: ImportedCalendar[]) {
         const calendars: Calendar[] = [];
         for (let data of objects) {
             const name = data.name ?? "Imported Calendar";
@@ -90,6 +91,8 @@ export default class Import {
                         interval: intervals,
                         timespan: leap.timespan ?? 0,
                         intercalary: leap.intercalary ?? false,
+                        numbered: !leap.not_numbered,
+                        after: leap.day,
                         offset: leap.offset ?? 0,
                         id: nanoid(6)
                     });
@@ -145,10 +148,13 @@ export default class Import {
                 month: 0
             };
             if (data.dynamic_data) {
-                dynamicData.year = data.dynamic_data.year ?? dynamicData.year;
+                dynamicData.year = Math.max(
+                    1,
+                    data.dynamic_data.year ?? dynamicData.year
+                );
                 dynamicData.day = data.dynamic_data.day ?? dynamicData.day;
                 dynamicData.month =
-                    data.dynamic_data.month ?? dynamicData.month;
+                    data.dynamic_data.timespan ?? dynamicData.month;
             }
 
             const events: Event[] = [];
@@ -235,7 +241,7 @@ export default class Import {
                     events.push({
                         name: event.name,
                         description: description,
-                        id: event.id,
+                        id: `${event.id}`,
                         note: null,
                         date,
                         category:

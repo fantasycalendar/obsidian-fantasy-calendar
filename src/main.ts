@@ -1,11 +1,4 @@
-import {
-    Component,
-    Notice,
-    Platform,
-    Plugin,
-    Vault,
-    WorkspaceLeaf
-} from "obsidian";
+import { Notice, Platform, Plugin, WorkspaceLeaf } from "obsidian";
 
 import FantasyCalendarSettings from "./settings/settings";
 
@@ -17,12 +10,48 @@ import FantasyCalendarView, {
     /* FullCalendarView */
 } from "./view/view";
 
-import "./main.css";
-import { Watcher } from "./watcher/watcher";
+import { CalendarEventTree, Watcher } from "./watcher/watcher";
+import { API } from "./api/api";
+import copy from "fast-copy";
 
 declare module "obsidian" {
     interface Workspace {
         on(name: "fantasy-calendars-updated", callback: () => any): EventRef;
+        on(
+            name: "fantasy-calendars-event-update",
+            callback: (tree: CalendarEventTree) => any
+        ): EventRef;
+        on(
+            name: "fantasy-calendar-settings-change",
+            callback: () => any
+        ): EventRef;
+        trigger(name: "fantasy-calendars-updated"): void;
+        trigger(name: "fantasy-calendar-settings-change"): void;
+        trigger(
+            name: "fantasy-calendars-event-update",
+            tree: CalendarEventTree
+        ): void;
+        trigger(
+            name: "link-hover",
+            popover: any, //hover popover, but don't need
+            target: HTMLElement, //targetEl
+            note: string, //linkText
+            source: string //source
+        ): void;
+        trigger(name: "fantasy-calendars-settings-loaded"): void;
+        on(
+            name: "fantasy-calendars-settings-loaded",
+            callback: () => any
+        ): EventRef;
+    }
+    interface App {
+        plugins: {
+            getPlugin(plugin: "obsidian-timelines"): {
+                settings: {
+                    timelineTag: string;
+                };
+            };
+        };
     }
 }
 
@@ -46,24 +75,40 @@ export const DEFAULT_CALENDAR: Calendar = {
         eras: []
     },
     current: {
-        year: 1,
+        year: null,
         month: null,
         day: null
     },
     events: [],
-    categories: []
+    categories: [],
+    autoParse: false,
+    path: "/",
+    supportTimelines: false,
+    syncTimelines: true,
+    timelineTag: "#timeline"
 };
 
 export const DEFAULT_DATA: FantasyCalendarData = {
+    addToDefaultIfMissing: true,
     calendars: [],
+    configDirectory: null,
     currentCalendar: null,
+    dailyNotes: false,
+    dateFormat: "YYYY-MM-DD",
     defaultCalendar: null,
     eventPreview: false,
-    configDirectory: null,
-    path: "/",
+    exit: {
+        saving: false,
+        event: false,
+        calendar: false
+    },
+    eventFrontmatter: false,
     parseDates: false,
-    dateFormat: "YYYY-MM-DD",
-    dailyNotes: false,
+    settingsToggleState: {
+        calendars: false,
+        events: false
+    },
+    showIntercalary: false,
     version: {
         major: null,
         minor: null,
@@ -72,13 +117,29 @@ export const DEFAULT_DATA: FantasyCalendarData = {
 };
 
 export default class FantasyCalendar extends Plugin {
-    async addNewCalendar(calendar: Calendar) {
-        this.data.calendars.push({ ...calendar });
+    api = new API(this);
+    settingsLoaded: boolean;
+    async addNewCalendar(calendar: Calendar, existing?: Calendar) {
+        let shouldParse =
+            !existing ||
+            calendar.name != existing?.name ||
+            (calendar.autoParse && !existing?.autoParse) ||
+            calendar.path != existing?.path;
+        if (existing == null) {
+            this.data.calendars.push(calendar);
+        } else {
+            this.data.calendars.splice(
+                this.data.calendars.indexOf(existing),
+                1,
+                calendar
+            );
+        }
         if (!this.data.defaultCalendar) {
             this.data.defaultCalendar = calendar.id;
         }
+        if (shouldParse) this.watcher.start(calendar);
         await this.saveCalendar();
-        this.watcher.registerCalendar(calendar);
+        /* this.watcher.registerCalendar(calendar); */
     }
     data: FantasyCalendarData;
     watcher = new Watcher(this);
@@ -93,6 +154,20 @@ export default class FantasyCalendar extends Plugin {
     get dailyNotes() {
         return this.app.internalPlugins.getPluginById("daily-notes");
     }
+    get canUseTimelines() {
+        return this.app.plugins.getPlugin("obsidian-timelines") != null;
+    }
+    syncTimelines(calendar: Calendar) {
+        return calendar.syncTimelines && this.canUseTimelines;
+    }
+    timelineTag(calendar: Calendar) {
+        if (this.syncTimelines) {
+            return this.app.plugins.getPlugin("obsidian-timelines").settings
+                .timelineTag;
+        } else {
+            return calendar.timelineTag;
+        }
+    }
     get format() {
         return (
             (this.data.dailyNotes && this.canUseDailyNotes
@@ -100,7 +175,7 @@ export default class FantasyCalendar extends Plugin {
                 : this.data.dateFormat) ?? "YYYY-MM-DD"
         );
     }
-    get defaultCalendar() {
+    get defaultCalendar(): Calendar {
         return (
             this.data.calendars.find(
                 (c) => c.id == this.data.defaultCalendar
@@ -122,26 +197,43 @@ export default class FantasyCalendar extends Plugin {
     async onload() {
         console.log("Loading Fantasy Calendars v" + this.manifest.version);
 
-        await this.loadSettings();
-
-        this.watcher.load();
-
-        this.addSettingTab(new FantasyCalendarSettings(this));
         this.registerView(
             VIEW_TYPE,
             (leaf: WorkspaceLeaf) => new FantasyCalendarView(this, leaf)
         );
-        this.app.workspace.onLayoutReady(() => this.addCalendarView(true));
+        this.registerView(FULL_VIEW, (leaf: WorkspaceLeaf) => {
+            return new FantasyCalendarView(this, leaf, { full: true });
+        });
+        this.app.workspace.onLayoutReady(async () => {
+            await this.loadSettings();
+
+            this.watcher.load();
+
+            this.addCommands();
+
+            this.addSettingTab(new FantasyCalendarSettings(this));
+
+            this.addCalendarView(true);
+        });
         this.addRibbonIcon(VIEW_TYPE, "Open Large Fantasy Calendar", (evt) => {
             this.app.workspace
                 .getLeaf(evt.getModifierState(MODIFIER_KEY))
                 .setViewState({ type: FULL_VIEW });
         });
+    }
 
-        this.registerView(FULL_VIEW, (leaf: WorkspaceLeaf) => {
-            return new FantasyCalendarView(this, leaf, { full: true });
-        });
+    async onunload() {
+        console.log("Unloading Fantasy Calendars v" + this.manifest.version);
+        this.app.workspace
+            .getLeavesOfType(VIEW_TYPE)
+            .forEach((leaf) => leaf.detach());
+        this.app.workspace
+            .getLeavesOfType(FULL_VIEW)
+            .forEach((leaf) => leaf.detach());
+        this.watcher.unload();
+    }
 
+    addCommands() {
         this.addCommand({
             id: "open-fantasy-calendar",
             name: "Open Fantasy Calendar",
@@ -211,17 +303,6 @@ export default class FantasyCalendar extends Plugin {
         });
     }
 
-    async onunload() {
-        console.log("Unloading Fantasy Calendars v" + this.manifest.version);
-        this.app.workspace
-            .getLeavesOfType(VIEW_TYPE)
-            .forEach((leaf) => leaf.detach());
-        this.app.workspace
-            .getLeavesOfType(FULL_VIEW)
-            .forEach((leaf) => leaf.detach());
-        this.watcher.unload();
-    }
-
     async addCalendarView(startup: boolean = false) {
         if (startup && this.app.workspace.getLeavesOfType(VIEW_TYPE)?.length)
             return;
@@ -238,7 +319,7 @@ export default class FantasyCalendar extends Plugin {
     }
     async loadSettings() {
         this.data = {
-            ...DEFAULT_DATA,
+            ...copy(DEFAULT_DATA),
             ...(await this.loadData())
         };
         if (
@@ -256,6 +337,23 @@ export default class FantasyCalendar extends Plugin {
         if (!this.data.defaultCalendar && this.data.calendars.length) {
             this.data.defaultCalendar = this.data.calendars[0].id;
         }
+        if (
+            this.data.calendars.length &&
+            !this.data.calendars.find(
+                (cal) => cal.id == this.data.defaultCalendar
+            )
+        ) {
+            this.data.defaultCalendar = this.data.calendars[0].id;
+        }
+
+        if ((this.data as any).autoParse && this.data.calendars.length) {
+            for (const calendar of this.data.calendars) {
+                calendar.autoParse = (this.data as any).autoParse;
+                calendar.path = (this.data as any).path;
+            }
+            delete (this.data as any).autoParse;
+            delete (this.data as any).path;
+        }
         /* if ((this.data.version?.major ?? 0) < 2 && this.data.calendars.length) {
             new Notice(
                 "Fantasy Calendar can now parse note titles for events. See the ReadMe for more info!"
@@ -267,6 +365,17 @@ export default class FantasyCalendar extends Plugin {
             minor: version[1],
             patch: version[2]
         }; */
+        this.settingsLoaded = true;
+        this.app.workspace.trigger("fantasy-calendars-settings-loaded");
+    }
+    onSettingsLoad(callback: () => any) {
+        if (this.settingsLoaded) {
+            callback();
+        } else {
+            this.app.workspace.on("fantasy-calendars-settings-loaded", () =>
+                callback()
+            );
+        }
     }
 
     async saveCalendar() {
@@ -282,7 +391,8 @@ export default class FantasyCalendar extends Plugin {
         return `${this.configDirectory}/data.json`;
     }
     async saveSettings() {
-        this.saveData(this.data);
+        await this.saveData(this.data);
+        this.app.workspace.trigger("fantasy-calendar-settings-change");
     }
     async saveData(data: FantasyCalendarData) {
         if (this.configDirectory) {

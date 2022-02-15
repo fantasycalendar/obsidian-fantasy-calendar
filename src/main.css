@@ -1,9 +1,4 @@
-.fantasy-calendar-date-fields-heading {
-    padding-bottom: 0;
-}
-.fantasy-calendar-create-calendar .fantasy-calendar-date-fields {
-    padding-top: 0;
-}
+
 .fantasy-calendar-date-fields {
     display: flex;
     justify-content: space-between;

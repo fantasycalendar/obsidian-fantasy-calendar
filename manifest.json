@@ -1,10 +1,10 @@
 {
-	"id": "fantasy-calendar",
-	"name": "Fantasy Calendar",
-	"version": "1.12.3",
-	"minAppVersion": "0.12.10",
-	"author": "Jeremy Valentine",
-	"description": "Fantasy calendars in Obsidian!",
-	"authorUrl": "https://github.com/valentine195/obsidian-fantasy-calendar",
-	"isDesktopOnly": false
+    "id": "fantasy-calendar",
+    "name": "Fantasy Calendar",
+    "version": "2.1.1",
+    "minAppVersion": "0.12.10",
+    "author": "Jeremy Valentine",
+    "description": "Fantasy calendars in Obsidian!",
+    "authorUrl": "https://github.com/valentine195/obsidian-fantasy-calendar",
+    "isDesktopOnly": false
 }

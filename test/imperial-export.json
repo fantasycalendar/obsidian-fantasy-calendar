@@ -1,0 +1,157 @@
+{
+    "name": "Third Imperium",
+    "static_data": {
+        "year_data": {
+            "first_day": 1,
+            "overflow": false,
+            "global_week": [
+                "Wonday",
+                "Tuday",
+                "Thirday",
+                "Forday",
+                "Fiday",
+                "Sixday",
+                "Senday"
+            ],
+            "timespans": [
+                {
+                    "name": "Month 1",
+                    "type": "month",
+                    "length": 364,
+                    "interval": 1,
+                    "offset": 0
+                }
+            ],
+            "leap_days": [
+                {
+                    "name": "Holiday",
+                    "intercalary": true,
+                    "timespan": 0,
+                    "adds_week_day": false,
+                    "day": 0,
+                    "week_day": "",
+                    "interval": "1",
+                    "offset": 0,
+                    "not_numbered": false,
+                    "show_text": true
+                }
+            ]
+        },
+        "moons": [],
+        "clock": {
+            "enabled": false,
+            "render": false,
+            "hours": 24,
+            "minutes": 60,
+            "offset": 0,
+            "crowding": 0
+        },
+        "seasons": {
+            "data": [],
+            "locations": [],
+            "global_settings": {
+                "season_offset": 0,
+                "weather_offset": 0,
+                "seed": 174082732,
+                "temp_sys": "metric",
+                "wind_sys": "metric",
+                "cinematic": false,
+                "enable_weather": false,
+                "periodic_seasons": true,
+                "color_enabled": false
+            }
+        },
+        "eras": [
+            {
+                "name": "Golden Age",
+                "formatting": "Year {{year}} - {{era_name}}",
+                "description": "",
+                "settings": {
+                    "use_custom_format": false,
+                    "show_as_event": false,
+                    "starting_era": false,
+                    "event_category_id": null,
+                    "ends_year": false,
+                    "restart": false
+                },
+                "date": {
+                    "year": 1000,
+                    "timespan": 0,
+                    "day": 1,
+                    "epoch": 365000
+                }
+            },
+            {
+                "name": "Rebellion",
+                "formatting": "Year {{year}} - {{era_name}}",
+                "description": "",
+                "settings": {
+                    "use_custom_format": false,
+                    "show_as_event": false,
+                    "starting_era": false,
+                    "event_category_id": null,
+                    "ends_year": false,
+                    "restart": false
+                },
+                "date": {
+                    "year": 1117,
+                    "timespan": 0,
+                    "day": 1,
+                    "epoch": 407705
+                }
+            },
+            {
+                "name": "Collapse",
+                "formatting": "Year {{year}} - {{era_name}}",
+                "description": "",
+                "settings": {
+                    "use_custom_format": false,
+                    "show_as_event": false,
+                    "starting_era": false,
+                    "event_category_id": null,
+                    "ends_year": false,
+                    "restart": false
+                },
+                "date": {
+                    "year": 1131,
+                    "timespan": 0,
+                    "day": 1,
+                    "epoch": 412815
+                }
+            }
+        ],
+        "settings": {
+            "layout": "grid",
+            "comments": "none",
+            "show_current_month": false,
+            "private": false,
+            "allow_view": true,
+            "only_backwards": true,
+            "only_reveal_today": false,
+            "hide_moons": false,
+            "hide_clock": false,
+            "hide_events": false,
+            "hide_eras": false,
+            "hide_all_weather": false,
+            "hide_future_weather": false,
+            "add_month_number": false,
+            "add_year_day_number": false,
+            "default_category": -1,
+            "year_zero_exists": true
+        },
+        "cycles": { "format": "", "data": [] }
+    },
+    "dynamic_data": {
+        "year": 1135,
+        "timespan": 0,
+        "day": 336,
+        "epoch": 414610,
+        "custom_location": false,
+        "location": null,
+        "current_era": 2,
+        "hour": 0,
+        "minute": 0
+    },
+    "events": [],
+    "categories": []
+}

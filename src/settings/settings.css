@@ -1,8 +1,89 @@
+body:not(.is-mobile)
+    .modal.mod-settings
+    .vertical-tab-content-container
+    .vertical-tab-content.fantasy-calendar-settings.fantasy-calendar-creator-open {
+    overflow: hidden;
+}
+
+.fantasy-calendar-settings,
+.fantasy-calendar-settings-content {
+    background-color: inherit;
+    position: relative;
+}
+
+.fantasy-calendar-confirm-buttons-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.fantasy-calendar-confirm-buttons-container .dont-ask {
+    cursor: pointer;
+}
+
 .fantasy-calendar-confirm-buttons {
     display: flex;
     justify-content: flex-end;
     align-items: center;
     gap: 0.5rem;
+}
+
+/** Details */
+.modal.mod-settings
+    .vertical-tab-content-container
+    .vertical-tab-content.fantasy-calendar-settings {
+    position: relative;
+    /* padding-top: 0px; */
+}
+
+.modal.mod-settings
+    .vertical-tab-content.fantasy-calendar-settings
+    .fantasy-calendar-settings-content
+    h2:first-child {
+    margin-top: initial;
+}
+
+.fantasy-calendar-settings details > summary {
+    outline: none;
+    display: block !important;
+    list-style: none !important;
+    list-style-type: none !important;
+    min-height: 1rem;
+    border-top-left-radius: 0.1rem;
+    border-top-right-radius: 0.1rem;
+    cursor: pointer;
+    position: relative;
+}
+
+.fantasy-calendar-settings details > summary::-webkit-details-marker,
+.fantasy-calendar-settings details > summary::marker {
+    display: none !important;
+}
+
+.fantasy-calendar-settings details > summary > .collapser {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    content: "";
+}
+
+.fantasy-calendar-settings details > summary > .collapser > .handle {
+    transform: rotate(0deg);
+    transition: transform 0.25s;
+    background-color: currentColor;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-image: var(--admonition-details-icon);
+    mask-image: var(--admonition-details-icon);
+    width: 20px;
+    height: 20px;
+}
+
+.fantasy-calendar-settings details[open] > summary > .collapser > .handle {
+    transform: rotate(90deg);
 }
 
 .fantasy-calendar-settings .fantasy-calendars {
@@ -15,17 +96,42 @@
     cursor: not-allowed;
 }
 
-.fantasy-calendar-settings .fantasy-calendars .existing-calendars > span {
+.fantasy-calendar-settings .fantasy-calendar-warning.date-format {
+    color: red;
+}
+.fantasy-calendar-settings .fantasy-calendar-warning {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.fantasy-calendar-settings .existing-calendars {
+    padding: 18px;
+}
+.fantasy-calendar-settings .existing-calendars > span {
     display: block;
     text-align: center;
-    margin-bottom: 18px;
     color: var(--text-muted);
 }
 
-.fantasy-calendar-settings
-    .fantasy-calendars
-    > .setting-item:not(.setting-item-heading) {
+.fantasy-calendar-nested-settings .setting-item {
     border: 0px;
+    padding-bottom: 0;
+}
+.fantasy-calendar-nested-settings {
+    padding-bottom: 18px;
+}
+.fantasy-calendar-nested-settings[open] .setting-item-heading,
+.fantasy-calendar-nested-settings:not(details) .setting-item-heading {
+    border-top: 0px;
+    border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.fantasy-calendar-nested-settings .warning-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
 }
 
 .fantasy-calendar-settings .fantasy-calendar-config .setting-item-name {
@@ -34,65 +140,11 @@
     align-items: center;
 }
 
-/** Create Calendar Modal */
-.modal-container.fantasy-calendar-create-calendar > .modal {
-    transition: width 0.5s ease-in-out, height 0.5s ease-in-out;
-}
-
-.fantasy-calendar-create-calendar .modal-content {
-    display: flex;
-    flex-flow: column nowrap;
-    gap: 0.5rem;
-}
-
-.fantasy-calendar-create-calendar .calendar-info .calendar-description {
-    display: flex;
-    flex-flow: column nowrap;
-}
-
-.fantasy-calendar-create-calendar .calendar-info textarea {
-    resize: vertical;
-}
-
-.fantasy-calendar-create-calendar details {
-    padding: 0.5rem;
-}
-.fantasy-calendar-create-calendar details[open] {
-    border: 1px solid var(--background-modifier-border);
-    border-radius: 0.5rem;
-}
-
-.fantasy-calendar-create-calendar .fantasy-calendar-container .existing-items {
-    overflow: auto;
-    max-height: 500px;
-}
-
-.fantasy-calendar-create-calendar
-    .fantasy-calendar-container
-    .existing-items
-    > span {
-    display: block;
-    text-align: center;
-    color: var(--text-muted);
-}
-
-.fantasy-calendar-create-calendar details .setting-item {
-    border: 0px;
-}
-
-.fantasy-calendar-create-calendar summary * {
-    display: inline;
-    margin: 0;
-}
 .fantasy-context-buttons {
     display: flex;
     justify-content: flex-end;
     align-items: center;
     gap: 0.25rem;
-}
-
-.fantasy-calendar-create-calendar button[disabled] {
-    cursor: not-allowed;
 }
 
 .fantasy-calendar-create-event .event-info {
@@ -128,6 +180,7 @@
     gap: 1rem;
     align-items: center;
     justify-content: flex-start;
+    margin: 5px;
 }
 .fantasy-calendar-choose-preset .fantasy-calendar-preset-container button {
     height: 100%;
@@ -138,7 +191,7 @@
 .fantasy-calendar-choose-preset
     .fantasy-calendar-preset-container
     button.mod-cta {
-    box-shadow: 0px 0px 5px var(--background-modifier-box-shadow);
+    box-shadow: 0 0 10px var(--background-modifier-success);
 }
 
 /** Leap Day Editor */
@@ -152,4 +205,9 @@
     grid-template-columns: 1fr auto;
     align-items: center;
     gap: 0.5rem;
+}
+
+/** Event Modal */
+.fantasy-calendar-event-formula .setting-item-control {
+    gap: 0.25rem;
 }

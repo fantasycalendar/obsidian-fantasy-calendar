@@ -4,6 +4,9 @@
     flex-flow: column nowrap;
     justify-content: flex-start;
 }
+.fantasy-calendar-view .view-content {
+    padding: 0.5rem;
+}
 .fantasy-calendar-full.view-content {
     display: flex;
     flex-flow: column;

@@ -33,26 +33,26 @@
     $: moonStore.set(moons);
     $: calendarStore.set(calendar);
 
+    $: showIntercalary = calendar.plugin.data.showIntercalary;
+
     calendar.on("month-update", () => {
         year = calendar.displayed.year;
         yearDisplay = calendar.getNameForYear(calendar.displayed.year);
         month = calendar.currentMonth;
+        next = calendar.nextMonth;
+        prev = calendar.previousMonth;
         weeks = calendar.weeksOfMonth(month);
         firstWeek = calendar.weekNumbersOfMonth(month);
-        dayNumber = calendar.dayNumberForDate(calendar.current);
-    });
-
-    calendar.on("day-update", () => {
-        dayNumber = calendar.dayNumberForDate(calendar.current);
     });
 
     $: weekdays = calendar.weekdays;
     $: year = calendar.displayed.year;
     $: yearDisplay = calendar.getNameForYear(calendar.displayed.year);
     $: month = calendar.currentMonth;
+    $: next = calendar.nextMonth;
+    $: prev = calendar.previousMonth;
     $: firstWeek = calendar.weekNumbersOfMonth(month);
     $: weeks = calendar.weeksOfMonth(month);
-    $: dayNumber = calendar.dayNumberForDate(calendar.current);
 </script>
 
 <div
@@ -99,7 +99,7 @@
         <Nav
             month={month.name}
             year={yearDisplay}
-            current={calendar.displayedDate}
+            current={calendar.currentDate}
             on:next={() => calendar.goToNext()}
             on:previous={() => calendar.goToPrevious()}
             on:reset
@@ -117,15 +117,30 @@
                 {/if}
             </div>
             <div class="month-view">
-                <!-- {#if month.type == "month"} -->
-                <div class="weekdays">
-                    {#each weekdays as day}
-                        <span class="weekday fantasy-weekday"
-                            >{day.name.slice(0, 3)}</span
-                        >
-                    {/each}
-                </div>
-                <!-- {/if} -->
+                {#if prev && prev.type == "intercalary" && !showIntercalary}
+                    <MonthView
+                        intercalary={true}
+                        columns={weekdays.length}
+                        {weeks}
+                        month={prev}
+                        {fullView}
+                        on:day-click
+                        on:day-doubleclick
+                        on:day-context-menu
+                        on:event-click
+                        on:event-mouseover
+                        on:event-context
+                    />
+                {/if}
+                {#if month.type == "month"}
+                    <div class="weekdays">
+                        {#each weekdays as day}
+                            <span class="weekday fantasy-weekday"
+                                >{day.name.slice(0, 3)}</span
+                            >
+                        {/each}
+                    </div>
+                {/if}
 
                 <MonthView
                     columns={weekdays.length}
@@ -139,6 +154,21 @@
                     on:event-mouseover
                     on:event-context
                 />
+                {#if next && next.type == "intercalary" && !showIntercalary}
+                    <MonthView
+                        intercalary={true}
+                        columns={weekdays.length}
+                        {weeks}
+                        month={next}
+                        {fullView}
+                        on:day-click
+                        on:day-doubleclick
+                        on:day-context-menu
+                        on:event-click
+                        on:event-mouseover
+                        on:event-context
+                    />
+                {/if}
             </div>
         </div>
     {/if}
@@ -228,4 +258,18 @@
         align-items: center;
         justify-content: center;
     }
+    /* .intercalary-container {
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: center;
+        align-items: center;
+        border-top: 1px solid var(--background-modifier-border);
+        border-bottom: 1px solid var(--background-modifier-border);
+        color: var(--text-accent);
+    } */
+    /* .intercalary-days {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    } */
 </style>
