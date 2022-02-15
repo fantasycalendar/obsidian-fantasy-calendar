@@ -1,6 +1,6 @@
 {
     "name": "fantasy-calendar",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "description": "Create fantasy calendars in Obsidian!",
     "main": "main.js",
     "scripts": {
@@ -10,11 +10,14 @@
         "dev": "node ./esbuild.config.mjs",
         "test": "jest",
         "deploy": "python -m mkdocs gh-deploy",
-        "release": "standard-version"
+        "release": "standard-version -a"
     },
     "standard-version": {
         "t": "",
-        "releaseCommitMessageFormat": "Fantasy Calendar Release: v{{currentTag}}"
+        "releaseCommitMessageFormat": "Fantasy Calendar Release: v{{currentTag}}",
+        "scripts": {
+            "postchangelog": "npx cpy-cli CHANGELOG.md docs/docs && git add ."
+        }
     },
     "keywords": [],
     "author": "",
