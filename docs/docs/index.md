@@ -1,6 +1,6 @@
 # Home
 
-Create the calendar of your fantasies. 
+Create the calendar of your fantasies.
 
 Use Obsidian Fantasy Calendar to track events during your TTRPG game, track moon phases for your werewolf novel, or even use it as a regular, real-world calendar. 
 
