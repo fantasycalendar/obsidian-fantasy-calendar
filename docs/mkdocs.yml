@@ -1,5 +1,6 @@
 site_name: Obsidian Fantasy Calendar
 repo_url: https://github.com/valentine195/obsidian-fantasy-calendar
+edit_uri: edit/master/docs/docs/
 markdown_extensions:
   - abbr
   - admonition
@@ -10,7 +11,7 @@ markdown_extensions:
   - pymdownx.tasklist
 theme:
   font:
-    text: Quicksand
+    text: Inter
     code: Roboto Mono
   name: material
   palette:
@@ -20,5 +21,11 @@ theme:
   features:
     - navigation.instant
     - navigation.tracking
-    - navigation.tabs
     - navigation.indexes
+nav:
+  - Overview: 'index.md'
+  - 'Getting Started': 'getting-started/index.md'
+  - 'Using the Plugin': 'using-the-plugin/index.md'
+  - Events: 'events/index.md'
+  - Configuration: 'settings/index.md'
+  - Changelog: 'CHANGELOG.md'
