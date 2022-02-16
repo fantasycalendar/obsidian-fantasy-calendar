@@ -31,15 +31,14 @@ Create fantasy calendars in Obsidian!
 The plugin will add a calendar view to the right pane on startup. If a calendar view is not in the workspace, one can be added using the "Open Fantasy Calendar" or "Open Large Fantasy Calendar" commands.
 
 > **:pencil: Opening the plugin for the first time?**
-> 
+>
 > The plugin does not come pre-loaded with any calendars. You have to create them yourself!
-> 
+>
 > See [Creating a Calendar](#creating-a-calendar) and [Calendar Presets](#presets) for more info.
 
 > **:calendar: Using the plugin for the real world?**
-> 
+>
 > The plugin's Gregorian Calendar [preset](#presets) is fully accurate!
-
 
 ### Large and small calendars
 
@@ -151,6 +150,15 @@ The leap day for the Gregorian calendar has 3 conditions:
 
 This leap day will occur every 4 years, but _not_ if the year is divisible by 100, **unless** the year is divisible by 400.
 
+### Intercalary Leap Days
+
+A leap day can be set to intercalary, which means it happens outside the normal flow of the month. The week will be interrupted by the leap day and then continue on the next weekday as if the leap day hadn't happened.
+
+Setting a leap day adds two new settings:
+
+1. Numbered - if set to numbered, the leap day will continue the day numbers as normal.
+2. After - the leap day will be added to the month after this day.
+
 ### Events
 
 Events can be created and managed in this section.
@@ -202,6 +210,10 @@ Events linked to notes will open the note when clicked.
 ### Multi-day Events
 
 Events can span multiple days by selecting "Add End Date" in the event creation modal.
+
+### Event Intervals
+
+You can make an event happen on an interval by clicking the "Add Interval" button. A starting date is required, but an end date is not.
 
 ### Event Creation from Frontmatter
 
