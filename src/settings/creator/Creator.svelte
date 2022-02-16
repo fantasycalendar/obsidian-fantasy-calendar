@@ -202,7 +202,7 @@
     .fantasy-calendar-creator,
     .fantasy-calendar-creator .fantasy-calendar-creator-inner,
     .fantasy-calendar-creator .fantasy-creator-app {
-        background-color: inherit;
+        background-color: var(--creator-background-color);
     }
     :global(body.is-mobile) .fantasy-calendar-creator,
     :global(body.is-mobile) .fantasy-calendar-creator .fantasy-creator-app {
