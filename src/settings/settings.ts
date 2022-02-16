@@ -529,7 +529,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
             this.containerEl.addClass("fantasy-calendar-creator-open");
             return new Promise((resolve) => {
                 const color = getComputedStyle(
-                    this.containerEl
+                    this.containerEl.closest(".modal")
                 ).backgroundColor;
                 const $app = new CalendarCreator({
                     target: this.containerEl,
