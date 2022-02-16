@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.1.2](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.1.1...2.1.2) (2022-02-16)
+
+
+### Bug Fixes
+
+* fixed creator background-color inheritance ([4e044be](https://github.com/valentine195/obsidian-fantasy-calendar/commit/4e044be6fddef46533362b5e51b87e4e19762bdb))
+
 ### [2.1.1](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.1.0...2.1.1) (2022-02-15)
 
 ## [2.1.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.0.7...2.1.0) (2022-02-14)
