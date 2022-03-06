@@ -219,11 +219,12 @@ You can make an event happen on an interval by clicking the "Add Interval" butto
 
 The following frontmatter properties are currently supported:
 
-| Property      | Description                                            |
-| ------------- | ------------------------------------------------------ |
-| `fc-date`     | Date object with `year`, `month` and `day` parameters. |
-| `fc-end`      | Date object with `year`, `month` and `day` parameters. |
-| `fc-category` | Name of the event category.                            |
+| Property          | Description                                                               |
+| ----------------- | ------------------------------------------------------------------------- |
+| `fc-date`         | Date object with `year`, `month` and `day` parameters.                    |
+| `fc-end`          | Date object with `year`, `month` and `day` parameters.                    |
+| `fc-category`     | Name of the event category.                                               |
+| `fc-display-name` | An optional display name for the event. Otherwise, the file name is used. |
 
 If a note with the above frontmatter properties is added to an event, it will prompt you to parse the properties; selecting yes will set the event properties accordingly.
 
@@ -254,6 +255,7 @@ Automatic event creation uses `fc-date` and `fc-category`, as well as an additio
 | [`fc-date`](#frontmatter-dates) | Date string, date object or array of date objects with `year`, `month` and `day` parameters. |
 | `fc-end`                        | Date string, date object or array of date objects with `year`, `month` and `day` parameters. |
 | `fc-category`                   | Name of the event category.                                                                  |
+| `fc-display-name`               | An optional display name for the event. Otherwise, the file name is used.                    |
 
 Once this setting is turned on, the calendar will look through its specified folder for events it should add to itself. When it finds them, they will be added - **unless an event with that exact date linked to that note is already on the calendar.**
 
@@ -343,6 +345,24 @@ fc-date:        # Event will repeat on the 3rd day of the month of February of t
 ```
 
 Turning on the [Parse Note Titles for Dates](#parse-note-titles-for-dates) will make this field optional, if a date matching the format specified in [the date format](#date-format) setting is in the title.
+
+#### Event Display Name
+By default, the calendar view displays automatically-created events with titles based on the event file name. To override this behavior, use the `fc-display-name` frontmatter field.
+
+Given the file `forecast.md`, the event's name can be overridden as follows:
+```
+---
+fc-calendar: My Custom Calendar
+fc-date: 1491-14-30
+fc-category: Natural Events
+fc-display-name: Weather        # The calendar displays "Weather" as the title rather than "forecast."
+---
+
+**Morning**: Cloudy
+**Day**: Clear
+**Night**: Apocalyptic storms
+
+```
 
 ## Plugin API
 

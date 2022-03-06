@@ -441,7 +441,8 @@ export default class FantasyCalendarView extends ItemView {
                                                       cat.id == event.category
                                               )?.name
                                       }
-                                    : {})
+                                    : {}),
+                                "fc-display-name": event.name
                             };
                             event.note = normalizePath(
                                 `${newFilePath}/${event.name}.md`
