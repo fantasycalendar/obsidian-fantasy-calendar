@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.1.4...2.2.0) (2022-03-07)
+
+
+### Features
+
+* Added support for optional display name frontmatter field (thanks [@kgar](https://github.com/kgar)) ([847048c](https://github.com/valentine195/obsidian-fantasy-calendar/commit/847048c24bad150b047fcab787d4636d1f49dfc4))
+
 ### [2.1.4](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.1.3...2.1.4) (2022-02-16)
 
 
