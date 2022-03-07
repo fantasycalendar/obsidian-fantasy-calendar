@@ -140,11 +140,12 @@ class Parser {
         });
     }
     getDataFromFrontmatter(frontmatter: FrontMatterCache) {
-        let name: string, fcCategory: string;
+        let name: string, fcCategory: string, eventDisplayName: string;
         if (frontmatter && "fc-ignore" in frontmatter) return {};
         if (frontmatter) {
             name = frontmatter?.["fc-calendar"];
             fcCategory = frontmatter?.["fc-category"];
+            eventDisplayName = frontmatter?.["fc-display-name"];
         }
         if (this.addToDefaultIfMissing && (!name || !name.length)) {
             name = this.defaultCalendar;
@@ -153,7 +154,7 @@ class Parser {
         const calendar = this.calendars.find(
             (calendar) => name == calendar.name.toLowerCase()
         );
-        return { calendar, fcCategory };
+        return { calendar, fcCategory, eventDisplayName };
     }
     removeEventsFromFile(path: string) {
         for (const calendar of this.calendars) {
@@ -178,7 +179,7 @@ class Parser {
         const events = [];
         const { frontmatter } = cache ?? {};
 
-        const { calendar, fcCategory } =
+        const { calendar, fcCategory, eventDisplayName } =
             this.getDataFromFrontmatter(frontmatter);
         if (!calendar) {
             this.removeEventsFromFile(file.path);
@@ -200,7 +201,8 @@ class Parser {
                 calendar,
                 fcCategory,
                 frontmatter,
-                file
+                file,
+                eventDisplayName
             )
         );
 
@@ -220,6 +222,7 @@ class Parser {
                 existing?.end?.month == event.end?.month &&
                 existing?.end?.year == event.end?.year &&
                 existing?.category == event.category &&
+                existing?.name == event.name &&
                 ((!event.timestamp && !existing?.timestamp) ||
                     existing?.timestamp == event.timestamp)
             ) {
@@ -241,7 +244,8 @@ class Parser {
         calendar: Calendar,
         fcCategory: string,
         frontmatter: FrontMatterCache,
-        file: { path: string; basename: string }
+        file: { path: string; basename: string },
+        eventDisplayName?: string
     ): Event[] {
         const { date, end } = this.getDates(
             frontmatter,
@@ -287,7 +291,7 @@ class Parser {
         return [
             {
                 id: nanoid(6),
-                name: file.basename,
+                name: eventDisplayName ?? file.basename,
                 note: file.path,
                 date,
                 end,

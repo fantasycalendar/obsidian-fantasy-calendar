@@ -181,7 +181,8 @@ export class CreateEventModal extends Modal {
                                                 !/^fc-calendar/.test(e) &&
                                                 !/^fc-date/.test(e) &&
                                                 !/^fc-end/.test(e) &&
-                                                !/^fc-category/.test(e)
+                                                !/^fc-category/.test(e) &&
+                                                !/^fc-display-name/.test(e)
                                         );
                                     existing.unshift(...frontmatter);
                                     content = content.replace(
@@ -421,6 +422,10 @@ export class CreateEventModal extends Modal {
 
         const { frontmatter } = cache;
         if (frontmatter) {
+            if ("fc-display-name" in frontmatter) {
+                this.event.name = frontmatter["fc-display-name"];
+            }
+
             if ("fc-date" in frontmatter) {
                 const { day, month, year } = frontmatter["fc-date"];
                 if (day) this.event.date.day = day;
