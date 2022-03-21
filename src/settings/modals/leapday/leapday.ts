@@ -28,8 +28,7 @@ export class CreateLeapDayModal extends Modal {
             this.editing = true;
         }
         this.containerEl.addClasses([
-            "fantasy-calendar-create-leapday",
-            "fantasy-calendar-settings"
+            "fantasy-calendar-create-leapday"
         ]);
     }
 
