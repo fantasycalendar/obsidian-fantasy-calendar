@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.2.1](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.2.0...2.2.1) (2022-03-21)
+
+
+### Bug Fixes
+
+* Issue with Leapday Modal positioning ([0802c5a](https://github.com/valentine195/obsidian-fantasy-calendar/commit/0802c5aa3bbc335aec323c6e0aa2623fd6d4b1a0))
+
 ## [2.2.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.1.4...2.2.0) (2022-03-07)
 
 
