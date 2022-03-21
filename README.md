@@ -1,5 +1,7 @@
 # Fantasy Calendars
 
+**Now part of the [Fantasy Calendar](https://fantasy-calendar.com/) family!**
+
 Create fantasy calendars in Obsidian!
 
 ![](https://raw.githubusercontent.com/valentine195/obsidian-fantasy-calendar/master/assets/example.png)
