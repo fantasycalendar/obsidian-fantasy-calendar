@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.2.2](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.2.1...2.2.2) (2022-03-21)
+
+
+### Bug Fixes
+
+* Improved messaging around saving calendar in creator ([ca78f51](https://github.com/valentine195/obsidian-fantasy-calendar/commit/ca78f51f513c9f154073630d74fd231fd88a129c))
+
 ### [2.2.1](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.2.0...2.2.1) (2022-03-21)
 
 
