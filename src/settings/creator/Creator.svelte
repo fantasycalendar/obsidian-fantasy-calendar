@@ -144,6 +144,9 @@
                                     use:savedEl
                                     aria-label={missing}
                                 />
+                                <span class="additional can-save">
+                                    All good! Exit to save calendar
+                                </span>
                             {:else}
                                 <div
                                     class="save"
@@ -245,6 +248,9 @@
     }
     .save.can-save {
         color: var(--interactive-success);
+    }
+    .additional.can-save {
+        color: var(--text-normal);
     }
 
     /* .fantasy-creator-app {
