@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.2.2...2.3.0) (2022-03-22)
+
+
+### Features
+
+* Added commands to trigger a rescan of notes for events ([8049be9](https://github.com/valentine195/obsidian-fantasy-calendar/commit/8049be90fb9c4a0674b9cfc4b9967bdf6dc4549c))
+
 ### [2.2.2](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.2.1...2.2.2) (2022-03-21)
 
 
