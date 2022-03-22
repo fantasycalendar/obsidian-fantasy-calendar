@@ -128,7 +128,6 @@ export class Watcher extends Component {
         /** Metadata for a file has changed and the file should be checked. */
         this.registerEvent(
             this.metadataCache.on("changed", (file) => {
-                this.time = Date.now();
                 this.startParsing([file.path]);
             })
         );
@@ -147,7 +146,6 @@ export class Watcher extends Component {
                     type: "calendars",
                     calendars: this.calendars
                 });
-                this.time = Date.now();
                 this.startParsing([abstractFile.path]);
             })
         );
@@ -155,7 +153,6 @@ export class Watcher extends Component {
         this.registerEvent(
             this.vault.on("delete", (abstractFile) => {
                 if (!(abstractFile instanceof TFile)) return;
-                const start = Date.now();
                 for (let calendar of this.calendars) {
                     const events = calendar.events.filter(
                         (event) => event.note === abstractFile.path
@@ -260,27 +257,12 @@ export class Watcher extends Component {
                     );
                     this.tree = new Map();
                     await this.plugin.saveCalendar();
-                    console.log(
-                        `Fantasy Calendar Event scanning complete in ${(
-                            (Date.now() - this.time) /
-                            1000
-                        ).toLocaleString("en-US", {
-                            maximumFractionDigits: 3
-                        })} seconds.`
-                    );
                 }
             }
         );
         this.start();
     }
-    time: number;
     start(calendar?: Calendar) {
-        console.log(
-            `Beginning Fantasy Calendar Event scanning for ${
-                calendar ? calendar.name : "all calendars"
-            }...`
-        );
-        this.time = Date.now();
         const calendars = calendar ? [calendar] : this.calendars;
         if (!calendars.length) return;
         let folders: Set<string> = new Set();
