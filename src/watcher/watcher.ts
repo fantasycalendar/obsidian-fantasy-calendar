@@ -128,6 +128,7 @@ export class Watcher extends Component {
         /** Metadata for a file has changed and the file should be checked. */
         this.registerEvent(
             this.metadataCache.on("changed", (file) => {
+                this.time = Date.now();
                 this.startParsing([file.path]);
             })
         );
@@ -146,6 +147,7 @@ export class Watcher extends Component {
                     type: "calendars",
                     calendars: this.calendars
                 });
+                this.time = Date.now();
                 this.startParsing([abstractFile.path]);
             })
         );
