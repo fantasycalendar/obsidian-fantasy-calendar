@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.2](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.3.1...2.3.2) (2022-03-22)
+
+
+### Bug Fixes
+
+* Removes event parsing console spam ([49fff4d](https://github.com/valentine195/obsidian-fantasy-calendar/commit/49fff4d769ae0e3d7406d429d2a09add5195af89))
+
 ### [2.3.1](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.3.0...2.3.1) (2022-03-22)
 
 
