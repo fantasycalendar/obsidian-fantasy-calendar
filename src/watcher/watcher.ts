@@ -5,7 +5,8 @@ import {
     TFile,
     TFolder,
     Vault,
-    getAllTags
+    getAllTags,
+    FuzzySuggestModal
 } from "obsidian";
 import type { Calendar, Event } from "src/@types";
 import type FantasyCalendar from "src/main";
@@ -30,6 +31,23 @@ declare global {
 
 export type CalendarEventTree = Map<string, Set<number>>;
 
+class CalendarPickerModal extends FuzzySuggestModal<Calendar> {
+    chosen: Calendar;
+    constructor(public plugin: FantasyCalendar) {
+        super(plugin.app);
+    }
+    getItems() {
+        return this.plugin.data.calendars;
+    }
+    getItemText(item: Calendar) {
+        return item.name;
+    }
+    onChooseItem(item: Calendar, evt: MouseEvent | KeyboardEvent): void {
+        this.chosen = item;
+        this.close();
+    }
+}
+
 export class Watcher extends Component {
     parsing: Set<string> = new Set();
     get calendars() {
@@ -49,6 +67,27 @@ export class Watcher extends Component {
 
     worker = new Worker();
     onload() {
+        this.plugin.addCommand({
+            id: "rescan-events",
+            name: "Rescan Events",
+            callback: () => {
+                this.start();
+            }
+        });
+        this.plugin.addCommand({
+            id: "rescan-events-for-calendar",
+            name: "Rescan Events for Calendar",
+            callback: () => {
+                const modal = new CalendarPickerModal(this.plugin);
+                modal.onClose = () => {
+                    if (modal.chosen) {
+                        this.start(modal.chosen);
+                    }
+                };
+                modal.open();
+            }
+        });
+
         /** Send the worker the calendars so I don't have to with every message. */
         this.worker.postMessage<CalendarsMessage>({
             type: "calendars",
@@ -219,12 +258,27 @@ export class Watcher extends Component {
                     );
                     this.tree = new Map();
                     await this.plugin.saveCalendar();
+                    console.log(
+                        `Fantasy Calendar Event scanning complete in ${(
+                            (Date.now() - this.time) /
+                            1000
+                        ).toLocaleString("en-US", {
+                            maximumFractionDigits: 3
+                        })} seconds.`
+                    );
                 }
             }
         );
         this.start();
     }
+    time: number;
     start(calendar?: Calendar) {
+        console.log(
+            `Beginning Fantasy Calendar Event scanning for ${
+                calendar ? calendar.name : "all calendars"
+            }...`
+        );
+        this.time = Date.now();
         const calendars = calendar ? [calendar] : this.calendars;
         if (!calendars.length) return;
         let folders: Set<string> = new Set();

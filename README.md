@@ -42,6 +42,24 @@ The plugin will add a calendar view to the right pane on startup. If a calendar 
 >
 > The plugin's Gregorian Calendar [preset](#presets) is fully accurate!
 
+### Commands
+
+#### Open Fantasy Calendar
+
+This command will open a calendar view in the side panes.
+
+#### Open Large Fantasy Calendar
+
+This command will open a calendar view in the center pane.
+
+#### Rescan Events
+
+This will trigger the plugin to rescan all notes for events for _all_ calendars.
+
+#### Rescan Events for Calendar
+
+This will trigger the plugin to rescan all notes for events for the chosen calendar.
+
 ### Large and small calendars
 
 A large calendar exists in the root workspace, and a small calendar exists in the left or right side pane. There are two distinct commands, but the calendars will detect where they are in Obsidian - as you move them around, they will resize themselves accordingly.
@@ -349,9 +367,11 @@ fc-date:        # Event will repeat on the 3rd day of the month of February of t
 Turning on the [Parse Note Titles for Dates](#parse-note-titles-for-dates) will make this field optional, if a date matching the format specified in [the date format](#date-format) setting is in the title.
 
 #### Event Display Name
+
 By default, the calendar view displays automatically-created events with titles based on the event file name. To override this behavior, use the `fc-display-name` frontmatter field.
 
 Given the file `forecast.md`, the event's name can be overridden as follows:
+
 ```
 ---
 fc-calendar: My Custom Calendar
