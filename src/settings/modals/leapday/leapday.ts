@@ -27,9 +27,7 @@ export class CreateLeapDayModal extends Modal {
             this.leapday = copy(leapday);
             this.editing = true;
         }
-        this.containerEl.addClasses([
-            "fantasy-calendar-create-leapday"
-        ]);
+        this.containerEl.addClasses(["fantasy-calendar-create-leapday"]);
     }
 
     async display() {
@@ -73,10 +71,7 @@ export class IntervalModal extends Modal {
         }
     }
     onOpen() {
-        this.containerEl.addClasses([
-            "fantasy-calendar-settings",
-            "fantasy-calendar-nested-settings"
-        ]);
+        this.containerEl.addClasses(["fantasy-calendar-nested-settings"]);
         this.contentEl.empty();
         this.titleEl.setText("Leap Day Condition");
 
