@@ -134,7 +134,7 @@ class Parser {
                 self.parseFileForEvents(data, cache, allTags, file);
                 resolve();
             }
-            setTimeout(() => resolve, 500);
+            setTimeout(() => resolve(), 500);
             ctx.addEventListener("message", resolution);
             ctx.postMessage<GetFileCacheMessage>({ path, type: "get" });
         });
