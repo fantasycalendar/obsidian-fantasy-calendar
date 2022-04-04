@@ -71,6 +71,9 @@ export class Watcher extends Component {
             id: "rescan-events",
             name: "Rescan Events",
             callback: () => {
+                if (this.plugin.data.debug) {
+                    console.info("Beginning full rescan for calendar events");
+                }
                 this.start();
             }
         });
@@ -81,6 +84,12 @@ export class Watcher extends Component {
                 const modal = new CalendarPickerModal(this.plugin);
                 modal.onClose = () => {
                     if (modal.chosen) {
+                        if (this.plugin.data.debug) {
+                            console.info(
+                                "Beginning full rescan for calendar events for calendar " +
+                                    modal.chosen.name
+                            );
+                        }
                         this.start(modal.chosen);
                     }
                 };
@@ -107,7 +116,8 @@ export class Watcher extends Component {
             parseTitle: this.plugin.data.parseDates,
             addToDefaultIfMissing: this.plugin.data.addToDefaultIfMissing,
             format: this.plugin.format,
-            defaultCalendar: this.plugin.defaultCalendar?.name
+            defaultCalendar: this.plugin.defaultCalendar?.name,
+            debug: this.plugin.data.debug
         });
         this.registerEvent(
             this.plugin.app.workspace.on(

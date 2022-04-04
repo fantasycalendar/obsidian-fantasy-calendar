@@ -13,6 +13,7 @@ export interface OptionsMessage {
     addToDefaultIfMissing: boolean;
     format: string;
     parseTitle: boolean;
+    debug: boolean;
 }
 export interface CalendarsMessage {
     type: "calendars";
@@ -64,6 +65,7 @@ class Parser {
     format: string;
     parseTitle: boolean = false;
     addToDefaultIfMissing: boolean;
+    debug: boolean;
 
     constructor() {
         //Register Options Changer
@@ -75,12 +77,14 @@ class Parser {
                         defaultCalendar,
                         addToDefaultIfMissing,
                         format,
-                        parseTitle
+                        parseTitle,
+                        debug
                     } = event.data;
                     this.addToDefaultIfMissing = addToDefaultIfMissing;
                     this.defaultCalendar = defaultCalendar;
                     this.format = format;
                     this.parseTitle = parseTitle;
+                    this.debug = debug;
                 }
             }
         );
@@ -181,35 +185,43 @@ class Parser {
 
         const { calendar, fcCategory, eventDisplayName } =
             this.getDataFromFrontmatter(frontmatter);
-        /* console.log(
-            "🚀 ~ file: watcher.worker.ts ~ line 183 ~ calendar",
-            calendar
-        ); */
+
         if (!calendar) {
+            if (this.debug) {
+                console.info(
+                    `Could not find calendar associated with file ${file.basename}`
+                );
+            }
             this.removeEventsFromFile(file.path);
             return;
         }
 
+        let timelineEvents: Event[] = [];
         if (
             calendar.supportTimelines &&
             allTags &&
             allTags.includes(calendar.timelineTag)
         ) {
-            events.push(
-                ...this.parseTimelineEvents(calendar, data, file, fcCategory)
+            timelineEvents = this.parseTimelineEvents(
+                calendar,
+                data,
+                file,
+                fcCategory
             );
+            events.push(...timelineEvents);
         }
 
-        events.push(
-            ...this.parseFrontmatterEvents(
-                calendar,
-                fcCategory,
-                frontmatter,
-                file,
-                eventDisplayName
-            )
+        const frontmatterEvents = this.parseFrontmatterEvents(
+            calendar,
+            fcCategory,
+            frontmatter,
+            file,
+            eventDisplayName
         );
 
+        events.push(...frontmatterEvents);
+
+        let added = 0;
         for (const event of events) {
             //TODO: Remove event existing check. Old events matching the file should just be removed.
             const existing = calendar.events.find(
@@ -217,7 +229,6 @@ class Parser {
                     exist.note == file.path &&
                     (!event.timestamp || exist.timestamp == event.timestamp)
             );
-
             if (
                 existing?.date.day == event.date.day &&
                 existing?.date.month == event.date.month &&
@@ -233,6 +244,9 @@ class Parser {
                 continue;
             }
 
+            /* console.log(`existing`, existing?.timestamp, existing.name);
+            console.log(`new`, event.timestamp, event.name); */
+
             ctx.postMessage<UpdateEventMessage>({
                 type: "update",
                 id: calendar.id,
@@ -242,6 +256,12 @@ class Parser {
                 event,
                 original: existing
             });
+            added++;
+        }
+        if (this.debug && events.length > 0) {
+            console.info(
+                `${added}/${events.length} (${frontmatterEvents.length} from frontmatter, ${timelineEvents.length} from timelines) event operations completed on ${calendar.name} for ${file.basename}`
+            );
         }
     }
     parseFrontmatterEvents(
