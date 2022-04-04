@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.4](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.3.3...2.3.4) (2022-04-04)
+
+
+### Bug Fixes
+
+* Adds debug option to settings for debugging file watcher ([d110fed](https://github.com/valentine195/obsidian-fantasy-calendar/commit/d110fedb1790011fdd0bb216a61c26632a6ce815))
+* Fixes resolve timeout ([4aa28fd](https://github.com/valentine195/obsidian-fantasy-calendar/commit/4aa28fdd49f88501e4fb5664a5675777f12cc998))
+
 ### [2.3.3](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.3.2...2.3.3) (2022-03-27)
 
 
