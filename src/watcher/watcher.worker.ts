@@ -181,6 +181,10 @@ class Parser {
 
         const { calendar, fcCategory, eventDisplayName } =
             this.getDataFromFrontmatter(frontmatter);
+        /* console.log(
+            "🚀 ~ file: watcher.worker.ts ~ line 183 ~ calendar",
+            calendar
+        ); */
         if (!calendar) {
             this.removeEventsFromFile(file.path);
             return;

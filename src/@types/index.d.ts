@@ -26,6 +26,7 @@ export interface FantasyCalendarData {
     settingsToggleState: {
         calendars: boolean;
         events: boolean;
+        advanced: boolean;
     };
     showIntercalary: boolean;
     version: {
@@ -33,4 +34,5 @@ export interface FantasyCalendarData {
         minor: number;
         patch: number;
     };
+    debug: boolean;
 }

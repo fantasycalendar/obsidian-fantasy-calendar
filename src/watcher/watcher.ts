@@ -49,7 +49,7 @@ class CalendarPickerModal extends FuzzySuggestModal<Calendar> {
 }
 
 export class Watcher extends Component {
-    parsing: Set<string> = new Set();
+    queue: Set<string> = new Set();
     get calendars() {
         return this.plugin.data.calendars;
     }
@@ -128,6 +128,7 @@ export class Watcher extends Component {
         /** Metadata for a file has changed and the file should be checked. */
         this.registerEvent(
             this.metadataCache.on("changed", (file) => {
+                if (this.queue.has(file.path)) return;
                 this.startParsing([file.path]);
             })
         );
@@ -180,6 +181,7 @@ export class Watcher extends Component {
             async (event: MessageEvent<GetFileCacheMessage>) => {
                 if (event.data.type == "get") {
                     const { path } = event.data;
+                    this.queue.delete(path);
                     const file =
                         this.plugin.app.vault.getAbstractFileByPath(path);
                     if (file instanceof TFile) {
@@ -213,8 +215,16 @@ export class Watcher extends Component {
 
                     if (!calendar) return;
                     if (index == -1) {
+                        if (this.plugin.data.debug)
+                            console.info(
+                                `Adding '${event.name}' to ${calendar.name}`
+                            );
                         calendar.events.push(event);
                     } else {
+                        if (this.plugin.data.debug)
+                            console.info(
+                                `Updating '${event.name}' in calendar ${calendar.name}`
+                            );
                         calendar.events.splice(
                             index,
                             index >= 0 ? 1 : 0,
@@ -238,6 +248,10 @@ export class Watcher extends Component {
                     if (!event) return;
                     const calendar = this.calendars.find((c) => c.id == id);
                     if (!calendar) return;
+                    if (this.plugin.data.debug)
+                        console.info(
+                            `Removing '${event.name}' from ${calendar.name}`
+                        );
                     calendar.events = calendar.events.filter(
                         (e) => e.id != event.id
                     );
@@ -297,6 +311,9 @@ export class Watcher extends Component {
         }
     }
     startParsing(paths: string[]) {
+        for (const path of paths) {
+            this.queue.add(path);
+        }
         this.worker.postMessage<QueueMessage>({
             type: "queue",
             paths

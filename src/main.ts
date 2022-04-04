@@ -106,14 +106,16 @@ export const DEFAULT_DATA: FantasyCalendarData = {
     parseDates: false,
     settingsToggleState: {
         calendars: false,
-        events: false
+        events: false,
+        advanced: true
     },
     showIntercalary: false,
     version: {
         major: null,
         minor: null,
         patch: null
-    }
+    },
+    debug: false
 };
 
 export default class FantasyCalendar extends Plugin {

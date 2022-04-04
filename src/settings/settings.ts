@@ -94,6 +94,16 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                 }
             })
         );
+        this.buildAdvanced(
+            this.contentEl.createEl("details", {
+                cls: "fantasy-calendar-nested-settings",
+                attr: {
+                    ...(this.data.settingsToggleState.advanced
+                        ? { open: `open` }
+                        : {})
+                }
+            })
+        );
     }
     buildInfo(containerEl: HTMLElement) {
         containerEl.empty();
@@ -499,6 +509,32 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                             this.buildEvents(containerEl);
                         });
                 }
+            });
+    }
+    buildAdvanced(containerEl: HTMLDetailsElement) {
+        containerEl.empty();
+        containerEl.ontoggle = () => {
+            this.data.settingsToggleState.advanced = containerEl.open;
+        };
+        const summary = containerEl.createEl("summary");
+        new Setting(summary).setHeading().setName("Advanced");
+
+        summary.createDiv("collapser").createDiv("handle");
+
+        new Setting(containerEl)
+            .setName("Show Event Debug Messages")
+            .setDesc(
+                createFragment((e) => {
+                    e.createSpan({
+                        text: "The plugin will show debug messages when events are added, deleted or updated by the file watcher."
+                    });
+                })
+            )
+            .addToggle((t) => {
+                t.setValue(this.data.debug).onChange(async (v) => {
+                    this.data.debug = v;
+                    await this.plugin.saveSettings();
+                });
             });
     }
 
