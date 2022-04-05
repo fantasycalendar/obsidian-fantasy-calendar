@@ -65,7 +65,7 @@ esbuild
                 compilerOptions: { css: true },
                 preprocess: sveltePreprocess()
             }),
-            inlineWorkerPlugin(/* { format: "cjs" } */)
+            inlineWorkerPlugin({ workerName: "Fantasy Calendar File Watcher" })
         ]
     })
     .catch(() => {

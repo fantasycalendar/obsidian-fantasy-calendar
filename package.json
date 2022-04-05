@@ -42,7 +42,7 @@
         "distinct-colors": "^3.0.0",
         "dotenv": "^14.2.0",
         "esbuild": "^0.13.15",
-        "esbuild-plugin-inline-worker": "^0.1.1",
+        "esbuild-plugin-inline-worker": "github:mitschabaude/esbuild-plugin-inline-worker",
         "esbuild-svelte": "^0.6.1",
         "fast-copy": "^2.1.1",
         "he": "^1.2.0",
