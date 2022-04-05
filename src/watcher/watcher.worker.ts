@@ -243,10 +243,10 @@ class Parser {
         );
 
         events.push(...frontmatterEvents);
-        console.log(
-            "🚀 ~ file: watcher.worker.ts ~ line 251 ~ events",
-            events.length
-        );
+        if (!events || !events.length) {
+            this.removeEventsFromFile(file.path);
+            return;
+        }
 
         let added = 0;
         for (const event of events) {
@@ -270,9 +270,6 @@ class Parser {
             ) {
                 continue;
             }
-
-            /* console.log(`existing`, existing?.timestamp, existing.name);
-            console.log(`new`, event.timestamp, event.name); */
 
             ctx.postMessage<UpdateEventMessage>({
                 type: "update",
@@ -303,7 +300,6 @@ class Parser {
             this.parseTitle ? file.basename : ""
         );
         if (!date) {
-            this.removeEventsFromFile(file.path);
             return [];
         }
 
@@ -371,10 +367,6 @@ class Parser {
         //     data-end="2000-10-20-00">
         //     A second event!
         // </span>
-        console.log(
-            "🚀 ~ file: watcher.worker.ts ~ line 374 ~ contents.matchAll(timelineData)",
-            contents.matchAll(timelineData)
-        );
         for (const match of contents.matchAll(timelineData)) {
             const doc = domparser.parseFromString(match[0], "text/html");
             const element = {
