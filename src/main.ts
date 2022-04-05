@@ -163,12 +163,16 @@ export default class FantasyCalendar extends Plugin {
         return calendar.syncTimelines && this.canUseTimelines;
     }
     timelineTag(calendar: Calendar) {
-        if (this.syncTimelines) {
-            return this.app.plugins.getPlugin("obsidian-timelines").settings
-                .timelineTag;
-        } else {
-            return calendar.timelineTag;
+        let tag = calendar.timelineTag;
+        if (this.syncTimelines(calendar)) {
+            tag =
+                this.app.plugins.getPlugin("obsidian-timelines").settings
+                    .timelineTag;
         }
+        if (!/^#/.test(tag)) {
+            tag = `#${tag}`;
+        }
+        return tag ?? calendar.timelineTag ?? "";
     }
     get format() {
         return (

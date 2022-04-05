@@ -129,7 +129,8 @@ export class Watcher extends Component {
                         addToDefaultIfMissing:
                             this.plugin.data.addToDefaultIfMissing,
                         format: this.plugin.format,
-                        defaultCalendar: this.plugin.defaultCalendar?.name
+                        defaultCalendar: this.plugin.defaultCalendar?.name,
+                        debug: this.plugin.data.debug
                     });
                 }
             )
@@ -275,6 +276,9 @@ export class Watcher extends Component {
             "message",
             async (evt: MessageEvent<SaveMessage>) => {
                 if (evt.data.type == "save") {
+                    if (this.plugin.data.debug) {
+                        console.info("Received save event from file watcher");
+                    }
                     this.plugin.app.workspace.trigger(
                         "fantasy-calendars-event-update",
                         this.tree
@@ -302,6 +306,17 @@ export class Watcher extends Component {
         }
 
         if (!folders.size) return;
+        if (this.plugin.data.debug) {
+            if (calendar) {
+                console.info(
+                    `Starting rescan for ${calendar.name} (${folders.size})`
+                );
+            } else {
+                console.info(
+                    `Starting rescan for ${calendars.length} calendars (${folders.size})`
+                );
+            }
+        }
         this.startParsing([...folders]);
     }
     addToTree(calendar: Calendar, event: Event) {

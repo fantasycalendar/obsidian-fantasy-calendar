@@ -85,6 +85,10 @@ class Parser {
                     this.format = format;
                     this.parseTitle = parseTitle;
                     this.debug = debug;
+
+                    if (this.debug) {
+                        console.info("Received options message");
+                    }
                 }
             }
         );
@@ -95,6 +99,9 @@ class Parser {
                 if (event.data.type == "calendars") {
                     const { calendars } = event.data;
                     this.calendars = [...calendars];
+                    if (this.debug) {
+                        console.info("Received calendars message");
+                    }
                 }
             }
         );
@@ -103,10 +110,18 @@ class Parser {
         ctx.addEventListener("message", (event: MessageEvent<QueueMessage>) => {
             if (event.data.type == "queue") {
                 this.add(...event.data.paths);
+                if (this.debug) {
+                    console.info(
+                        `Received queue message for ${event.data.paths.length} paths`
+                    );
+                }
             }
         });
     }
     add(...paths: string[]) {
+        if (this.debug) {
+            console.info(`Adding ${paths.length} paths to queue`);
+        }
         this.queue.push(...paths);
         if (!this.parsing) this.parse();
     }
@@ -114,9 +129,17 @@ class Parser {
         this.parsing = true;
         while (this.queue.length) {
             const path = this.queue.shift();
+            if (this.debug) {
+                console.info(
+                    `Parsing ${path} for calendar events (${this.queue.length} to go)`
+                );
+            }
             await this.getFileData(path);
         }
         this.parsing = false;
+        if (this.debug) {
+            console.info(`Parsing complete`);
+        }
 
         ctx.postMessage<SaveMessage>({ type: "save" });
     }
@@ -220,6 +243,10 @@ class Parser {
         );
 
         events.push(...frontmatterEvents);
+        console.log(
+            "🚀 ~ file: watcher.worker.ts ~ line 251 ~ events",
+            events.length
+        );
 
         let added = 0;
         for (const event of events) {
@@ -344,6 +371,10 @@ class Parser {
         //     data-end="2000-10-20-00">
         //     A second event!
         // </span>
+        console.log(
+            "🚀 ~ file: watcher.worker.ts ~ line 374 ~ contents.matchAll(timelineData)",
+            contents.matchAll(timelineData)
+        );
         for (const match of contents.matchAll(timelineData)) {
             const doc = domparser.parseFromString(match[0], "text/html");
             const element = {
