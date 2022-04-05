@@ -223,7 +223,9 @@ class Parser {
         if (
             calendar.supportTimelines &&
             allTags &&
-            allTags.includes(calendar.timelineTag)
+            allTags
+                .map((tag) => tag.replace(/#/, ""))
+                .includes(calendar.timelineTag.replace(/#/, ""))
         ) {
             timelineEvents = this.parseTimelineEvents(
                 calendar,
@@ -410,7 +412,7 @@ class Parser {
                 };
             }
             const category = calendar.categories.find(
-                (cat) => cat?.name == fcCategory
+                (cat) => cat?.name == element.dataset.class ?? fcCategory
             );
 
             events.push({
