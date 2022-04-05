@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.6](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.3.5...2.3.6) (2022-04-05)
+
+
+### Bug Fixes
+
+* Fixes timelines events being removed sometimes if no frontmatter events are present in file ([45fa154](https://github.com/valentine195/obsidian-fantasy-calendar/commit/45fa1544db7fccaeb840906e0b5ddc1d6db371dd))
+* Fixes timelines events issue when syncing with timelines plugin ([1a9f87f](https://github.com/valentine195/obsidian-fantasy-calendar/commit/1a9f87ff60cc7ee1b1038ca96298de0f75247d28))
+
 ### [2.3.5](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.3.4...2.3.5) (2022-04-04)
 
 
