@@ -108,5 +108,7 @@ export interface Era {
     name: string;
     format: string;
     description: string;
+    restart: boolean;
+    endsYear: boolean;
     start: CurrentCalendarData;
 }

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.7](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.3.6...2.3.7) (2022-04-06)
+
+
+### Bug Fixes
+
+* Strips `#` from tags when comparing ([60f7d09](https://github.com/valentine195/obsidian-fantasy-calendar/commit/60f7d09c32b48d8fd7583ee37570c0a6a9bce594))
+
 ### [2.3.6](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.3.5...2.3.6) (2022-04-05)
 
 
