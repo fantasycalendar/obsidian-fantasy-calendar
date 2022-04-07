@@ -6,8 +6,9 @@ import { nanoid } from "../../../utils/functions";
 
 import LeapDayNew from "./LeapDayNew.svelte";
 import LeapDayInterval from "./LeapDayInterval.svelte";
+import { FantasyCalendarModal } from "../modal";
 
-export class CreateLeapDayModal extends Modal {
+export class CreateLeapDayModal extends FantasyCalendarModal {
     saved = true;
     leapday: LeapDay = {
         id: nanoid(6),
@@ -49,7 +50,7 @@ export class CreateLeapDayModal extends Modal {
     }
 }
 
-export class IntervalModal extends Modal {
+export class IntervalModal extends FantasyCalendarModal {
     saved: boolean = true;
     editing: boolean = false;
     condition: LeapDayCondition = {

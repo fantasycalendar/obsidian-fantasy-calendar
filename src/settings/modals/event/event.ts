@@ -18,8 +18,9 @@ import PathSuggestionModal from "../../../suggester/path";
 
 import copy from "fast-copy";
 import FantasyCalendar from "src/main";
+import { FantasyCalendarModal } from "../modal";
 
-export class CreateEventModal extends Modal {
+export class CreateEventModal extends FantasyCalendarModal {
     saved = false;
     event: Event = {
         name: null,

@@ -2,8 +2,9 @@ import { Modal, App, Setting, Notice } from "obsidian";
 import type { Calendar, Moon } from "../../@types";
 
 import { nanoid } from "../../utils/functions";
+import { FantasyCalendarModal } from "./modal";
 
-export class CreateMoonModal extends Modal {
+export class CreateMoonModal extends FantasyCalendarModal {
     saved = false;
     moon: Moon = {
         name: null,

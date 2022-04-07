@@ -1,5 +1,6 @@
 import { App, ButtonComponent, ExtraButtonComponent, Modal } from "obsidian";
 import FantasyCalendar from "src/main";
+import { FantasyCalendarModal } from "./modal";
 
 export async function confirmWithModal(
     app: App,
@@ -22,7 +23,7 @@ export async function confirmWithModal(
     });
 }
 
-export class ConfirmModal extends Modal {
+export class ConfirmModal extends FantasyCalendarModal {
     constructor(
         app: App,
         public text: string,
@@ -72,7 +73,7 @@ export async function confirmDeleteCalendar(
         }
     });
 }
-class ConfirmDeleteCalendarModal extends Modal {
+class ConfirmDeleteCalendarModal extends FantasyCalendarModal {
     confirmed: boolean = false;
     constructor(public plugin: FantasyCalendar) {
         super(plugin.app);
@@ -119,7 +120,7 @@ class ConfirmDeleteCalendarModal extends Modal {
     }
 }
 
-export class ConfirmExitModal extends Modal {
+export class ConfirmExitModal extends FantasyCalendarModal {
     confirmed: boolean = false;
     constructor(public plugin: FantasyCalendar) {
         super(plugin.app);
@@ -180,7 +181,7 @@ export async function confirmEventDeletion(plugin: FantasyCalendar) {
     });
 }
 
-class ConfirmDeleteEventModal extends Modal {
+class ConfirmDeleteEventModal extends FantasyCalendarModal {
     confirmed: boolean = false;
     constructor(public plugin: FantasyCalendar) {
         super(plugin.app);

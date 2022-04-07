@@ -22,6 +22,7 @@ import type { Calendar } from "src/@types";
 
 import { confirmDeleteCalendar, confirmWithModal } from "./modals/confirm";
 import { FolderSuggestionModal } from "src/suggester/folder";
+import { FantasyCalendarModal } from "./modals/modal";
 
 export enum Recurring {
     none = "None",
@@ -604,7 +605,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
     }
 }
 
-class MobileCreatorModal extends Modal {
+class MobileCreatorModal extends FantasyCalendarModal {
     calendar: Calendar;
     saved = false;
     constructor(public plugin: FantasyCalendar, calendar: Calendar) {

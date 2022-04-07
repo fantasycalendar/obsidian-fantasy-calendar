@@ -29,6 +29,7 @@ import CalendarUI from "./ui/Calendar.svelte";
 import { confirmEventDeletion } from "src/settings/modals/confirm";
 import { areDatesEqual, daysBetween } from "src/utils/functions";
 import { MODIFIER_KEY } from "../main";
+import { FantasyCalendarModal } from "src/settings/modals/modal";
 
 addIcon(
     VIEW_TYPE,
@@ -646,7 +647,7 @@ export default class FantasyCalendarView extends ItemView {
     full = true;
 }
  */
-class SwitchModal extends Modal {
+class SwitchModal extends FantasyCalendarModal {
     confirmed: boolean = false;
     constructor(public plugin: FantasyCalendar, public calendar: Calendar) {
         super(plugin.app);
@@ -689,7 +690,7 @@ class SwitchModal extends Modal {
     }
 }
 
-class ChangeDateModal extends Modal {
+class ChangeDateModal extends FantasyCalendarModal {
     confirmed: boolean = false;
     date: CurrentCalendarData;
     dateFieldEl: HTMLDivElement;
@@ -835,7 +836,7 @@ class ChangeDateModal extends Modal {
     }
 }
 
-class ViewEventModal extends Modal {
+class ViewEventModal extends FantasyCalendarModal {
     constructor(public event: Event, public plugin: FantasyCalendar) {
         super(plugin.app);
         this.containerEl.addClass("fantasy-calendar-view-event");

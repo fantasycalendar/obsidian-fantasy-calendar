@@ -3,8 +3,9 @@ import { Modal, ButtonComponent, ExtraButtonComponent } from "obsidian";
 import type { Calendar } from "src/@types";
 import { nanoid } from "src/utils/functions";
 import { PRESET_CALENDARS } from "src/utils/presets";
+import { FantasyCalendarModal } from "./modal";
 
-export class CalendarPresetModal extends Modal {
+export class CalendarPresetModal extends FantasyCalendarModal {
     preset: Calendar;
     saved: boolean;
     async onOpen() {
