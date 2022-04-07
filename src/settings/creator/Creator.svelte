@@ -19,6 +19,7 @@
     import { Writable, writable } from "svelte/store";
     import { getCanSave, getMissingNotice, warning } from "./Utilities/utils";
     import { ConfirmExitModal } from "../modals/confirm";
+    import EraContainer from "./Containers/EraContainer.svelte";
 
     const mobile = Platform.isMobile;
     let ready = mobile;
@@ -176,6 +177,7 @@
                 <WeekdayContainer {calendar} />
                 <MonthContainer />
                 <YearContainer {calendar} app={plugin.app} />
+                <EraContainer {plugin} {calendar} />
                 <CurrentDate />
                 <EventContainer {plugin} {calendar} />
                 <CategoryContainer {calendar} />
@@ -210,7 +212,7 @@
     :global(body.is-mobile) .fantasy-calendar-creator,
     :global(body.is-mobile) .fantasy-calendar-creator .fantasy-creator-app {
         padding: 0px 10px;
-        width:100%;
+        width: 100%;
     }
     .fantasy-creator-app {
         overflow: auto;

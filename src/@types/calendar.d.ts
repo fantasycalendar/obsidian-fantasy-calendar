@@ -105,10 +105,11 @@ export interface Season {
 }
 
 export interface Era {
+    id: string;
     name: string;
     format: string;
-    description: string;
     restart: boolean;
     endsYear: boolean;
+    event: boolean;
     start: CurrentCalendarData;
 }

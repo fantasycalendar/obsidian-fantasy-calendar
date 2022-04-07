@@ -166,23 +166,29 @@ export const PRESET_CALENDARS: Calendar[] = [
             eras: [
                 {
                     name: "Before Christ",
-                    description: "",
                     format: "Year {{abs_year}} - {{era_name}}",
                     start: {
                         year: -1,
                         month: 0,
                         day: 31
-                    }
+                    },
+                    id: "ID_9a2978c92baa",
+                    restart: false,
+                    endsYear: false,
+                    event: false
                 },
                 {
                     name: "Anno Domini",
-                    description: "",
                     format: "Year {{year}} - {{era_name}}",
                     start: {
                         year: 1,
                         month: 0,
                         day: 1
-                    }
+                    },
+                    id: "ID_a8db38899a2b",
+                    restart: false,
+                    endsYear: false,
+                    event: false
                 }
             ],
             offset: 0
@@ -602,13 +608,16 @@ export const PRESET_CALENDARS: Calendar[] = [
             eras: [
                 {
                     name: "Common Year",
-                    description: "",
                     format: "Year {{year}} CY",
                     start: {
                         year: 1,
                         month: 0,
                         day: 1
-                    }
+                    },
+                    id: "ID_db994869db7b",
+                    restart: false,
+                    endsYear: false,
+                    event: false
                 }
             ]
         },
@@ -998,63 +1007,81 @@ export const PRESET_CALENDARS: Calendar[] = [
             eras: [
                 {
                     name: "Age of Serpents",
-                    description: "",
                     format: "Year {{year}} - {{era_name}}",
                     start: {
                         year: 4720,
                         month: 8,
                         day: 15
-                    }
+                    },
+                    id: "ID_eb4af87babaa",
+                    restart: false,
+                    endsYear: false,
+                    event: false
                 },
                 {
                     name: "Age of Darkness",
-                    description: "",
                     format: "Year {{abs_year}} - {{era_name}}",
                     start: {
                         year: -5300,
                         month: 0,
                         day: 1
-                    }
+                    },
+                    id: "ID_58e99a8b9b9a",
+                    restart: false,
+                    endsYear: false,
+                    event: false
                 },
                 {
                     name: "Age of Anguish",
-                    description: "",
                     format: "Year {{year}} - {{era_name}}",
                     start: {
                         year: -4500,
                         month: 8,
                         day: 1
-                    }
+                    },
+                    id: "ID_3af84ada898a",
+                    restart: false,
+                    endsYear: false,
+                    event: false
                 },
                 {
                     name: "Age of Destiny",
-                    description: "",
                     format: "Year {{year}} - {{era_name}}",
                     start: {
                         year: -3500,
                         month: 8,
                         day: 1
-                    }
+                    },
+                    id: "ID_abc87ad9fbfb",
+                    restart: false,
+                    endsYear: false,
+                    event: false
                 },
                 {
                     name: "Age of Enthronement",
-                    description: "",
                     format: "Year {{year}} AR - {{era_name}}",
                     start: {
                         year: 1,
                         month: 8,
                         day: 1
-                    }
+                    },
+                    id: "ID_19197be9dac8",
+                    restart: false,
+                    endsYear: false,
+                    event: false
                 },
                 {
                     name: "Age of Lost Omens",
-                    description: "",
                     format: "Year {{year}} AR - {{era_name}}",
                     start: {
                         year: 4606,
                         month: 8,
                         day: 1
-                    }
+                    },
+                    id: "ID_7b585b5bd9ea",
+                    restart: false,
+                    endsYear: false,
+                    event: false
                 }
             ]
         },
@@ -2949,23 +2976,29 @@ export const PRESET_CALENDARS: Calendar[] = [
             eras: [
                 {
                     name: "Before Christ",
-                    description: "",
                     format: "Year {{year}} - {{era_name}}",
                     start: {
                         year: -9000,
                         month: 0,
                         day: 0
-                    }
+                    },
+                    id: "ID_897bba588a98",
+                    restart: false,
+                    endsYear: false,
+                    event: false
                 },
                 {
                     name: "Anno Domini",
-                    description: "",
                     format: "Year {{year}} - {{era_name}}",
                     start: {
                         year: 1,
                         month: 0,
                         day: 1
-                    }
+                    },
+                    id: "ID_185ab9b8b95a",
+                    restart: false,
+                    endsYear: false,
+                    event: false
                 }
             ]
         },
@@ -3203,43 +3236,55 @@ export const PRESET_CALENDARS: Calendar[] = [
             eras: [
                 {
                     name: "The Founding",
-                    description: "",
                     format: "Year {{year}} - {{era_name}}",
                     start: {
                         year: 1,
                         month: 0,
                         day: 1
-                    }
+                    },
+                    id: "ID_cb9baaabab7a",
+                    restart: false,
+                    endsYear: false,
+                    event: false
                 },
                 {
                     name: "Age of Arcanum",
-                    description: "",
                     format: "Year {{year}} - {{era_name}}",
                     start: {
                         year: -1500,
                         month: 0,
                         day: 1
-                    }
+                    },
+                    id: "ID_499b3ae8c868",
+                    restart: false,
+                    endsYear: false,
+                    event: false
                 },
                 {
                     name: "The Calamity",
-                    description: "",
                     format: "Year {{year}} - {{era_name}}",
                     start: {
                         year: -665,
                         month: 0,
                         day: 1
-                    }
+                    },
+                    id: "ID_7ac8c9590999",
+                    restart: false,
+                    endsYear: false,
+                    event: false
                 },
                 {
                     name: "Post-Divergence",
-                    description: "",
                     format: "Year {{year}} P.D.",
                     start: {
                         year: 1,
                         month: 0,
                         day: 1
-                    }
+                    },
+                    id: "ID_58aad97ac84b",
+                    restart: false,
+                    endsYear: false,
+                    event: false
                 }
             ]
         },

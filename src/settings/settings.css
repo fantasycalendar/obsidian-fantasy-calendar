@@ -43,7 +43,7 @@ body:not(.is-mobile)
     margin-top: initial;
 }
 
-.fantasy-calendar-settings details > summary {
+details.fantasy-calendar-nested-settings > summary {
     outline: none;
     display: block !important;
     list-style: none !important;
@@ -55,12 +55,12 @@ body:not(.is-mobile)
     position: relative;
 }
 
-.fantasy-calendar-settings details > summary::-webkit-details-marker,
-.fantasy-calendar-settings details > summary::marker {
+details.fantasy-calendar-nested-settings > summary::-webkit-details-marker,
+details.fantasy-calendar-nested-settings > summary::marker {
     display: none !important;
 }
 
-.fantasy-calendar-settings details > summary > .collapser {
+details.fantasy-calendar-nested-settings > summary > .collapser {
     position: absolute;
     top: 50%;
     right: 8px;
@@ -68,7 +68,7 @@ body:not(.is-mobile)
     content: "";
 }
 
-.fantasy-calendar-settings details > summary > .collapser > .handle {
+details.fantasy-calendar-nested-settings > summary > .collapser > .handle {
     transform: rotate(0deg);
     transition: transform 0.25s;
     background-color: currentColor;
@@ -82,7 +82,10 @@ body:not(.is-mobile)
     height: 20px;
 }
 
-.fantasy-calendar-settings details[open] > summary > .collapser > .handle {
+details.fantasy-calendar-nested-settings[open]
+    > summary
+    > .collapser
+    > .handle {
     transform: rotate(90deg);
 }
 
@@ -120,6 +123,9 @@ body:not(.is-mobile)
 }
 .fantasy-calendar-nested-settings {
     padding-bottom: 18px;
+}
+.fantasy-calendar-nested-settings:not([open]) .setting-item-heading {
+    border-bottom: 1px solid transparent;
 }
 .fantasy-calendar-nested-settings[open] .setting-item-heading,
 .fantasy-calendar-nested-settings:not(details) .setting-item-heading {

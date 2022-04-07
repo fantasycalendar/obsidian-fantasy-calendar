@@ -71,6 +71,7 @@
 <div class="fantasy-calendar-nested-settings">
     <TextComponent
         name={"Name"}
+        desc={""}
         value={leapDay.name}
         warn={!leapDay.name}
         on:blur={(evt) => (leapDay.name = evt.detail)}
