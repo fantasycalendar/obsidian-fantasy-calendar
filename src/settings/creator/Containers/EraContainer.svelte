@@ -21,7 +21,7 @@
 
     $: eras = calendar.static.eras;
     /* Fix old era schema */
-    if (eras.some((era) => !era.id)) {
+    if (eras && eras.length && eras.some((era) => !era.id)) {
         eras = eras.map((era) => {
             return {
                 ...era,

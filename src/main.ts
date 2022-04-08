@@ -13,6 +13,7 @@ import FantasyCalendarView, {
 import { CalendarEventTree, Watcher } from "./watcher/watcher";
 import { API } from "./api/api";
 import copy from "fast-copy";
+import { nanoid } from "./utils/functions";
 
 declare module "obsidian" {
     interface Workspace {
@@ -360,17 +361,30 @@ export default class FantasyCalendar extends Plugin {
             delete (this.data as any).autoParse;
             delete (this.data as any).path;
         }
-        /* if ((this.data.version?.major ?? 0) < 2 && this.data.calendars.length) {
-            new Notice(
-                "Fantasy Calendar can now parse note titles for events. See the ReadMe for more info!"
-            );
+
+        for (const calendar of this.data.calendars) {
+            if (
+                calendar.static.eras &&
+                calendar.static.eras.length &&
+                calendar.static.eras.some((era) => !era.id)
+            ) {
+                console.log(
+                    "🚀 ~ file: main.ts ~ line 370 ~ calendar.static.eras",
+                    calendar.static.eras
+                );
+                calendar.static.eras = calendar.static.eras.map((era) => {
+                    return {
+                        ...copy(era),
+                        id: era.id ?? nanoid(6),
+                        restart: era.restart ?? false,
+                        endsYear: era.endsYear ?? false,
+                        event: era.event ?? false
+                    };
+                });
+            }
         }
-        const version = this.manifest.version.split(".").map((v) => Number(v));
-        this.data.version = {
-            major: version[0],
-            minor: version[1],
-            patch: version[2]
-        }; */
+        this.saveSettings();
+
         this.settingsLoaded = true;
         this.app.workspace.trigger("fantasy-calendars-settings-loaded");
     }

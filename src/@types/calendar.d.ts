@@ -112,4 +112,6 @@ export interface Era {
     endsYear: boolean;
     event: boolean;
     start: CurrentCalendarData;
+    eventDescription?: string;
+    eventCategory?: string;
 }

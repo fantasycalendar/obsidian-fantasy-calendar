@@ -217,3 +217,8 @@ details.fantasy-calendar-nested-settings[open]
 .fantasy-calendar-event-formula .setting-item-control {
     gap: 0.25rem;
 }
+
+/** Era Modal */
+.era-event {
+    flex-grow: 1;
+}
