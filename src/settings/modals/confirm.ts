@@ -91,10 +91,10 @@ class ConfirmDeleteCalendarModal extends FantasyCalendarModal {
         buttonContainerEl.createEl("a").createEl("small", {
             cls: "dont-ask",
             text: "Delete and don't ask again"
-        }).onclick = () => {
+        }).onclick = async () => {
             this.confirmed = true;
             this.plugin.data.exit.calendar = true;
-            this.plugin.saveSettings();
+            await this.plugin.saveSettings();
             this.close();
         };
 
@@ -138,10 +138,10 @@ export class ConfirmExitModal extends FantasyCalendarModal {
         buttonContainerEl.createEl("a").createEl("small", {
             cls: "dont-ask",
             text: "Exit and don't ask again"
-        }).onclick = () => {
+        }).onclick = async () => {
             this.confirmed = true;
             this.plugin.data.exit.saving = true;
-            this.plugin.saveSettings();
+            await this.plugin.saveSettings();
             this.close();
         };
 
@@ -199,10 +199,10 @@ class ConfirmDeleteEventModal extends FantasyCalendarModal {
         buttonContainerEl.createEl("a").createEl("small", {
             cls: "dont-ask",
             text: "Delete and don't ask again"
-        }).onclick = () => {
+        }).onclick = async () => {
             this.confirmed = true;
             this.plugin.data.exit.event = true;
-            this.plugin.saveSettings();
+            await this.plugin.saveSettings();
             this.close();
         };
 

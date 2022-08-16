@@ -115,13 +115,13 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                 `All confirmations set to "Don't Ask Again" will be reset.`
             )
             .addButton((b) => {
-                b.setIcon("reset").onClick(() => {
+                b.setIcon("reset").onClick(async () => {
                     this.plugin.data.exit = {
                         saving: false,
                         event: false,
                         calendar: false
                     };
-                    this.plugin.saveSettings();
+                    await this.plugin.saveSettings();
                 });
             });
 
@@ -219,9 +219,9 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                 "Intercalary months will appear a distinct months in the calendar."
             )
             .addToggle((t) => {
-                t.setValue(this.data.showIntercalary).onChange((v) => {
+                t.setValue(this.data.showIntercalary).onChange(async (v) => {
                     this.data.showIntercalary = v;
-                    this.plugin.saveCalendar();
+                    await this.plugin.saveCalendar();
                 });
             });
         new Setting(this.calendarsEl)
@@ -236,7 +236,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                 d.onChange(async (v) => {
                     if (v === "none") {
                         this.plugin.data.defaultCalendar = null;
-                        this.plugin.saveSettings();
+                        await this.plugin.saveSettings();
                         return;
                     }
 
@@ -404,9 +404,9 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                 "Use the core Note Preview plugin to display event notes when hovered."
             )
             .addToggle((t) => {
-                t.setValue(this.data.eventPreview).onChange((v) => {
+                t.setValue(this.data.eventPreview).onChange(async (v) => {
                     this.data.eventPreview = v;
-                    this.plugin.saveSettings();
+                    await this.plugin.saveSettings();
                 });
             });
         new Setting(containerEl)
@@ -415,9 +415,9 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                 "Events linked to notes will write their data to the note frontmatter."
             )
             .addToggle((t) => {
-                t.setValue(this.data.eventFrontmatter).onChange((v) => {
+                t.setValue(this.data.eventFrontmatter).onChange(async (v) => {
                     this.data.eventFrontmatter = v;
-                    this.plugin.saveSettings();
+                    await this.plugin.saveSettings();
                 });
             });
 
@@ -484,9 +484,9 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
             .addText((t) => {
                 t.setDisabled(this.data.dailyNotes)
                     .setValue(this.plugin.format)
-                    .onChange((v) => {
+                    .onChange(async (v) => {
                         this.data.dateFormat = v;
-                        this.plugin.saveSettings();
+                        await this.plugin.saveSettings();
                     });
                 t.inputEl.onblur = () => this.buildEvents(containerEl);
             })

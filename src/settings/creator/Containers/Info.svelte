@@ -92,9 +92,9 @@
         const text = new ObsidianTextComponent(node);
         text.setValue(`${calendar.timelineTag ?? ""}`.replace("#", ""))
             .setDisabled(calendar.syncTimelines)
-            .onChange((v) => {
+            .onChange(async (v) => {
                 calendar.timelineTag = v.startsWith("#") ? v : `#${v}`;
-                plugin.saveSettings();
+                await plugin.saveSettings();
             });
         const b = new ExtraButtonComponent(node);
         if (!plugin.canUseTimelines) {

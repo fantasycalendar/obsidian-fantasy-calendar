@@ -163,7 +163,7 @@ export class Watcher extends Component {
         );
         /** A file has been deleted and should be checked for events to unlink. */
         this.registerEvent(
-            this.vault.on("delete", (abstractFile) => {
+            this.vault.on("delete", async (abstractFile) => {
                 if (!(abstractFile instanceof TFile)) return;
                 for (let calendar of this.calendars) {
                     const events = calendar.events.filter(
@@ -176,7 +176,7 @@ export class Watcher extends Component {
                         this.addToTree(calendar, event);
                     }
                 }
-                this.plugin.saveCalendar();
+                await this.plugin.saveCalendar();
                 this.plugin.app.workspace.trigger(
                     "fantasy-calendars-event-update",
                     this.tree

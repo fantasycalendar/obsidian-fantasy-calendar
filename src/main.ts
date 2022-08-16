@@ -368,10 +368,6 @@ export default class FantasyCalendar extends Plugin {
                 calendar.static.eras.length &&
                 calendar.static.eras.some((era) => !era.id)
             ) {
-                console.log(
-                    "🚀 ~ file: main.ts ~ line 370 ~ calendar.static.eras",
-                    calendar.static.eras
-                );
                 calendar.static.eras = calendar.static.eras.map((era) => {
                     return {
                         ...copy(era),
@@ -383,7 +379,7 @@ export default class FantasyCalendar extends Plugin {
                 });
             }
         }
-        this.saveSettings();
+        await this.saveSettings();
 
         this.settingsLoaded = true;
         this.app.workspace.trigger("fantasy-calendars-settings-loaded");

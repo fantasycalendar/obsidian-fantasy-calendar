@@ -128,7 +128,7 @@ export default class FantasyCalendarView extends ItemView {
         }
     }
 
-    registerCalendarInterval() {
+    async registerCalendarInterval() {
         if (this.interval) {
             clearInterval(this.interval);
             this.interval = null;
@@ -148,15 +148,15 @@ export default class FantasyCalendarView extends ItemView {
                     this.helper.goToNextCurrentDay();
                 }
                 this.calendar.date = current.valueOf();
-                this.saveCalendars();
+                await this.saveCalendars();
             }
-            this.interval = window.setInterval(() => {
+            this.interval = window.setInterval(async () => {
                 if (daysBetween(new Date(), current) >= 1) {
                     this.helper.goToNextCurrentDay();
                     this.helper.current;
                     current = new Date();
                     this.calendar.date = current.valueOf();
-                    this.saveCalendars();
+                    await this.saveCalendars();
                 }
             }, 60 * 1000);
 
@@ -164,9 +164,9 @@ export default class FantasyCalendarView extends ItemView {
         }
     }
 
-    saveCalendars() {
+    async saveCalendars() {
         this.updateMe = false;
-        this.plugin.saveCalendar();
+        await this.plugin.saveCalendar();
     }
 
     interval: number;
@@ -192,13 +192,13 @@ export default class FantasyCalendarView extends ItemView {
             date
         );
 
-        modal.onClose = () => {
+        modal.onClose = async () => {
             if (!modal.saved) return;
             this.calendar.events.push(modal.event);
 
             this.helper.addEvent(modal.event);
 
-            this.saveCalendars();
+            await this.saveCalendars();
 
             this._app.$set({
                 calendar: this.helper
@@ -269,14 +269,14 @@ export default class FantasyCalendarView extends ItemView {
                     });
                 }
                 menu.addItem((item) => {
-                    item.setTitle("Set as Today").onClick(() => {
+                    item.setTitle("Set as Today").onClick(async () => {
                         this.calendar.current = day.date;
 
                         this.helper.current.day = day.number;
 
                         this.triggerHelperEvent("day-update");
 
-                        this.saveCalendars();
+                        await this.saveCalendars();
                     });
                 });
                 menu.addItem((item) =>
@@ -296,13 +296,13 @@ export default class FantasyCalendarView extends ItemView {
             menu.addItem((item) => {
                 item.setTitle(
                     `${this.calendar.displayWeeks ? "Hide" : "Show"} Weeks`
-                ).onClick(() => {
+                ).onClick(async () => {
                     this.calendar.displayWeeks = !this.calendar.displayWeeks;
                     this.helper.update(this.calendar);
                     this._app.$set({
                         displayWeeks: this.calendar.displayWeeks
                     });
-                    this.saveCalendars();
+                    await this.saveCalendars();
                 });
             });
             menu.addItem((item) => {
@@ -323,11 +323,11 @@ export default class FantasyCalendarView extends ItemView {
             menu.addItem((item) => {
                 item.setTitle(
                     this.dayNumber ? "Hide Day Number" : "Display Day Number"
-                ).onClick(() => {
+                ).onClick(async () => {
                     this.dayNumber = !this.dayNumber;
                     this.calendar.static.displayDayNumber = this.dayNumber;
                     this._app.$set({ displayDayNumber: this.dayNumber });
-                    this.saveCalendars();
+                    await this.saveCalendars();
                 });
             });
             menu.addItem((item) => {
@@ -458,7 +458,7 @@ export default class FantasyCalendarView extends ItemView {
                                     `---\n${stringifyYaml(content)}\n---`
                                 );
                             }
-                            this.saveCalendars();
+                            await this.saveCalendars();
 
                             if (file instanceof TFile) {
                                 const fileViews =
@@ -491,7 +491,7 @@ export default class FantasyCalendarView extends ItemView {
                             event
                         );
 
-                        modal.onClose = () => {
+                        modal.onClose = async () => {
                             if (!modal.saved) return;
 
                             const existing = this.calendar.events.find(
@@ -518,7 +518,7 @@ export default class FantasyCalendarView extends ItemView {
                                 );
                             }
 
-                            this.saveCalendars();
+                            await this.saveCalendars();
 
                             this._app.$set({
                                 calendar: this.helper
@@ -552,7 +552,7 @@ export default class FantasyCalendarView extends ItemView {
                             existing.date.year
                         );
 
-                        this.saveCalendars();
+                        await this.saveCalendars();
 
                         this._app.$set({
                             calendar: this.helper
@@ -596,7 +596,7 @@ export default class FantasyCalendarView extends ItemView {
         if (!this.helper) return;
         if (!this.calendar) return;
         const modal = new ChangeDateModal(this.plugin, this.calendar);
-        modal.onClose = () => {
+        modal.onClose = async () => {
             if (!modal.confirmed) return;
             if (modal.setCurrent) {
                 this.calendar.current = { ...modal.date };
@@ -607,7 +607,7 @@ export default class FantasyCalendarView extends ItemView {
                 this._app.$set({ calendar: this.helper });
             }
 
-            this.saveCalendars();
+            await this.saveCalendars();
         };
 
         modal.open();

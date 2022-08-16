@@ -177,7 +177,7 @@
                 <WeekdayContainer {calendar} />
                 <MonthContainer />
                 <YearContainer {calendar} app={plugin.app} />
-                <EraContainer {plugin} {calendar} />
+                <!--<EraContainer {plugin} {calendar} />-->
                 <CurrentDate />
                 <EventContainer {plugin} {calendar} />
                 <CategoryContainer {calendar} />
