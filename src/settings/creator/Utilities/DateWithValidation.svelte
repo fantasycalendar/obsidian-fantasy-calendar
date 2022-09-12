@@ -16,14 +16,21 @@
     export let date: CurrentCalendarData;
 
     $: months = calendar.static.months;
-
-    $: validDay = isValidDay(date.day, calendar);
-    $: validMonth = isValidMonth(date.month, calendar);
-    $: validYear = isValidYear(date.year, calendar);
-    $: invalid = !validDay || !validMonth || !validYear;
+    $: years = calendar.static.years ?? [];
+    let validDay: boolean,
+        validMonth: boolean,
+        validYear: boolean,
+        invalid: boolean;
+    $: {
+        validDay = isValidDay(date.day, calendar);
+        validMonth = isValidMonth(date.month, calendar);
+        validYear = isValidYear(date.year, calendar);
+        invalid = !validDay || !validMonth || !validYear;
+    }
 
     $: {
         dispatch("date-change", date);
+        dispatch("invalid", invalid);
     }
 </script>
 
@@ -81,13 +88,25 @@
                 <div use:warning />
             {/if}
         </div>
-        <input
-            type="number"
-            spellcheck="false"
-            placeholder="Year"
-            class:invalid={!validYear}
-            bind:value={date.year}
-        />
+        {#if calendar.static.useCustomYears}
+            <select
+                class="dropdown"
+                bind:value={date.year}
+                class:invalid={!validYear}
+            >
+                {#each years?.filter((m) => m.name) as year, index}
+                    <option value={index}>{year.name}</option>
+                {/each}
+            </select>
+        {:else}
+            <input
+                type="number"
+                spellcheck="false"
+                placeholder="Year"
+                class:invalid={!validYear}
+                bind:value={date.year}
+            />
+        {/if}
         {#if invalid}
             <div class="setting-item-description">
                 {#if !validYear}

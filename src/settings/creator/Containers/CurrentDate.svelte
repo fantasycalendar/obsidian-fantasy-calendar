@@ -5,12 +5,6 @@
     import { Writable } from "svelte/store";
     import DateWithValidation from "../Utilities/DateWithValidation.svelte";
     import Details from "../Utilities/Details.svelte";
-    import {
-        warning,
-        invalidDayLabel,
-        invalidMonthLabel,
-        invalidYearLabel
-    } from "../Utilities/utils";
 
     let calendar: Calendar;
     const store = getContext<Writable<Calendar>>("store");
@@ -18,7 +12,6 @@
     store.subscribe((v) => (calendar = v));
 
     $: current = calendar.current;
-    $: months = calendar.static.months;
 
     $: validDay = isValidDay(current.day, calendar);
     $: validMonth = isValidMonth(current.month, calendar);
@@ -31,5 +24,9 @@
     warn={invalid}
     label={"Invalid current date specified"}
 >
-    <DateWithValidation {calendar} date={current} />
+    <DateWithValidation
+        {calendar}
+        date={current}
+        on:invalid={(evt) => (invalid = evt.detail)}
+    />
 </Details>
