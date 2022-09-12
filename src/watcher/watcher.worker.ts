@@ -87,7 +87,7 @@ class Parser {
                     this.debug = debug;
 
                     if (this.debug) {
-                        console.info("Received options message");
+                        console.debug("Received options message");
                     }
                 }
             }
@@ -100,7 +100,7 @@ class Parser {
                     const { calendars } = event.data;
                     this.calendars = [...calendars];
                     if (this.debug) {
-                        console.info("Received calendars message");
+                        console.debug("Received calendars message");
                     }
                 }
             }
@@ -111,7 +111,7 @@ class Parser {
             if (event.data.type == "queue") {
                 this.add(...event.data.paths);
                 if (this.debug) {
-                    console.info(
+                    console.debug(
                         `Received queue message for ${event.data.paths.length} paths`
                     );
                 }
@@ -120,7 +120,7 @@ class Parser {
     }
     add(...paths: string[]) {
         if (this.debug) {
-            console.info(`Adding ${paths.length} paths to queue`);
+            console.debug(`Adding ${paths.length} paths to queue`);
         }
         this.queue.push(...paths);
         if (!this.parsing) this.parse();
@@ -130,7 +130,7 @@ class Parser {
         while (this.queue.length) {
             const path = this.queue.shift();
             if (this.debug) {
-                console.info(
+                console.debug(
                     `Parsing ${path} for calendar events (${this.queue.length} to go)`
                 );
             }

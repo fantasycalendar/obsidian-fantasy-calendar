@@ -227,13 +227,13 @@ export class Watcher extends Component {
                     if (!calendar) return;
                     if (index == -1) {
                         if (this.plugin.data.debug)
-                            console.info(
+                            console.debug(
                                 `Adding '${event.name}' to ${calendar.name}`
                             );
                         calendar.events.push(event);
                     } else {
                         if (this.plugin.data.debug)
-                            console.info(
+                            console.debug(
                                 `Updating '${event.name}' in calendar ${calendar.name}`
                             );
                         calendar.events.splice(
@@ -260,7 +260,7 @@ export class Watcher extends Component {
                     const calendar = this.calendars.find((c) => c.id == id);
                     if (!calendar) return;
                     if (this.plugin.data.debug)
-                        console.info(
+                        console.debug(
                             `Removing '${event.name}' from ${calendar.name}`
                         );
                     calendar.events = calendar.events.filter(
@@ -277,7 +277,7 @@ export class Watcher extends Component {
             async (evt: MessageEvent<SaveMessage>) => {
                 if (evt.data.type == "save") {
                     if (this.plugin.data.debug) {
-                        console.info("Received save event from file watcher");
+                        console.debug("Received save event from file watcher");
                     }
                     this.plugin.app.workspace.trigger(
                         "fantasy-calendars-event-update",
