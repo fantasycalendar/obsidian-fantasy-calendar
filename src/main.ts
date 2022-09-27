@@ -56,6 +56,12 @@ declare module "obsidian" {
     }
 }
 
+declare global {
+    interface Window {
+        FantasyCalendarAPI?: API;
+    }
+}
+
 export const MODIFIER_KEY = Platform.isMacOS ? "Meta" : "Control";
 
 export const DEFAULT_CALENDAR: Calendar = {
@@ -203,6 +209,9 @@ export default class FantasyCalendar extends Plugin {
     }
     async onload() {
         console.log("Loading Fantasy Calendars v" + this.manifest.version);
+
+        (window["FantasyCalendarAPI"] = this.api) &&
+            this.register(() => delete window["FantasyCalendarAPI"]);
 
         this.registerView(
             VIEW_TYPE,

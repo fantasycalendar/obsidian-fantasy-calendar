@@ -394,16 +394,10 @@ The full API can be referenced [here](./src/@types/api.d.ts).
 
 ### Accessing the API
 
-The plugin must be retrieved from Obsidian's `App` interface to be used. The easiest way to do that is:
+The plugin API is available on the global window object as `FantasyCalendarAPI`.
 
 ```js
-const plugin = app.plugins.getPlugin("fantasy-calendar");
-```
-
-This will then allow you to access the Fantasy Calendar API:
-
-```js
-const api = plugin.api;
+const day = FantasyCalendarAPI.getDay({ year: 2022, month: 11, day: 25 });
 ```
 
 ## Settings
