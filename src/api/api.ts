@@ -1,10 +1,16 @@
 import { Notice } from "obsidian";
-import type { Calendar, CurrentCalendarData, Moon, Phase } from "src/@types";
+import type {
+    Calendar,
+    CurrentCalendarData,
+    EventCategory,
+    Moon,
+    Phase
+} from "src/@types";
 import type APIDefinition from "src/@types/api";
 import type { Day } from "src/@types/api";
 import CalendarHelper from "src/helper";
 import FantasyCalendar from "src/main";
-import { dateString } from "src/utils/functions";
+import { dateString, nanoid } from "src/utils/functions";
 
 import MoonUI from "../view/ui/Moon.svelte";
 
@@ -123,6 +129,38 @@ export class API implements APIDefinition {
             weekday: day.weekday,
             displayDate: dateString(day.date, helper.data.months)
         };
+    }
+
+    async addCategoryToCalendar(
+        category: EventCategory,
+        calendar: Calendar | string = this.plugin.defaultCalendar
+    ) {
+        if (!category) {
+            throw new Error("Category is required.");
+        }
+        if (!category.name || !category.color) {
+            throw new Error("A category requires a name and a color.");
+        }
+        if (!category.id) {
+            category.id = nanoid(6);
+        }
+        if (typeof calendar == "string") {
+            calendar =
+                this.plugin.data.calendars.find((c) => c.name == calendar) ??
+                this.plugin.defaultCalendar;
+        }
+
+        if (
+            !calendar ||
+            typeof calendar != "object" ||
+            !("categories" in calendar)
+        ) {
+            throw new Error("Invalid calendar provided.");
+        }
+
+        calendar.categories.push(category);
+
+        await this.plugin.saveCalendar();
     }
     getHelper(calendar = this.plugin.defaultCalendar) {
         return new CalendarHelper(calendar, this.plugin);
