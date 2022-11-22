@@ -55,7 +55,7 @@ export type RenameMessage = {
     file: { path: string; basename: string; oldPath: string };
 };
 
-const timelineData: RegExp = /(<(span|div)(?s:.)*?<\/(span|div)>)/g;
+const timelineData: RegExp = /(<(span|div)[\S\s]*?<\/(span|div)>)/g;
 const ctx: Worker = self as any;
 class Parser {
     queue: string[] = [];
