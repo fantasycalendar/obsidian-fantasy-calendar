@@ -399,7 +399,7 @@ class Parser {
             let datebits = element.dataset.date.split(/(?<!^)-/);
             const date = {
                 year: parseInt(datebits[0]),
-                month: parseInt(datebits[1]),
+                month: parseInt(datebits[1])-1,
                 day: parseInt(datebits[2])
             };
             let end;
@@ -407,7 +407,7 @@ class Parser {
                 datebits = element.dataset.end.split(/(?<!^)-/);
                 end = {
                     year: parseInt(datebits[0]),
-                    month: parseInt(datebits[1]),
+                    month: parseInt(datebits[1])-1,
                     day: parseInt(datebits[2])
                 };
             }
