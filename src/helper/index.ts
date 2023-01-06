@@ -15,7 +15,7 @@ import type {
     FcEvent,
     LeapDay,
     Moon
-} from "../@types";
+} from "src/@types";
 
 export class DayHelper {
     private _events: FcEvent[];
@@ -171,7 +171,7 @@ export class MonthHelper {
                         ) +
                         day.day;
                     const daysBetween = currentDays - startDays;
-                    
+
                     return daysBetween % event.formulas[0].number == 0;
                 }
             }

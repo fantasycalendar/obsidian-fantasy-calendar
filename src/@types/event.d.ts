@@ -1,22 +1,26 @@
+import { Nullable } from ".";
+
+export interface FcEventSort {
+    timestamp: number;
+    order: string;
+}
+export interface FcEventDate {
+    year: Nullable<number>,
+    month: Nullable<number>,
+    day: Nullable<number>
+}
+
 export interface FcEvent {
     name: string;
     description: string;
-    date: {
-        month: number;
-        day: number;
-        year: number;
-    };
-    end?: {
-        month: number;
-        day: number;
-        year: number;
-    };
+    date: FcEventDate;
+    end?: FcEventDate;
     id: string;
     note: string;
     category: string;
-    timestamp?: number;
-    auto?: boolean;
+    sort: FcEventSort;
     formulas?: EventFormula[];
+    img?: string;
 }
 
 type EventFormula = FormulaInterval;
