@@ -2,7 +2,7 @@ import { Notice } from "obsidian";
 import type {
     Calendar,
     CurrentCalendarData,
-    EventCategory,
+    FcEventCategory,
     Moon,
     Phase
 } from "src/@types";
@@ -132,7 +132,7 @@ export class API implements APIDefinition {
     }
 
     async addCategoryToCalendar(
-        category: EventCategory,
+        category: FcEventCategory,
         calendar: Calendar | string = this.plugin.defaultCalendar
     ) {
         if (!category) {
