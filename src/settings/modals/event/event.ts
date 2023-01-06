@@ -8,7 +8,7 @@ import {
     TextAreaComponent,
     TFile
 } from "obsidian";
-import type { Calendar, Event } from "../../../@types";
+import type { Calendar, FcEvent } from "../../../@types";
 
 import { dateString, nanoid } from "../../../utils/functions";
 
@@ -22,7 +22,7 @@ import { FantasyCalendarModal } from "../modal";
 
 export class CreateEventModal extends FantasyCalendarModal {
     saved = false;
-    event: Event = {
+    event: FcEvent = {
         name: null,
         description: null,
         date: {
@@ -49,7 +49,7 @@ export class CreateEventModal extends FantasyCalendarModal {
     constructor(
         public plugin: FantasyCalendar,
         public calendar: Calendar,
-        event?: Event,
+        event?: FcEvent,
         date?: { month: number; day: number; year: number }
     ) {
         super(plugin.app);

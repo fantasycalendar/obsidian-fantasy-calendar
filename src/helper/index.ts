@@ -12,13 +12,13 @@ import type {
     Calendar,
     CurrentCalendarData,
     Month,
-    Event,
+    FcEvent,
     LeapDay,
     Moon
 } from "../@types";
 
 export class DayHelper {
-    private _events: Event[];
+    private _events: FcEvent[];
     shouldUpdate: boolean = false;
     get calendar() {
         return this.month.calendar;
@@ -30,7 +30,7 @@ export class DayHelper {
             year: this.year
         };
     }
-    get events(): Event[] {
+    get events(): FcEvent[] {
         if (!this._events || !this._events.length || this.shouldUpdate) {
             this._events = this.month.getEventsOnDay(this.date);
         }
@@ -123,7 +123,7 @@ export class MonthHelper {
     get type() {
         return this.data.type;
     }
-    events: Event[];
+    events: FcEvent[];
     getEventsOnDay(day: CurrentCalendarData) {
         if (!this.events || !this.events.length || this.shouldUpdate) {
             this.days.forEach((day) => (day.shouldUpdate = true));
@@ -213,13 +213,13 @@ export class MonthHelper {
 }
 
 interface YearEventCache {
-    events: Event[];
+    events: FcEvent[];
     shouldUpdate: boolean;
     months: Map<number, MonthHelper>;
 }
 
 export default class CalendarHelper extends Events {
-    addEvent(event: Event) {
+    addEvent(event: FcEvent) {
         const year = event.date.year;
         const month = event.date.month;
 
@@ -261,7 +261,7 @@ export default class CalendarHelper extends Events {
     /**
      * Get all the events that occur in a given month.
      */
-    getEventsForMonth(helper: MonthHelper): Event[] {
+    getEventsForMonth(helper: MonthHelper): FcEvent[] {
         //get from cache first
 
         //else

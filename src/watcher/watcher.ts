@@ -8,7 +8,7 @@ import {
     getAllTags,
     FuzzySuggestModal
 } from "obsidian";
-import type { Calendar, Event } from "src/@types";
+import type { Calendar, FcEvent } from "src/@types";
 import type FantasyCalendar from "src/main";
 //have to ignore until i fix typing issue
 //@ts-expect-error
@@ -319,7 +319,7 @@ export class Watcher extends Component {
         }
         this.startParsing([...folders]);
     }
-    addToTree(calendar: Calendar, event: Event) {
+    addToTree(calendar: Calendar, event: FcEvent) {
         if (!this.tree.has(calendar.id)) {
             this.tree.set(calendar.id, new Set());
         }
