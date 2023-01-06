@@ -1,10 +1,10 @@
 import {
     Moon,
     Phase,
-    Event,
+    FcEvent,
     CurrentCalendarData,
     LeapDay,
-    EventCategory
+    FcEventCategory
 } from ".";
 
 declare class API {
@@ -28,14 +28,14 @@ declare class API {
     ): Day;
 
     addCategoryToCalendar(
-        category: EventCategory,
+        category: FcEventCategory,
         calendar: Calendar | string = this.plugin.defaultCalendar
     ): Promise<void>;
 }
 
 export type Day = {
     moons: [Moon, Phase][];
-    events: Event[];
+    events: FcEvent[];
     date: CurrentCalendarData;
     longDate: {
         day: number;

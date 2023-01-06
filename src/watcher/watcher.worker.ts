@@ -1,5 +1,5 @@
 import type { CachedMetadata, FrontMatterCache } from "obsidian";
-import type { Calendar, CurrentCalendarData, Event } from "src/@types";
+import type { Calendar, CurrentCalendarData, FcEvent } from "src/@types";
 import { nanoid, wrap } from "src/utils/functions";
 const { DOMParser } = require("xmldom");
 
@@ -35,14 +35,14 @@ export interface UpdateEventMessage {
     type: "update";
     id: string;
     index: number;
-    event: Event;
-    original: Event;
+    event: FcEvent;
+    original: FcEvent;
 }
 export interface DeleteEventMessage {
     type: "delete";
     id: string;
     index: number;
-    event: Event;
+    event: FcEvent;
 }
 
 export interface SaveMessage {
@@ -219,7 +219,7 @@ class Parser {
             return;
         }
 
-        let timelineEvents: Event[] = [];
+        let timelineEvents: FcEvent[] = [];
         if (
             calendar.supportTimelines &&
             allTags &&
@@ -296,7 +296,7 @@ class Parser {
         frontmatter: FrontMatterCache,
         file: { path: string; basename: string },
         eventDisplayName?: string
-    ): Event[] {
+    ): FcEvent[] {
         const { date, end } = this.getDates(
             frontmatter,
             this.parseTitle ? file.basename : ""
@@ -356,7 +356,7 @@ class Parser {
         file: { path: string; basename: string },
         fcCategory: string
     ) {
-        const events: Event[] = [];
+        const events: FcEvent[] = [];
         const domparser = new DOMParser();
         // span or div with attributes:
         // <span

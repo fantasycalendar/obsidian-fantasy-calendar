@@ -1,11 +1,11 @@
 /** Worker for eventual offloading of calendar calculation. */
-import type { Event } from "src/@types/index";
+import type { FcEvent } from "src/@types/index";
 
 const ctx: Worker = self as any;
 
 interface EventMessage {
     type: "hash";
-    events: Event[];
+    events: FcEvent[];
 }
 
 // Respond to message from parent thread

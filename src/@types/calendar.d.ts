@@ -1,5 +1,5 @@
 import { Moon } from ".";
-import { Event, EventCategory } from ".";
+import { FcEvent, FcEventCategory } from ".";
 
 export interface Calendar {
     id: string;
@@ -8,8 +8,8 @@ export interface Calendar {
     static: StaticCalendarData;
     current: CurrentCalendarData;
     _current?: CurrentCalendarData;
-    events: Event[];
-    categories: EventCategory[];
+    events: FcEvent[];
+    categories: FcEventCategory[];
     date?: number;
     displayWeeks?: boolean;
     autoParse: boolean;

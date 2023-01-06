@@ -1,4 +1,4 @@
-export interface Event {
+export interface FcEvent {
     name: string;
     description: string;
     date: {
@@ -26,14 +26,14 @@ interface FormulaInterval {
     timespan: "days";
 }
 
-export interface ColorEvent extends Event {
+export interface ColorEvent extends FcEvent {
     color: string;
 }
 
-export interface EventCategory {
+export interface FcEventCategory {
     name: string;
     color: string;
     id: string;
 }
 
-export interface EventCondition {}
+export interface FcEventCondition {}
