@@ -17,6 +17,7 @@ export interface Calendar {
     supportTimelines: boolean;
     syncTimelines: boolean;
     timelineTag: string;
+    dateFormat?: string;
 }
 export interface StaticCalendarData {
     firstWeekDay: number;
@@ -65,7 +66,7 @@ interface LeapDayCondition {
 
 /**
 Example Condition
-  
+
 400,!100,4 - Every 4 years, unless it is divisible by 100, but again if it is divisible by 400.
 
 [

@@ -1,11 +1,10 @@
-import type { Recurring } from "src/settings/settings";
-
 export * from "./calendar";
-export * from "./leapday";
 export * from "./event";
 export * from "./moons";
 
 import type { Calendar } from "./calendar";
+
+export type Nullable<T> = T | null;
 
 export interface FantasyCalendarData {
     addToDefaultIfMissing: boolean;

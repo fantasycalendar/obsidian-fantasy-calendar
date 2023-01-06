@@ -14,6 +14,7 @@ import { CalendarEventTree, Watcher } from "./watcher/watcher";
 import { API } from "./api/api";
 import copy from "fast-copy";
 import { nanoid } from "./utils/functions";
+import { FcEventHelper } from "./helper/event.helper";
 
 declare module "obsidian" {
     interface Workspace {
@@ -92,7 +93,7 @@ export const DEFAULT_CALENDAR: Calendar = {
     path: "/",
     supportTimelines: false,
     syncTimelines: true,
-    timelineTag: "#timeline"
+    timelineTag: "timeline"
 };
 
 export const DEFAULT_DATA: FantasyCalendarData = {
@@ -174,10 +175,7 @@ export default class FantasyCalendar extends Plugin {
         if (this.syncTimelines(calendar)) {
             tag =
                 this.app.plugins.getPlugin("obsidian-timelines").settings
-                    .timelineTag;
-        }
-        if (!/^#/.test(tag)) {
-            tag = `#${tag}`;
+                    .timelineTag.replace("#", "");
         }
         return tag ?? calendar.timelineTag ?? "";
     }
@@ -350,27 +348,25 @@ export default class FantasyCalendar extends Plugin {
                 )
             );
         }
-        if (!this.data.defaultCalendar && this.data.calendars.length) {
-            this.data.defaultCalendar = this.data.calendars[0].id;
-        }
-        if (
-            this.data.calendars.length &&
-            !this.data.calendars.find(
-                (cal) => cal.id == this.data.defaultCalendar
-            )
-        ) {
-            this.data.defaultCalendar = this.data.calendars[0].id;
-        }
-
-        if ((this.data as any).autoParse && this.data.calendars.length) {
-            for (const calendar of this.data.calendars) {
-                calendar.autoParse = (this.data as any).autoParse;
-                calendar.path = (this.data as any).path;
+        if (this.data.calendars.length) {
+            if (!this.data.defaultCalendar ||
+                !this.data.calendars.find(
+                    (cal) => cal.id == this.data.defaultCalendar
+                )
+            ) {
+                this.data.defaultCalendar = this.data.calendars[0].id;
             }
-            delete (this.data as any).autoParse;
-            delete (this.data as any).path;
+            if ((this.data as any).autoParse) {
+                for (const calendar of this.data.calendars) {
+                    calendar.autoParse = (this.data as any).autoParse;
+                    calendar.path = (this.data as any).path;
+                }
+                delete (this.data as any).autoParse;
+                delete (this.data as any).path;
+            }
+        } else {
+            this.data.defaultCalendar = null;
         }
-
         for (const calendar of this.data.calendars) {
             if (
                 calendar.static.eras &&
@@ -385,6 +381,17 @@ export default class FantasyCalendar extends Plugin {
                         endsYear: era.endsYear ?? false,
                         event: era.event ?? false
                     };
+                });
+            }
+            if (!this.data.version.major || this.data.version.major < 3) {
+                // Ensure events in existing calendars have sort keys
+                console.log("Updating cached events");
+                const helper = new FcEventHelper(calendar, false, this.format);
+                calendar.events.forEach((e) => {
+                    e.sort = helper.timestampForFcEvent(e);
+                    const x: any = e;
+                    delete x["timestamp"];
+                    delete x["auto"];
                 });
             }
         }
@@ -416,6 +423,7 @@ export default class FantasyCalendar extends Plugin {
         return `${this.configDirectory}/data.json`;
     }
     async saveSettings() {
+        this.data.version = this.manifestToVersion();
         await this.saveData(this.data);
         this.app.workspace.trigger("fantasy-calendar-settings-change");
     }
@@ -439,5 +447,13 @@ export default class FantasyCalendar extends Plugin {
             }
         }
         await super.saveData(data);
+    }
+    manifestToVersion() {
+        let v = this.manifest.version.split(".");
+        return {
+            major: Number(v[0]),
+            minor: Number(v[1]),
+            patch: Number(v[2])
+        }
     }
 }

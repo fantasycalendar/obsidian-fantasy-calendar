@@ -93,7 +93,7 @@
         text.setValue(`${calendar.timelineTag ?? ""}`.replace("#", ""))
             .setDisabled(calendar.syncTimelines)
             .onChange(async (v) => {
-                calendar.timelineTag = v.startsWith("#") ? v : `#${v}`;
+                calendar.timelineTag = v.replace("#", "");
                 await plugin.saveSettings();
             });
         const b = new ExtraButtonComponent(node);
