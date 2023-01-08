@@ -385,7 +385,7 @@ export default class FantasyCalendar extends Plugin {
             }
             if (!this.data.version.major || this.data.version.major < 3) {
                 // Ensure events in existing calendars have sort keys
-                console.log("Updating cached events");
+                if (this.data.debug) console.log("Updating cached events for %s", calendar.name);
                 const helper = new FcEventHelper(calendar, false, this.format);
                 calendar.events.forEach((e) => {
                     e.sort = helper.timestampForFcEvent(e);

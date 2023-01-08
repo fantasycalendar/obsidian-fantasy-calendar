@@ -240,20 +240,28 @@ class Parser {
                 name = this.defaultCalendar;
             }
             name = name?.toLowerCase();
-            let helper = this.eventHelpers.get(name);
-            if (!helper) {
-                const calendar = this.calendars.find(
-                    (calendar) => name == calendar.name.toLowerCase()
-                );
-                if (!calendar && this.debug) {
-                    console.info(
-                        `Could not find calendar associated with file ${file.basename}`
+            if (name) {
+                if (this.debug) console.log("Finding calendar for ", name);
+                let helper = this.eventHelpers.get(name);
+                if (helper) {
+                    return helper;
+                } else {
+                    const calendar = this.calendars.find(
+                        (calendar) => name == calendar.name.toLowerCase()
                     );
-                    return null;
+                    if (calendar) {
+                        if (this.debug) console.log("creating event helper for calendar", calendar);
+                        helper = new FcEventHelper(calendar, this.parseTitle, this.format);
+                        this.eventHelpers.set(name, helper);
+                        return helper;
+                    }
                 }
-                helper = new FcEventHelper(calendar, this.parseTitle, this.format);
             }
-            return helper;
+            if (this.debug) {
+                console.info(
+                    `Could not find calendar ${name} associated with file ${file.basename}`
+                );
+            }
         }
         return null;
     }
