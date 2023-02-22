@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.11](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.3.10...2.3.11) (2023-02-22)
+
+
+### Bug Fixes
+
+* Adds `addCategoryToCalendar` method to API ([70e6b5d](https://github.com/valentine195/obsidian-fantasy-calendar/commit/70e6b5dd1f6a87c0ad3178c2aa9e583556d4c8fe))
+* disable event frontmatter writing, debounce save ([c1ae662](https://github.com/valentine195/obsidian-fantasy-calendar/commit/c1ae66243b4b0e4f4f01af0eb1b01d303836d74b))
+
 ### [2.3.10](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.3.9...2.3.10) (2022-09-27)
 
 
