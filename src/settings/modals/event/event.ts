@@ -132,8 +132,9 @@ export class CreateEventModal extends FantasyCalendarModal {
                         }
                         this.saved = true;
                         if (
-                            this.plugin.data.eventFrontmatter &&
-                            this.event.note
+                            false
+                            /* this.plugin.data.eventFrontmatter &&
+                            this.event.note */
                         ) {
                             const [path, subpath] =
                                 this.event.note.split(/[#^]/);

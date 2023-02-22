@@ -1,4 +1,4 @@
-import { Notice, Platform, Plugin, WorkspaceLeaf } from "obsidian";
+import { debounce, Notice, Platform, Plugin, WorkspaceLeaf } from "obsidian";
 
 import FantasyCalendarSettings from "./settings/settings";
 
@@ -388,6 +388,7 @@ export default class FantasyCalendar extends Plugin {
                 });
             }
         }
+        this.data.eventFrontmatter = false;
         await this.saveSettings();
 
         this.settingsLoaded = true;
@@ -416,10 +417,10 @@ export default class FantasyCalendar extends Plugin {
         return `${this.configDirectory}/data.json`;
     }
     async saveSettings() {
-        await this.saveData(this.data);
+        await this.save(this.data);
         this.app.workspace.trigger("fantasy-calendar-settings-change");
     }
-    async saveData(data: FantasyCalendarData) {
+    save = debounce(async (data: FantasyCalendarData) => {
         if (this.configDirectory) {
             try {
                 if (
@@ -438,6 +439,6 @@ export default class FantasyCalendar extends Plugin {
                 );
             }
         }
-        await super.saveData(data);
-    }
+        await this.saveData(data);
+    }, 200);
 }

@@ -411,14 +411,14 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
             });
         new Setting(containerEl)
             .setName("Write Event Data to Frontmatter")
-            .setDesc(
-                "Events linked to notes will write their data to the note frontmatter."
-            )
+            .setDesc("This setting is temporarily disabled.")
             .addToggle((t) => {
-                t.setValue(this.data.eventFrontmatter).onChange(async (v) => {
-                    this.data.eventFrontmatter = v;
-                    await this.plugin.saveSettings();
-                });
+                t.setValue(false)
+                    .setDisabled(true)
+                    .onChange(async (v) => {
+                        this.data.eventFrontmatter = v;
+                        await this.plugin.saveSettings();
+                    });
             });
 
         new Setting(containerEl)
