@@ -43,3 +43,7 @@ __Please attach a copy of your **Show Debug Info**, found under the Obsidian Top
 
 
 __Anything else that we forgot to ask that you think you ought to add? Also, this is a great spot for screenshots and error codes.__
+
+
+
+Thank you for your submission!
