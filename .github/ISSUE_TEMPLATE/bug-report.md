@@ -23,7 +23,7 @@ Steps to reproduce the behavior:
 __What Calendar system were you using?__ 
 *Harptos, Earth, Etc* 
 
-__Was it created within the plugin, or imported from Fantasy Calendars online?__
+__Was it created within the plugin, or imported from Fantasy Calendar online?__
 
 *Please include a most recent copy or link to the calendar, if possible.*
 
