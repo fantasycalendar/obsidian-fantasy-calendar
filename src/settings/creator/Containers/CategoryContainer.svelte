@@ -1,6 +1,6 @@
 <script lang="ts">
     import { ExtraButtonComponent, TextComponent } from "obsidian";
-    import { createEventDispatcher } from "svelte";
+    import { createEventDispatcher, getContext } from "svelte";
     import randomColor from "randomcolor";
 
     import type { Calendar, EventCategory } from "src/@types";
@@ -11,9 +11,10 @@
 
     const dispatch = createEventDispatcher();
 
-    export let calendar: Calendar;
+    const calendar = getContext("store");
+    const { categoryStore } = calendar;
 
-    $: categories = calendar.categories;
+    $: categories = $calendar.categories;
 
     const name = (node: HTMLElement, category: EventCategory) => {
         const comp = new TextComponent(node)
@@ -21,38 +22,37 @@
             .setPlaceholder("Name")
             .onChange((v) => {
                 category.name = v;
-                dispatch("update", category);
+                categoryStore.update(category.id, category);
             });
         comp.inputEl.setAttr("style", "width: 100%;");
     };
     const trash = (node: HTMLElement, item: EventCategory) => {
         new ExtraButtonComponent(node).setIcon("trash").onClick(() => {
-            categories = categories.filter(
-                (category) => category.id !== item.id
-            );
-
-            dispatch("delete", item);
+            categoryStore.delete(item.id);
         });
     };
     const updateColor = (event: Event, category: EventCategory) => {
         const { target } = event;
         if (!(target instanceof HTMLInputElement)) return;
         category.color = target.value;
-        dispatch("update", category);
+        categoryStore.update(category.id, category);
     };
 </script>
 
-<Details name={"Categories"}>
+<Details
+    name={"Categories"}
+    open={false}
+    desc={`${$categoryStore.length} categor${
+        $categoryStore.length != 1 ? "ies" : "y"
+    }`}
+>
     <AddNew
         on:click={() =>
-            (calendar.categories = [
-                ...categories,
-                {
-                    id: nanoid(6),
-                    color: randomColor(),
-                    name: "Category"
-                }
-            ])}
+            categoryStore.add({
+                id: nanoid(6),
+                color: randomColor(),
+                name: "Category"
+            })}
     />
 
     {#if !categories.length}

@@ -17,30 +17,28 @@
     import { DEFAULT_CALENDAR } from "src/main";
 
     export let plugin: FantasyCalendar;
-    export let calendar: Calendar;
 
-    const store = getContext<Writable<Calendar>>("store");
-    store.subscribe((v) => (calendar = v));
+    const calendar = getContext("store");
 
-    $: displayDayNumber = calendar.static.displayDayNumber;
-    $: incrementDay = calendar.static.incrementDay;
+    $: displayDayNumber = $calendar.static.displayDayNumber;
+    $: incrementDay = $calendar.static.incrementDay;
 
-    $: validName = calendar.name != null && calendar.name.length;
+    $: validName = $calendar.name != null && $calendar.name.length;
 
-    $: autoParse = calendar.autoParse;
+    $: autoParse = $calendar.autoParse;
 
-    $: timelines = calendar.supportTimelines;
+    $: timelines = $calendar.supportTimelines;
 
-    if (!calendar.timelineTag)
-        calendar.timelineTag = DEFAULT_CALENDAR.timelineTag;
+    if (!$calendar.timelineTag)
+        $calendar.timelineTag = DEFAULT_CALENDAR.timelineTag;
 
     const folder = (node: HTMLElement) => {
         let folders = plugin.app.vault
             .getAllLoadedFiles()
             .filter((f) => f instanceof TFolder);
         const text = new ObsidianTextComponent(node);
-        if (!calendar.path) calendar.path = "/";
-        text.setPlaceholder(calendar.path ?? "/");
+        if (!$calendar.path) $calendar.path = "/";
+        text.setPlaceholder($calendar.path ?? "/");
         const modal = new FolderSuggestionModal(plugin.app, text, [
             ...(folders as TFolder[])
         ]);
@@ -49,14 +47,14 @@
             const v = text.inputEl.value?.trim()
                 ? text.inputEl.value.trim()
                 : "/";
-            calendar.path = normalizePath(v);
+            $calendar.path = normalizePath(v);
         };
 
         text.inputEl.onblur = async () => {
             const v = text.inputEl.value?.trim()
                 ? text.inputEl.value.trim()
                 : "/";
-            calendar.path = normalizePath(v);
+            $calendar.path = normalizePath(v);
         };
     };
 
@@ -90,31 +88,31 @@
 
     const timelinesTagSetting = (node: HTMLElement) => {
         const text = new ObsidianTextComponent(node);
-        text.setValue(`${calendar.timelineTag ?? ""}`.replace("#", ""))
-            .setDisabled(calendar.syncTimelines)
+        text.setValue(`${$calendar.timelineTag ?? ""}`.replace("#", ""))
+            .setDisabled($calendar.syncTimelines)
             .onChange(async (v) => {
-                calendar.timelineTag = v.startsWith("#") ? v : `#${v}`;
+                $calendar.timelineTag = v.startsWith("#") ? v : `#${v}`;
                 await plugin.saveSettings();
             });
         const b = new ExtraButtonComponent(node);
         if (!plugin.canUseTimelines) {
-            calendar.syncTimelines = false;
+            $calendar.syncTimelines = false;
             b.extraSettingsEl.detach();
             return;
         }
-        if (calendar.syncTimelines) {
+        if ($calendar.syncTimelines) {
             b.setIcon("checkmark")
                 .setTooltip("Unsync from Timelines Plugin")
                 .onClick(async () => {
-                    calendar.syncTimelines = false;
+                    $calendar.syncTimelines = false;
                     await plugin.saveSettings();
                 });
         } else {
             b.setIcon("sync")
                 .setTooltip("Sync with Timelines Plugin")
                 .onClick(async () => {
-                    calendar.syncTimelines = true;
-                    calendar.timelineTag =
+                    $calendar.syncTimelines = true;
+                    $calendar.timelineTag =
                         plugin.app.plugins.getPlugin(
                             "obsidian-timelines"
                         ).settings.timelineTag;
@@ -134,24 +132,24 @@
             name={"Calendar Name"}
             warn={!validName}
             desc={!validName ? "The calendar must have a name" : ""}
-            value={calendar.name}
+            value={$calendar.name}
             on:blur={(evt) => {
-                calendar.name = evt.detail;
-                store.set(calendar);
+                $calendar.name = evt.detail;
             }}
+            on:change={(evt) => ($calendar.name = evt.detail)}
         />
         <TextAreaComponent
             name={"Calendar Description"}
-            value={calendar.description}
-            on:blur={(evt) => (calendar.description = evt.detail)}
+            value={$calendar.description}
+            on:blur={(evt) => ($calendar.description = evt.detail)}
         />
         <ToggleComponent
             name={"Display Day Number"}
             desc={"Display day of year in Day View"}
             value={displayDayNumber}
             on:click={() => {
-                calendar.static.displayDayNumber =
-                    !calendar.static.displayDayNumber;
+                $calendar.static.displayDayNumber =
+                    !$calendar.static.displayDayNumber;
             }}
         />
         <ToggleComponent
@@ -159,7 +157,7 @@
             desc={"Automatically increment the current day every real-world day."}
             value={incrementDay}
             on:click={() => {
-                calendar.static.incrementDay = !calendar.static.incrementDay;
+                $calendar.static.incrementDay = !$calendar.static.incrementDay;
             }}
         />
         <ToggleComponent
@@ -167,14 +165,14 @@
             desc={"The plugin will automatically parse files in the vault for events."}
             value={autoParse}
             on:click={() => {
-                calendar.autoParse = !calendar.autoParse;
+                $calendar.autoParse = !$calendar.autoParse;
             }}
         />
         {#if autoParse}
             <TextComponent
                 name={"Events Folder"}
                 desc={"The plugin will only parse files in this folder for events."}
-                value={calendar.path}
+                value={$calendar.path}
             >
                 <div use:folder />
             </TextComponent>
@@ -183,11 +181,11 @@
                 desc={timelinesDesc}
                 value={timelines}
                 on:click={() => {
-                    calendar.supportTimelines = !calendar.supportTimelines;
+                    $calendar.supportTimelines = !$calendar.supportTimelines;
                 }}
             />
             {#if timelines}
-                {#key calendar.syncTimelines}
+                {#key $calendar.syncTimelines}
                     <TextComponent
                         name={"Default Timelines Tag"}
                         desc={timelinesTagDesc}

@@ -373,6 +373,8 @@ export default class FantasyCalendar extends Plugin {
 
         for (const calendar of this.data.calendars) {
             if (
+                calendar &&
+                calendar.static &&
                 calendar.static.eras &&
                 calendar.static.eras.length &&
                 calendar.static.eras.some((era) => !era.id)

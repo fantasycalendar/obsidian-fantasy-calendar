@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
+    import { createEventDispatcher, getContext } from "svelte";
 
     import type { Calendar, Moon } from "src/@types";
     import { ButtonComponent, ExtraButtonComponent, Setting } from "obsidian";
@@ -9,15 +9,12 @@
     import ToggleComponent from "../Settings/ToggleComponent.svelte";
     import { CreateMoonModal } from "src/settings/modals/moons";
     import type FantasyCalendar from "src/main";
-import Details from "../Utilities/Details.svelte";
+    import Details from "../Utilities/Details.svelte";
 
-    export let calendar: Calendar;
     export let plugin: FantasyCalendar;
 
-    $: moons = calendar.static.moons;
-    $: displayMoons = calendar.static.displayMoons;
-
-    const dispatch = createEventDispatcher();
+    const calendar = getContext("store");
+    const { moonStore, displayMoons } = calendar;
 
     const trash = (node: HTMLElement) => {
         let b = new ExtraButtonComponent(node)
@@ -28,48 +25,42 @@ import Details from "../Utilities/Details.svelte";
         new ExtraButtonComponent(node).setIcon("pencil").setTooltip("Edit");
     };
     const deleteMoon = (item: Moon) => {
-        calendar.static.moons = calendar.static.moons.filter(
-            (moon) => moon.id !== item.id
-        );
+        moonStore.delete(item.id);
     };
 
     const add = (moon?: Moon) => {
-        const modal = new CreateMoonModal(plugin.app, calendar, moon);
+        const modal = new CreateMoonModal(plugin.app, $calendar, moon);
         modal.onClose = () => {
             if (!modal.saved) return;
             if (modal.editing) {
-                const index = calendar.static.moons.findIndex(
-                    (e) => e.id === modal.moon.id
-                );
-
-                calendar.static.moons.splice(index, 1, {
-                    ...modal.moon
-                });
+                moonStore.update(moon.id, { ...modal.moon });
             } else {
-                calendar.static.moons.push({ ...modal.moon });
+                moonStore.add({ ...modal.moon });
             }
-            moons = calendar.static.moons;
         };
         modal.open();
     };
 </script>
 
-<Details name={"Moons"}>
+<Details
+    name={"Moons"}
+    open={false}
+    desc={`${$moonStore.length} moon${$moonStore.length != 1 ? "s" : ""}`}
+>
     <ToggleComponent
         name={"Display Moons"}
         desc={"Display moons by default when viewing this calendar."}
-        value={displayMoons}
-        on:click={() =>
-            (calendar.static.displayMoons = !calendar.static.displayMoons)}
+        value={$displayMoons}
+        on:click={() => ($displayMoons = !$displayMoons)}
     />
 
     <AddNew on:click={() => add()} />
 
-    {#if !moons.length}
+    {#if !$moonStore.length}
         <NoExistingItems message={"Create a new moon to see it here."} />
     {:else}
         <div class="existing-items">
-            {#each moons as moon}
+            {#each $moonStore as moon}
                 <div class="moon">
                     <div class="moon-info">
                         <span class="setting-item-name">
@@ -83,7 +74,14 @@ import Details from "../Utilities/Details.svelte";
                         </span>
                         <div class="setting-item-description">
                             <div class="date">
-                                Cycle: {moon.cycle} days
+                                <span>
+                                    Cycle: {moon.cycle} days
+                                </span>
+                                {#if moon.offset}
+                                    <span>
+                                        , offset: {moon.offset} days
+                                    </span>
+                                {/if}
                             </div>
                         </div>
                     </div>

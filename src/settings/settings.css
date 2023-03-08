@@ -139,6 +139,9 @@ details.fantasy-calendar-nested-settings[open]
     align-items: center;
     gap: 0.25rem;
 }
+.fantasy-calendar-nested-settings .warning-label-container + .setting-item {
+    padding-top: 20px;
+}
 
 .fantasy-calendar-settings .fantasy-calendar-config .setting-item-name {
     display: flex;
@@ -193,6 +196,8 @@ details.fantasy-calendar-nested-settings[open]
     width: 100%;
     white-space: pre-line;
     max-width: 250px;
+
+    flex-direction: column;
 }
 .fantasy-calendar-choose-preset
     .fantasy-calendar-preset-container

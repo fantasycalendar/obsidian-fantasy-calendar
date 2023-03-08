@@ -17,43 +17,54 @@
         debounce,
         SearchComponent
     } from "obsidian";
+    import { getContext } from "svelte";
+    import { derived, writable } from "svelte/store";
 
-    export let calendar: Calendar;
     export let plugin: FantasyCalendar;
-    let sliced = 1;
+
+    const calendar = getContext("store");
+    const { eventStore, monthStore } = calendar;
+    const { sortedStore } = eventStore;
+
+    const slicer = writable(1);
     let filtered = false;
-    $: sorted = calendar.events.sort((a, b) => {
-        if (a.date.year != b.date.year) {
-            return a.date.year - b.date.year;
+    let nameFilter = writable<string>("");
+
+    const sorted = derived([sortedStore, nameFilter], ([events, filter]) => {
+        if (!filter || !filter.length) {
+            filtered = false;
+            return events;
         }
-        if (a.date.month != b.date.month) {
-            return a.date.month - b.date.month;
+        const results = [];
+        for (const event of events) {
+            const result = prepareFuzzySearch(filter)(event.name);
+            if (result) {
+                results.push(event);
+            }
         }
-        return a.date.day - b.date.day;
+        filtered = true;
+        return results;
     });
-    $: events = sorted.slice(0, 100 * sliced);
-    $: months = calendar.static.months;
+
+    const sliced = derived([sorted, slicer], ([events, slicer]) =>
+        events.slice(0, 100 * slicer)
+    );
 
     const deleteEvent = (item: Event) => {
-        events = events.filter((event) => event.id !== item.id);
+        eventStore.delete(item.id);
     };
     const getCategory = (category: string) => {
-        return calendar.categories.find(({ id }) => id == category);
+        return $calendar.categories.find(({ id }) => id == category);
     };
     const add = (event?: Event) => {
-        const modal = new CreateEventModal(plugin, calendar, event);
+        const modal = new CreateEventModal(plugin, $calendar, event);
         modal.onClose = () => {
             if (!modal.saved) return;
             if (modal.editing) {
-                const index = calendar.events.findIndex(
-                    (e) => e.id === modal.event.id
-                );
-
-                calendar.events.splice(index, 1, { ...modal.event });
+                eventStore.update(event.id, { ...modal.event });
             } else {
-                calendar.events.push({ ...modal.event });
+                eventStore.add({ ...modal.event });
             }
-            events = calendar.events;
         };
         modal.open();
     };
@@ -64,7 +75,7 @@
                 "Are you sure you want to delete all events from this calendar?"
             )
         ) {
-            calendar.events = [];
+            eventStore.set([]);
         }
     };
     const filter = (node: HTMLElement) => {
@@ -76,28 +87,7 @@
                 search = s;
                 s.onChange(
                     debounce((v) => {
-                        if (!v) {
-                            sorted = calendar.events.sort((a, b) => {
-                                if (a.date.year != b.date.year) {
-                                    return a.date.year - b.date.year;
-                                }
-                                if (a.date.month != b.date.month) {
-                                    return a.date.month - b.date.month;
-                                }
-                                return a.date.day - b.date.day;
-                            });
-                            filtered = false;
-                            return;
-                        }
-                        const results = [];
-                        for (const event of sorted) {
-                            const result = prepareFuzzySearch(v)(event.name);
-                            if (result) {
-                                results.push(event);
-                            }
-                        }
-                        sorted = results;
-                        filtered = true;
+                        $nameFilter = v;
                     }, 250)
                 );
             })
@@ -111,10 +101,11 @@
                                 "Are you sure you want to delete the filtered events from this calendar?"
                             )
                         ) {
-                            calendar.events = calendar.events.filter(
-                                (e) => !sorted.includes(e)
+                            eventStore.set(
+                                $eventStore.filter((e) => !$sorted.includes(e))
                             );
                             search.setValue("");
+                            $nameFilter = "";
                         }
                     });
             });
@@ -123,7 +114,8 @@
 
 <Details
     name={"Events"}
-    desc={`Displaying ${events.length}/${calendar.events.length} events.`}
+    desc={`Displaying ${$sorted.length}/${$calendar.events.length} events.`}
+    open={false}
 >
     <ButtonComponent
         name={"Delete All Events"}
@@ -133,11 +125,11 @@
     <div class="filter" use:filter />
     <AddNew on:click={() => add()} />
     <div class="existing-items">
-        {#each events as event}
+        {#each $sliced as event}
             <EventInstance
                 {event}
                 category={getCategory(event.category)}
-                date={dateString(event.date, months, event.end)}
+                date={dateString(event.date, $monthStore, event.end)}
                 on:edit={() => add(event)}
                 on:delete={() => deleteEvent(event)}
             />
@@ -150,8 +142,8 @@
             </div>
         {/each}
     </div>
-    {#if !filtered && events.length < calendar.events.length}
-        <div class="more" on:click={() => sliced++}>
+    {#if !filtered && $sliced.length < $eventStore.length}
+        <div class="more" on:click={() => $slicer++}>
             <small>Load More Events...</small>
         </div>
     {/if}

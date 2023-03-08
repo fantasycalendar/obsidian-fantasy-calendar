@@ -20,6 +20,7 @@
     import { getCanSave, getMissingNotice, warning } from "./Utilities/utils";
     import { ConfirmExitModal } from "../modals/confirm";
     import EraContainer from "./Containers/EraContainer.svelte";
+    import createStore from "./stores/calendar";
 
     const mobile = Platform.isMobile;
     let ready = mobile;
@@ -31,16 +32,13 @@
     const dispatch = createEventDispatcher();
 
     export let width: number;
-    export let calendar: Calendar;
+    export let base: Calendar;
     export let plugin: FantasyCalendar;
     export let color: string = null;
     export let top: number;
 
-    const store = writable<Calendar>(calendar);
-    store.subscribe((v) => {
-        calendar = v;
-    });
-    setContext<Writable<Calendar>>("store", store);
+    const calendar = createStore(plugin, base);
+    setContext<Writable<Calendar>>("store", calendar);
 
     const back = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("left-arrow-with-tail");
@@ -62,17 +60,16 @@
                         const modal = new CalendarPresetModal(plugin.app);
                         modal.onClose = () => {
                             if (!modal.saved) return;
-                            calendar = copy(modal.preset);
-                            if (calendar?.name == "Gregorian Calendar") {
+                            $calendar = copy(modal.preset);
+                            if ($calendar?.name == "Gregorian Calendar") {
                                 const today = new Date();
 
-                                calendar.current = {
+                                calendar.setCurrentDate({
                                     year: today.getFullYear(),
                                     month: today.getMonth(),
                                     day: today.getDate()
-                                };
+                                });
                             }
-                            store.set(calendar);
                         };
                         modal.open();
                     });
@@ -81,18 +78,18 @@
 
     let saved = false;
 
-    $: missing = getMissingNotice(calendar);
-    $: canSave = getCanSave(calendar);
+    $: missing = getMissingNotice($calendar);
+    const { valid } = calendar;
 
     const checkCanSave = () => {
-        if (!canSave && !plugin.data.exit.saving) {
+        if (!$valid && !plugin.data.exit.saving) {
             const modal = new ConfirmExitModal(plugin);
             modal.onClose = () => {
                 if (modal.confirmed) {
                     ready = false;
                 }
                 if (mobile) {
-                    dispatch("exit", { saved, calendar });
+                    dispatch("exit", { saved, calendar: $calendar });
                 }
             };
             modal.open();
@@ -102,7 +99,7 @@
         }
     };
     const savedEl = (node: HTMLElement) => {
-        if (canSave) {
+        if ($valid) {
             setIcon(node, "checkmark");
         } else {
             warning(node);
@@ -123,7 +120,7 @@
             style={!mobile ? `width: ${width + 4}px;` : ""}
             transition:animation={{ x: width * 1.5, opacity: 1 }}
             on:introend={() => dispatch("flown")}
-            on:outroend={() => dispatch("exit", { saved, calendar })}
+            on:outroend={() => dispatch("exit", { saved, calendar: $calendar })}
         >
             <div class="top-nav">
                 <div class="icons">
@@ -131,7 +128,7 @@
                         <div
                             class="back"
                             use:back
-                            aria-label={canSave
+                            aria-label={$valid
                                 ? "Save and exit"
                                 : "Exit without saving"}
                             on:click={() => {
@@ -139,7 +136,7 @@
                             }}
                         />
                         <div class="check">
-                            {#if canSave}
+                            {#if $valid}
                                 <div
                                     class="save can-save"
                                     use:savedEl
@@ -173,16 +170,20 @@
             </div>
             <div class="fantasy-creator-app">
                 <div use:preset />
-                <Info {calendar} {plugin} />
-                <WeekdayContainer {calendar} />
+                <Info {plugin} />
+                <WeekdayContainer />
                 <MonthContainer />
-                <YearContainer {calendar} app={plugin.app} />
+                <YearContainer app={plugin.app} />
+                <!-- 
+            -->
                 <!--<EraContainer {plugin} {calendar} />-->
                 <CurrentDate />
-                <EventContainer {plugin} {calendar} />
-                <CategoryContainer {calendar} />
-                <MoonContainer {plugin} {calendar} />
-                <LeapDayContainer {calendar} {plugin} />
+                <EventContainer {plugin} />
+                <CategoryContainer />
+                <MoonContainer {plugin} />
+                <LeapDayContainer {plugin} />
+                <!-- 
+            -->
             </div>
         </div>
     {/if}

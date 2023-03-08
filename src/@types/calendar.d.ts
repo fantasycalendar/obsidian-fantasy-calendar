@@ -46,11 +46,16 @@ export interface TimeSpan {
     id: string;
 }
 
-export interface Day extends TimeSpan {}
-export interface Year extends TimeSpan {}
+export interface Day extends TimeSpan {
+    type: "day"
+}
+export interface Year extends TimeSpan {
+    type: "year"
+}
 export type Week = Day[];
 export interface Month extends TimeSpan {
     length: number;
+    type: "month";
 }
 export interface IntercalaryMonth extends Month {
     length: 1;

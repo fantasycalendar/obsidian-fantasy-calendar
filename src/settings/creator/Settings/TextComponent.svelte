@@ -43,6 +43,7 @@
                         {placeholder}
                         class:warn
                         bind:value
+                        on:input={() => dispatch("change", value)}
                         on:blur={() => {
                             dispatch("blur", value);
                         }}
@@ -54,6 +55,7 @@
                         {placeholder}
                         class:warn
                         bind:value
+                        on:input={() => dispatch("change", value)}
                         on:blur={() => {
                             dispatch("blur", value);
                         }}

@@ -23,13 +23,24 @@ import type { Calendar } from "src/@types";
 import { confirmDeleteCalendar, confirmWithModal } from "./modals/confirm";
 import { FolderSuggestionModal } from "src/suggester/folder";
 import { FantasyCalendarModal } from "./modals/modal";
+import { Writable } from "svelte/store";
+import createStore from "./creator/stores/calendar";
 
 export enum Recurring {
     none = "None",
     monthly = "Monthly",
     yearly = "Yearly"
 }
-
+interface Context {
+    store: ReturnType<typeof createStore>;
+}
+declare module "svelte" {
+    function setContext<K extends keyof Context>(
+        key: K,
+        value: Context[K]
+    ): void;
+    function getContext<K extends keyof Context>(key: K): Context[K];
+}
 declare module "obsidian" {
     interface App {
         internalPlugins: {
@@ -571,7 +582,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                 const $app = new CalendarCreator({
                     target: this.containerEl,
                     props: {
-                        calendar: clone,
+                        base: clone,
                         plugin: this.plugin,
                         width: this.contentEl.clientWidth,
                         color,
@@ -620,7 +631,7 @@ class MobileCreatorModal extends FantasyCalendarModal {
         const $app = new CalendarCreator({
             target: this.contentEl,
             props: {
-                calendar: this.calendar,
+                base: this.calendar,
                 plugin: this.plugin,
                 width: this.contentEl.clientWidth,
                 top: 0
@@ -634,6 +645,7 @@ class MobileCreatorModal extends FantasyCalendarModal {
                     calendar: Calendar;
                 }>
             ) => {
+                console.log("🚀 ~ file: settings.ts:648 ~ evt:", evt.detail);
                 if (evt.detail.saved) {
                     //saved
                     this.calendar = copy(evt.detail.calendar);

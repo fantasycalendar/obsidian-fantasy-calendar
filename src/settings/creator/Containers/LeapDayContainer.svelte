@@ -10,64 +10,50 @@
     import { Writable } from "svelte/store";
     import Details from "../Utilities/Details.svelte";
 
-    export let calendar: Calendar;
     export let plugin: FantasyCalendar;
 
-    const store = getContext<Writable<Calendar>>("store");
+    const calendar = getContext("store");
 
-    store.subscribe((v) => (calendar = v));
-
-    $: leapdays = calendar.static.leapDays;
-    let disabled =
-        calendar.static.months?.filter((m) => m.name?.length).length == 0;
-    $: {
-        disabled =
-            calendar.static.months?.filter((m) => m.name?.length).length == 0;
-    }
-
-    const deleteLeapDay = (item: LeapDay) => {
-        leapdays = leapdays.filter((leapday) => leapday.id !== item.id);
-    };
+    const { leapDayStore, leapDayDisabled } = calendar;
 
     const add = (leapday?: LeapDay) => {
-        const modal = new CreateLeapDayModal(plugin.app, calendar, leapday);
+        const modal = new CreateLeapDayModal(plugin.app, $calendar, leapday);
         modal.onClose = () => {
             if (!modal.saved) return;
             if (!modal.leapday.interval.length) return;
             if (!modal.leapday.name) return;
             if (modal.editing) {
-                const index = calendar.static.leapDays.findIndex(
-                    (e) => e.id === modal.leapday.id
-                );
-
-                calendar.static.leapDays.splice(index, 1, {
-                    ...modal.leapday
-                });
+                leapDayStore.update(leapday.id, { ...modal.leapday });
             } else {
-                calendar.static.leapDays.push({ ...modal.leapday });
+                leapDayStore.add({ ...modal.leapday });
             }
-            leapdays = calendar.static.leapDays;
         };
         modal.open();
     };
 </script>
 
-<Details name={"Leap Days"}>
+<Details
+    name={"Leap Days"}
+    open={false}
+    desc={`${$leapDayStore.length} leap day${
+        $leapDayStore.length != 1 ? "s" : ""
+    }`}
+>
     <AddNew
         on:click={() => add()}
-        {disabled}
-        label={disabled ? "At least one named month is required" : null}
+        disabled={$leapDayDisabled}
+        label={$leapDayDisabled ? "At least one named month is required" : null}
     />
 
-    {#if !leapdays.length}
+    {#if !$leapDayStore.length}
         <NoExistingItems message={"Create a new leap day to see it here."} />
     {:else}
         <div class="existing-items">
-            {#each leapdays as leapday}
+            {#each $leapDayStore as leapday}
                 <LeapDayUI
                     {leapday}
                     on:edit={() => add(leapday)}
-                    on:delete={() => deleteLeapDay(leapday)}
+                    on:delete={() => leapDayStore.delete(leapday.id)}
                 />
             {/each}
         </div>

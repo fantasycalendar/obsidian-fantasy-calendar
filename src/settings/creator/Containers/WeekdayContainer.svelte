@@ -1,38 +1,20 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
+    import { createEventDispatcher, getContext } from "svelte";
     import { flip } from "svelte/animate";
     import { dndzone, SOURCES, TRIGGERS } from "svelte-dnd-action";
     import { ExtraButtonComponent, setIcon, TextComponent } from "obsidian";
-    import type { Calendar, Day } from "src/@types";
-
-    import { nanoid } from "src/utils/functions";
-
+    import type { Day } from "src/@types";
     import ToggleComponent from "../Settings/ToggleComponent.svelte";
     import AddNew from "../Utilities/AddNew.svelte";
     import NoExistingItems from "../Utilities/NoExistingItems.svelte";
     import Details from "../Utilities/Details.svelte";
+    const calendar = getContext("store");
 
-    const dispatch = createEventDispatcher();
-    export let calendar: Calendar;
+    const { staticStore, weekdayStore } = calendar;
 
-    $: weekdays = calendar.static.weekdays;
-    let firstWeekday = calendar.static.firstWeekDay;
-    $: {
-        firstWeekday = calendar.static.firstWeekDay;
-    }
-    $: overflow = calendar.static.overflow;
+    $: overflow = $staticStore.overflow;
+    let firstWeekday = $staticStore.firstWeekDay;
 
-    $: {
-        dispatch("weekday-update", weekdays);
-    }
-
-    $: {
-        dispatch("first-weekday-update", firstWeekday);
-    }
-
-    $: {
-        dispatch("overflow-update", overflow);
-    }
     const grip = (node: HTMLElement) => {
         setIcon(node, "fantasy-calendar-grip");
     };
@@ -40,9 +22,7 @@
     const trash = (node: HTMLElement, item: Day) => {
         new ExtraButtonComponent(node)
             .setIcon("trash")
-            .onClick(
-                () => (weekdays = weekdays.filter((day) => day.id !== item.id))
-            );
+            .onClick(() => weekdayStore.delete(item.id));
     };
     function startDrag(e: Event) {
         e.preventDefault();
@@ -56,7 +36,7 @@
             items: newItems,
             info: { source, trigger }
         } = e.detail;
-        weekdays = newItems;
+        weekdayStore.set(newItems);
         // Ensure dragging is stopped on drag finish via keyboard
         if (source === SOURCES.KEYBOARD && trigger === TRIGGERS.DRAG_STOPPED) {
             dragDisabled = true;
@@ -67,7 +47,7 @@
             items: newItems,
             info: { source }
         } = e.detail;
-        weekdays = newItems;
+        weekdayStore.set(newItems);
         // Ensure dragging is stopped on drag finish via pointer (mouse, touch)
         if (source === SOURCES.POINTER) {
             dragDisabled = true;
@@ -80,8 +60,7 @@
             .setPlaceholder("Name")
             .onChange((v) => {
                 item.name = v;
-                dispatch("weekday-update", weekdays);
-                weekdays = weekdays;
+                weekdayStore.update(item.id, item);
             })
             .inputEl.setAttr("style", "width: 100%;");
     };
@@ -89,38 +68,31 @@
 
 <Details
     name={"Weekdays"}
-    warn={!weekdays?.length}
+    warn={!$weekdayStore?.length}
     label={"At least one weekday is required"}
+    desc={`${$weekdayStore.length} weekday${$weekdayStore.length != 1 ? "s" : ""}`}
+    open={false}
 >
     <ToggleComponent
         name={"Overflow Weeks"}
         desc={"Turn this off to make each month start on the first of the week."}
-        value={calendar.static.overflow}
-        on:click={() => (calendar.static.overflow = !calendar.static.overflow)}
-    />
-
-    <AddNew
+        value={$staticStore.overflow}
         on:click={() =>
-            (calendar.static.weekdays = [
-                ...weekdays,
-                {
-                    type: "day",
-                    name: null,
-                    id: nanoid(6)
-                }
-            ])}
+            staticStore.setProperty("overflow", !$staticStore.overflow)}
     />
 
-    {#if !weekdays.length}
+    <AddNew on:click={() => weekdayStore.add()} />
+
+    {#if !$weekdayStore.length}
         <NoExistingItems message={"Create a new weekday to see it here."} />
     {:else}
         <div
-            use:dndzone={{ items: weekdays, flipDurationMs, dragDisabled }}
+            use:dndzone={{ items: $weekdayStore, flipDurationMs, dragDisabled }}
             class="existing-items"
             on:consider={handleConsider}
             on:finalize={handleFinalize}
         >
-            {#each weekdays as item (item.id)}
+            {#each $weekdayStore as item (item.id)}
                 <div
                     animate:flip={{ duration: flipDurationMs }}
                     class="weekday"
@@ -150,13 +122,16 @@
         <div class="setting-item-control">
             <select
                 class="dropdown"
-                aria-label={weekdays.filter((v) => v.name?.length).length
+                aria-label={$weekdayStore.filter((v) => v.name?.length).length
                     ? null
                     : "Named Weekday Required"}
-                bind:value={calendar.static.firstWeekDay}
+                bind:value={firstWeekday}
+                on:change={() => {
+                    staticStore.setProperty("firstWeekDay", firstWeekday);
+                }}
             >
                 <option selected hidden disabled>Select a Weekday</option>
-                {#each weekdays.filter((v) => v.name?.length) as weekday, index}
+                {#each $weekdayStore.filter((v) => v.name?.length) as weekday, index}
                     <option disabled={!overflow} value={index}>
                         {weekday.name ?? ""}
                     </option>

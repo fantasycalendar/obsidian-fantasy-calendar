@@ -17,16 +17,12 @@
     import ToggleComponent from "../Settings/ToggleComponent.svelte";
     import AddNew from "../Utilities/AddNew.svelte";
     import NoExistingItems from "../Utilities/NoExistingItems.svelte";
-    import type { Writable } from "svelte/store";
     import Details from "../Utilities/Details.svelte";
 
-    export let calendar: Calendar;
+    const calendar = getContext("store");
 
-    const store = getContext<Writable<Calendar>>("store");
-    store.subscribe((v) => (calendar = v));
-
-    $: years = calendar.static.years;
-    $: useCustomYears = calendar.static.useCustomYears;
+    const { yearStore, staticStore } = calendar;
+    const { customYears } = yearStore;
 
     const grip = (node: HTMLElement) => {
         setIcon(node, "fantasy-calendar-grip");
@@ -35,9 +31,7 @@
     const trash = (node: HTMLElement, item: Year) => {
         new ExtraButtonComponent(node)
             .setIcon("trash")
-            .onClick(
-                () => (years = years.filter((year) => year.id !== item.id))
-            );
+            .onClick(() => yearStore.delete(item.id));
     };
 
     const name = (node: HTMLElement, item: Year) => {
@@ -46,8 +40,7 @@
             .setPlaceholder("Name")
             .onChange((v) => {
                 item.name = v;
-                dispatch("years-update", years);
-                years = years;
+                yearStore.update(item.id, item);
             });
         comp.inputEl.setAttr("style", "width: 100%;");
     };
@@ -68,17 +61,16 @@
 
     const confirmCustom = async () => {
         if (
-            calendar.static.useCustomYears &&
-            years?.length &&
-            (await confirmWithModal(
-                app,
-                "The custom years you have created will be removed. Proceed?"
-            ))
+            !$yearStore?.length ||
+            ($customYears &&
+                (await confirmWithModal(
+                    app,
+                    "The custom years you have created will be removed. Proceed?"
+                )))
         ) {
-            calendar.static.years = [];
+            yearStore.set([]);
         }
-        calendar.static.useCustomYears = !calendar.static.useCustomYears;
-        store.set(calendar);
+        staticStore.setProperty("useCustomYears", !$staticStore.useCustomYears);
     };
 
     function startDrag(e: Event) {
@@ -93,7 +85,7 @@
             items: newItems,
             info: { source, trigger }
         } = e.detail;
-        years = newItems;
+        yearStore.set(newItems);
         // Ensure dragging is stopped on drag finish via keyboard
         if (source === SOURCES.KEYBOARD && trigger === TRIGGERS.DRAG_STOPPED) {
             dragDisabled = true;
@@ -104,62 +96,48 @@
             items: newItems,
             info: { source }
         } = e.detail;
-        years = newItems;
+        yearStore.set(newItems);
         // Ensure dragging is stopped on drag finish via pointer (mouse, touch)
         if (source === SOURCES.POINTER) {
             dragDisabled = true;
         }
     }
-
-    const dispatch = createEventDispatcher();
-
-    $: {
-        dispatch("years-update", years);
-        //TODO: add new days to dropdown, remove removed days from dropdown
-    }
-
-    $: {
-        dispatch("use-custom-update", useCustomYears);
-    }
 </script>
 
 <Details
     name={"Years"}
-    warn={useCustomYears && !years?.length}
+    warn={$customYears && !$yearStore?.length}
     label={"At least one year is required when using custom years"}
+    open={false}
 >
     <ToggleComponent
         name="Use Custom Years"
         desc={customDesc}
-        value={useCustomYears}
+        value={$customYears}
         on:click={() => confirmCustom()}
     />
 
-    {#if useCustomYears}
+    {#if $customYears}
         <AddNew
             on:click={() => {
-                calendar.static.years = [
-                    ...(years ?? []),
-                    {
-                        name: null,
-                        id: nanoid(6),
-                        type: "year"
-                    }
-                ];
-                store.set(calendar);
+                yearStore.add();
             }}
         />
 
-        {#if !years || !years.length}
+        {#if !$yearStore?.length}
             <NoExistingItems message={"Create a new year to see it here."} />
         {:else}
             <div
-                use:dndzone={{ items: years, flipDurationMs, dragDisabled }}
+                use:dndzone={{
+                    items: $yearStore,
+                    flipDurationMs,
+                    dragDisabled
+                }}
                 class="existing-items"
                 on:consider={handleConsider}
                 on:finalize={handleFinalize}
             >
-                {#each years as item (item.id)}
+                {#each $yearStore as item (item.id)}
                     <div
                         animate:flip={{ duration: flipDurationMs }}
                         class="weekday"
