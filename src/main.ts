@@ -333,23 +333,32 @@ export default class FantasyCalendar extends Plugin {
         this.app.workspace.getLeaf(false).setViewState({ type: FULL_VIEW });
         if (this.full) this.app.workspace.revealLeaf(this.full.leaf);
     }
+    async loadData(): Promise<FantasyCalendarData> {
+        if (this.configDirectory) {
+            if (await this.app.vault.adapter.exists(this.configFilePath)) {
+                return JSON.parse(
+                    await this.app.vault.adapter.read(this.configFilePath)
+                );
+            }
+        }
+        if (
+            await this.app.vault.adapter.exists(
+                `${this.manifest.dir}/temp.json`
+            )
+        ) {
+            return JSON.parse(
+                await this.app.vault.adapter.read(
+                    `${this.manifest.dir}/temp.json`
+                )
+            );
+        }
+        return (await super.loadData()) as FantasyCalendarData;
+    }
     async loadSettings() {
         this.data = {
             ...copy(DEFAULT_DATA),
             ...(await this.loadData())
         };
-        if (
-            this.configDirectory &&
-            (await this.app.vault.adapter.exists(this.configFilePath))
-        ) {
-            this.data = Object.assign(
-                {},
-                this.data,
-                JSON.parse(
-                    await this.app.vault.adapter.read(this.configFilePath)
-                )
-            );
-        }
         if (!this.data.defaultCalendar && this.data.calendars.length) {
             this.data.defaultCalendar = this.data.calendars[0].id;
         }
@@ -443,4 +452,23 @@ export default class FantasyCalendar extends Plugin {
         }
         await this.saveData(data);
     }, 200);
+    async saveData(data: FantasyCalendarData, directory = this.manifest.dir) {
+        try {
+            await this.app.vault.adapter.write(
+                `${directory}/temp.json`,
+                JSON.stringify(data, null, null)
+            );
+            if (await this.app.vault.adapter.exists(`${directory}/data.json`)) {
+                await this.app.vault.adapter.remove(`${directory}/data.json`);
+            }
+            await this.app.vault.adapter.copy(
+                `${directory}/temp.json`,
+                `${directory}/data.json`
+            );
+            await this.app.vault.adapter.remove(`${directory}/temp.json`);
+        } catch (e) {
+            console.log("🚀 ~ file: main.ts:499 ~ e:", e);
+            await super.saveData(data);
+        }
+    }
 }
