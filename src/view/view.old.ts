@@ -74,7 +74,7 @@ export default class FantasyCalendarView extends ItemView {
     moons: boolean = true;
     calendar: Calendar;
     /* calendarDropdownEl: HTMLDivElement; */
-    protected $app: CalendarUI;
+    protected _app: CalendarUI;
     constructor(
         public plugin: FantasyCalendar,
         public leaf: WorkspaceLeaf,
@@ -90,9 +90,10 @@ export default class FantasyCalendarView extends ItemView {
         );
         this.registerEvent(
             this.plugin.app.workspace.on("layout-change", () => {
-                if (!this.$app) return;
-                this.$app.$set({
-                    fullView: this.full
+                if (!this._app) return;
+                this._app.$set({
+                    fullView: this.full,
+                    ...(this.full ? { dayView: false } : {})
                 });
             })
         );
@@ -104,7 +105,7 @@ export default class FantasyCalendarView extends ItemView {
             return;
         }
         if (!this.plugin.data.calendars.length) {
-            this.$app?.$destroy();
+            this._app?.$destroy();
             this.contentEl.empty();
             this.noCalendarEl = this.contentEl.createDiv("fantasy-no-calendar");
             this.noCalendarEl.createSpan({
@@ -130,10 +131,10 @@ export default class FantasyCalendarView extends ItemView {
 
         this.registerCalendarInterval();
 
-        if (!this.$app) {
+        if (!this._app) {
             this.build();
         } else {
-            this.$app.$set({ calendar: this.helper });
+            this._app.$set({ calendar: this.helper });
         }
     }
 
@@ -209,7 +210,7 @@ export default class FantasyCalendarView extends ItemView {
 
             await this.saveCalendars();
 
-            this.$app.$set({
+            this._app.$set({
                 calendar: this.helper
             });
 
@@ -225,11 +226,10 @@ export default class FantasyCalendarView extends ItemView {
 
     build() {
         this.contentEl.empty();
-        this.$app = new CalendarUI({
+        this._app = new CalendarUI({
             target: this.contentEl,
             props: {
-                plugin: this.plugin,
-                calendar: this.calendar,
+                calendar: this.helper,
                 fullView: this.full,
                 yearView: this.yearView,
                 moons: this.moons,
@@ -237,14 +237,14 @@ export default class FantasyCalendarView extends ItemView {
                 displayDayNumber: this.dayNumber
             }
         });
-        this.$app.$on("day-click", (event: CustomEvent<DayHelper>) => {
+        this._app.$on("day-click", (event: CustomEvent<DayHelper>) => {
             const day = event.detail;
 
             if (day.events.length) return;
             this.createEventForDay(day.date);
         });
 
-        this.$app.$on("day-doubleclick", (event: CustomEvent<DayHelper>) => {
+        this._app.$on("day-doubleclick", (event: CustomEvent<DayHelper>) => {
             const day = event.detail;
             if (!day.events.length) return;
 
@@ -254,12 +254,12 @@ export default class FantasyCalendarView extends ItemView {
 
             this.yearView = false;
 
-            this.$app.$set({ yearView: false });
-            this.$app.$set({ dayView: true });
+            this._app.$set({ yearView: false });
+            this._app.$set({ dayView: true });
             this.triggerHelperEvent("day-update", false);
         });
 
-        this.$app.$on(
+        this._app.$on(
             "day-context-menu",
             (event: CustomEvent<{ day: DayHelper; evt: MouseEvent }>) => {
                 const { day, evt } = event.detail;
@@ -299,7 +299,7 @@ export default class FantasyCalendarView extends ItemView {
             }
         );
 
-        this.$app.$on("settings", (event: CustomEvent<MouseEvent>) => {
+        this._app.$on("settings", (event: CustomEvent<MouseEvent>) => {
             const evt = event.detail;
             const menu = new Menu(this.app);
 
@@ -310,7 +310,7 @@ export default class FantasyCalendarView extends ItemView {
                 ).onClick(async () => {
                     this.calendar.displayWeeks = !this.calendar.displayWeeks;
                     this.helper.update(this.calendar);
-                    this.$app.$set({
+                    this._app.$set({
                         displayWeeks: this.calendar.displayWeeks
                     });
                     await this.saveCalendars();
@@ -321,7 +321,7 @@ export default class FantasyCalendarView extends ItemView {
                     `Open ${this.yearView ? "Month" : "Year"}`
                 ).onClick(() => {
                     this.yearView = !this.yearView;
-                    this.$app.$set({ yearView: this.yearView });
+                    this._app.$set({ yearView: this.yearView });
                 });
             });
             menu.addItem((item) => {
@@ -337,7 +337,7 @@ export default class FantasyCalendarView extends ItemView {
                 ).onClick(async () => {
                     this.dayNumber = !this.dayNumber;
                     this.calendar.static.displayDayNumber = this.dayNumber;
-                    this.$app.$set({ displayDayNumber: this.dayNumber });
+                    this._app.$set({ displayDayNumber: this.dayNumber });
                     await this.saveCalendars();
                 });
             });
@@ -366,7 +366,7 @@ export default class FantasyCalendarView extends ItemView {
             menu.showAtMouseEvent(evt);
         });
 
-        this.$app.$on(
+        this._app.$on(
             "event-click",
             (evt: CustomEvent<{ event: Event; modifier: boolean }>) => {
                 const { event, modifier } = evt.detail;
@@ -394,7 +394,7 @@ export default class FantasyCalendarView extends ItemView {
             }
         );
 
-        this.$app.$on(
+        this._app.$on(
             "event-mouseover",
             (evt: CustomEvent<{ target: HTMLElement; event: Event }>) => {
                 if (!this.plugin.data.eventPreview) return;
@@ -411,7 +411,7 @@ export default class FantasyCalendarView extends ItemView {
             }
         );
 
-        this.$app.$on(
+        this._app.$on(
             "event-context",
             (custom: CustomEvent<{ evt: MouseEvent; event: Event }>) => {
                 const { evt, event } = custom.detail;
@@ -531,7 +531,7 @@ export default class FantasyCalendarView extends ItemView {
 
                             await this.saveCalendars();
 
-                            this.$app.$set({
+                            this._app.$set({
                                 calendar: this.helper
                             });
 
@@ -565,7 +565,7 @@ export default class FantasyCalendarView extends ItemView {
 
                         await this.saveCalendars();
 
-                        this.$app.$set({
+                        this._app.$set({
                             calendar: this.helper
                         });
 
@@ -577,18 +577,18 @@ export default class FantasyCalendarView extends ItemView {
             }
         );
 
-        this.$app.$on("event", (e: CustomEvent<CurrentCalendarData>) => {
+        this._app.$on("event", (e: CustomEvent<CurrentCalendarData>) => {
             const date = e.detail;
             this.createEventForDay(date);
         });
 
-        this.$app.$on("reset", () => {
+        this._app.$on("reset", () => {
             this.helper.reset();
 
             this.yearView = false;
 
-            this.$app.$set({ yearView: false });
-            this.$app.$set({ dayView: true });
+            this._app.$set({ yearView: false });
+            this._app.$set({ dayView: true });
             this.triggerHelperEvent("day-update", false);
         });
     }
@@ -600,8 +600,8 @@ export default class FantasyCalendarView extends ItemView {
 
         this.yearView = false;
 
-        this.$app.$set({ yearView: false });
-        this.$app.$set({ dayView: true });
+        this._app.$set({ yearView: false });
+        this._app.$set({ dayView: true });
         this.triggerHelperEvent("day-update", false);
     }
 
@@ -617,7 +617,7 @@ export default class FantasyCalendarView extends ItemView {
             } else {
                 this.helper.displayed = { ...modal.date };
                 this.helper.update();
-                this.$app.$set({ calendar: this.helper });
+                this._app.$set({ calendar: this.helper });
             }
 
             await this.saveCalendars();
@@ -628,7 +628,7 @@ export default class FantasyCalendarView extends ItemView {
 
     toggleMoons() {
         this.moons = !this.moons;
-        this.$app.$set({ moons: this.moons });
+        this._app.$set({ moons: this.moons });
     }
 
     async onClose() {}

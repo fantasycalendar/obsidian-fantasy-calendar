@@ -439,10 +439,7 @@ export default class FantasyCalendar extends Plugin {
                 ) {
                     await this.app.vault.adapter.mkdir(this.configDirectory);
                 }
-                await this.app.vault.adapter.write(
-                    this.configFilePath,
-                    JSON.stringify(data)
-                );
+                await this.saveData(data, this.configFilePath);
             } catch (e) {
                 console.error(e);
                 new Notice(
@@ -467,7 +464,6 @@ export default class FantasyCalendar extends Plugin {
             );
             await this.app.vault.adapter.remove(`${directory}/temp.json`);
         } catch (e) {
-            console.log("🚀 ~ file: main.ts:499 ~ e:", e);
             await super.saveData(data);
         }
     }

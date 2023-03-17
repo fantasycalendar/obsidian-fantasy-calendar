@@ -1,11 +1,8 @@
 <script lang="ts">
-    import { Calendar } from "src/@types";
     import type CalendarHelper from "src/helper";
-    import FantasyCalendar from "src/main";
 
     import { setContext } from "svelte";
     import { writable } from "svelte/store";
-    import { createCalendarStore } from "../stores/calendar";
     import DayView from "./DayView.svelte";
 
     import MonthView from "./Month.svelte";
@@ -14,13 +11,29 @@
     import YearViewBig from "./YearViewBig.svelte";
 
     export let fullView: boolean = false;
-    export let calendar: Calendar;
-    export let plugin: FantasyCalendar;
+    export let dayView: boolean = false;
+    export let yearView: boolean = false;
+    export let calendar: CalendarHelper;
+    export let moons: boolean;
+    export let displayDayNumber: boolean;
+    export let displayWeeks: boolean;
 
-    const store = createCalendarStore(calendar, plugin);
-    setContext("store", store);
+    $: {
+        if (yearView) dayView = false;
+    }
 
-    $: showIntercalary = plugin.data.showIntercalary;
+    const dayViewStore = writable(dayView);
+    const moonStore = writable(moons);
+    const calendarStore = writable(calendar);
+    setContext("dayView", dayViewStore);
+    setContext("displayMoons", moonStore);
+    setContext("calendar", calendarStore);
+
+    $: dayViewStore.set(dayView);
+    $: moonStore.set(moons);
+    $: calendarStore.set(calendar);
+
+    $: showIntercalary = calendar.plugin.data.showIntercalary;
 
     calendar.on("month-update", () => {
         year = calendar.displayed.year;

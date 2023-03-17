@@ -22,7 +22,7 @@ export interface StaticCalendarData {
     firstWeekDay: number;
     overflow: boolean;
     weekdays: Week;
-    months: Month[];
+    months: GenericMonth[];
     leapDays: LeapDay[];
     moons: Moon[];
     displayMoons: boolean;
@@ -47,17 +47,18 @@ export interface TimeSpan {
 }
 
 export interface Day extends TimeSpan {
-    type: "day"
+    type: "day";
 }
 export interface Year extends TimeSpan {
-    type: "year"
+    type: "year";
 }
 export type Week = Day[];
+export type GenericMonth = Month | IntercalaryMonth;
 export interface Month extends TimeSpan {
     length: number;
     type: "month";
 }
-export interface IntercalaryMonth extends Month {
+export interface IntercalaryMonth extends TimeSpan {
     length: 1;
     type: "intercalary";
 }

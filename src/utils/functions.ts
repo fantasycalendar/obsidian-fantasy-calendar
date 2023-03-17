@@ -1,4 +1,4 @@
-import type { Calendar, CurrentCalendarData, LeapDay, Month } from "../@types";
+import type { Calendar, CurrentCalendarData, GenericMonth, LeapDay, Month } from "../@types";
 
 export function daysBetween(date1: Date, date2: Date) {
     const d1 = window.moment(date1);
@@ -80,7 +80,7 @@ export function ordinal(i: number) {
 }
 export function dateString(
     date: CurrentCalendarData,
-    months: Month[],
+    months: GenericMonth[],
     end?: CurrentCalendarData
 ) {
     if (!date || date.day == undefined) {
