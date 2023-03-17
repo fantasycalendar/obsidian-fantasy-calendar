@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.3.11...3.0.0) (2023-03-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* Rewrote Creator from scratch
+
+### Features
+
+* Attempt at atomic saving to mitigate data loss issue ([2b14e90](https://github.com/valentine195/obsidian-fantasy-calendar/commit/2b14e9031895d5c57136d2e68154161d336c026b))
+* Rewrote Creator from scratch ([618a859](https://github.com/valentine195/obsidian-fantasy-calendar/commit/618a8590fe0d23cc93136ae09c79eac035dad632))
+
 ### [2.3.11](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.3.10...2.3.11) (2023-02-22)
 
 
