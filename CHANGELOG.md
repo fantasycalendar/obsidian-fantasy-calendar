@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.3.11...3.0.0) (2023-03-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* Rewrote Creator from scratch
+
+### Features
+
+* Attempt at atomic saving to mitigate data loss issue ([2b14e90](https://github.com/valentine195/obsidian-fantasy-calendar/commit/2b14e9031895d5c57136d2e68154161d336c026b))
+* Rewrote Creator from scratch ([618a859](https://github.com/valentine195/obsidian-fantasy-calendar/commit/618a8590fe0d23cc93136ae09c79eac035dad632))
+
+
+### Bug Fixes
+
+* Date string method now uses custom years properly ([6602ac7](https://github.com/valentine195/obsidian-fantasy-calendar/commit/6602ac72d6e46f8ed7507cafa1eeb5e425273f78))
+* fixes issue setting custom year index out of bounds ([f4cd8c3](https://github.com/valentine195/obsidian-fantasy-calendar/commit/f4cd8c33aaf19016977b16388d6920f58e7a0952))
+* fixes Nav error if previous month is undefined ([6d6b2e4](https://github.com/valentine195/obsidian-fantasy-calendar/commit/6d6b2e4f62fc5fcb84c1b7c9c162187bda1db3b6))
+
 ## [3.0.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.3.11...3.0.0) (2023-03-17)
 
 
