@@ -129,7 +129,7 @@
             <EventInstance
                 {event}
                 category={getCategory(event.category)}
-                date={dateString(event.date, $monthStore, event.end)}
+                date={dateString(event.date, $calendar, event.end)}
                 on:edit={() => add(event)}
                 on:delete={() => deleteEvent(event)}
             />

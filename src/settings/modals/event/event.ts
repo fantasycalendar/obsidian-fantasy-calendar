@@ -291,11 +291,7 @@ export class CreateEventModal extends FantasyCalendarModal {
     buildDateString() {
         this.stringEl.empty();
         this.stringEl.createSpan({
-            text: dateString(
-                this.event.date,
-                this.calendar.static.months,
-                this.event.end
-            )
+            text: dateString(this.event.date, this.calendar, this.event.end)
         });
     }
     buildDateFields(el: HTMLElement, field = this.event.date) {

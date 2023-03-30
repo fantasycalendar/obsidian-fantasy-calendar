@@ -12,9 +12,9 @@
     import Details from "../Utilities/Details.svelte";
 
     const calendar = getContext("store");
-    const { validDate, currentStore, monthStore } = calendar;
+    const { validDate, currentStore, monthStore, yearStore } = calendar;
     $: desc = $validDate
-        ? dateString($currentStore, $monthStore)
+        ? dateString($currentStore, $calendar)
         : "Invalid date";
 </script>
 

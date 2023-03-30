@@ -171,7 +171,7 @@ export class MonthHelper {
                         ) +
                         day.day;
                     const daysBetween = currentDays - startDays;
-                    
+
                     return daysBetween % event.formulas[0].number == 0;
                 }
             }
@@ -521,20 +521,20 @@ export default class CalendarHelper extends Events {
      * Display string for current date.
      */
     get currentDate() {
-        return dateString(this.current, this.data.months);
+        return dateString(this.current, this.calendar);
     }
 
     /**
      * Display string for displayed date.
      */
     get displayedDate() {
-        return dateString(this.displayed, this.data.months);
+        return dateString(this.displayed, this.calendar);
     }
     /**
      * Display string for viewed date.
      */
     get viewedDate() {
-        return dateString(this.viewing, this.data.months);
+        return dateString(this.viewing, this.calendar);
     }
 
     /**
@@ -627,6 +627,7 @@ export default class CalendarHelper extends Events {
     }
     getPreviousMonthIndex() {
         const month = this.getPreviousMonth();
+        if (!month) return Infinity;
         return this.data.months.indexOf(month.data);
     }
     getDirectionalStandardMonthHelper(

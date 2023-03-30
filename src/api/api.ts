@@ -127,7 +127,7 @@ export class API implements APIDefinition {
             longDate: day.longDate,
             leapDay: day.leapday,
             weekday: day.weekday,
-            displayDate: dateString(day.date, helper.data.months)
+            displayDate: dateString(day.date, helper.calendar)
         };
     }
 

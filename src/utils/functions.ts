@@ -80,19 +80,28 @@ export function ordinal(i: number) {
 }
 export function dateString(
     date: CurrentCalendarData,
-    months: Month[],
+    calendar: Calendar,
     end?: CurrentCalendarData
 ) {
     if (!date || date.day == undefined) {
         return "";
     }
     const { day, month, year } = date;
+    let yearDisplay: string = `${year}`;
+    const { months, years, useCustomYears } = calendar.static;
+    if (useCustomYears) {
+        yearDisplay = years[year - 1].name;
+    }
     if (month != undefined && !months[month]) return "Invalid Date";
 
     if (end && end.day) {
         const endDay = end.day;
         const endMonth = end.month;
         const endYear = end.year;
+        let endYearDisplay: string = `${endYear}`;
+        if (useCustomYears) {
+            endYearDisplay = years[endYear - 1]?.name;
+        }
 
         if (
             endMonth != undefined &&
@@ -101,19 +110,21 @@ export function dateString(
             year != undefined
         ) {
             if (year != endYear) {
-                return `${months[month].name} ${ordinal(day)}, ${year} - ${
-                    months[endMonth].name
-                } ${ordinal(endDay)}, ${endYear}`;
+                return `${months[month].name} ${ordinal(
+                    day
+                )}, ${yearDisplay} - ${months[endMonth].name} ${ordinal(
+                    endDay
+                )}, ${endYear}`;
             }
             if (endMonth == month) {
                 return `${months[month].name} ${ordinal(day)}-${ordinal(
                     endDay
-                )}, ${year}`;
+                )}, ${yearDisplay}`;
             }
             if (month != undefined && year != undefined) {
                 return `${months[month].name} ${ordinal(day)}-${
                     months[endMonth].name
-                } ${ordinal(endDay)}, ${year}`;
+                } ${ordinal(endDay)}, ${yearDisplay}`;
             }
             if (month != undefined) {
                 return `${months[month].name} ${ordinal(day)}-${
@@ -125,7 +136,7 @@ export function dateString(
     }
 
     if (month != undefined && year != undefined) {
-        return `${months[month].name} ${ordinal(day)}, ${year}`;
+        return `${months[month].name} ${ordinal(day)}, ${yearDisplay}`;
     }
     if (month != undefined) {
         return `${months[month].name} ${ordinal(day)} of every year`;

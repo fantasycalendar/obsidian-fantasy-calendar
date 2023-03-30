@@ -645,7 +645,6 @@ class MobileCreatorModal extends FantasyCalendarModal {
                     calendar: Calendar;
                 }>
             ) => {
-                console.log("🚀 ~ file: settings.ts:648 ~ evt:", evt.detail);
                 if (evt.detail.saved) {
                     //saved
                     this.calendar = copy(evt.detail.calendar);
