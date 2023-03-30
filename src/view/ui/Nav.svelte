@@ -18,6 +18,7 @@
     });
 
     let previous = calendar.getPreviousMonth();
+    $: prevousLabel = previous?.name ?? "No Previous Month";
     let next = calendar.getNextMonth();
 
     calendar.on("month-update", () => {
@@ -48,7 +49,7 @@
             <div
                 class="arrow calendar-clickable"
                 use:left
-                aria-label={previous.name}
+                aria-label={prevousLabel}
                 on:click={() => dispatch("previous")}
             />
             <div
