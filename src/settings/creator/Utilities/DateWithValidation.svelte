@@ -82,7 +82,7 @@
                 class:invalid={!$validYear}
             >
                 {#each $yearStore?.filter((m) => m.name) as year, index}
-                    <option value={index}>{year.name}</option>
+                    <option value={index + 1}>{year.name}</option>
                 {/each}
             </select>
         {:else}
