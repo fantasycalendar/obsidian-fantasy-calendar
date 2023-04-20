@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.1.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/3.0.0...3.1.0) (2023-04-20)
+
+
+### Features
+
+* Switch to settings service & local markdown config ([8ffe10c](https://github.com/valentine195/obsidian-fantasy-calendar/commit/8ffe10c20277d811cd56d0c99cf871944df32c54))
+
 ## [3.0.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/2.3.11...3.0.0) (2023-03-30)
 
 
