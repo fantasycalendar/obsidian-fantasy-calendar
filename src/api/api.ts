@@ -160,7 +160,7 @@ export class API implements APIDefinition {
 
         calendar.categories.push(category);
 
-        await this.plugin.saveCalendar();
+        await this.plugin.saveCalendars();
     }
     getHelper(calendar = this.plugin.defaultCalendar) {
         return new CalendarHelper(calendar, this.plugin);

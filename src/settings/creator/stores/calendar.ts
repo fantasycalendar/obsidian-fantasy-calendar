@@ -13,7 +13,7 @@ import type {
     Year
 } from "src/@types";
 import type FantasyCalendar from "src/main";
-import { DEFAULT_CALENDAR } from "src/main";
+import { DEFAULT_CALENDAR } from "src/settings/settings.constants";
 import {
     isValidDay,
     isValidMonth,

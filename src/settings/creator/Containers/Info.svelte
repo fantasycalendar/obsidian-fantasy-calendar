@@ -14,7 +14,7 @@
     import TextComponent from "../Settings/TextComponent.svelte";
     import ToggleComponent from "../Settings/ToggleComponent.svelte";
     import Details from "../Utilities/Details.svelte";
-    import { DEFAULT_CALENDAR } from "src/main";
+    import { DEFAULT_CALENDAR } from "src/settings/settings.constants";
 
     export let plugin: FantasyCalendar;
 

@@ -12,8 +12,7 @@ import FantasyCalendarView, {
 
 import { CalendarEventTree, Watcher } from "./watcher/watcher";
 import { API } from "./api/api";
-import copy from "fast-copy";
-import { nanoid } from "./utils/functions";
+import SettingsService from "./settings/settings.service";
 
 declare module "obsidian" {
     interface Workspace {
@@ -64,70 +63,9 @@ declare global {
 
 export const MODIFIER_KEY = Platform.isMacOS ? "Meta" : "Control";
 
-export const DEFAULT_CALENDAR: Calendar = {
-    name: null,
-    description: null,
-    id: null,
-    static: {
-        incrementDay: false,
-        firstWeekDay: null,
-        overflow: true,
-        weekdays: [],
-        months: [],
-
-        moons: [],
-        displayMoons: true,
-        displayDayNumber: false,
-        leapDays: [],
-        eras: []
-    },
-    current: {
-        year: null,
-        month: null,
-        day: null
-    },
-    events: [],
-    categories: [],
-    autoParse: false,
-    path: "/",
-    supportTimelines: false,
-    syncTimelines: true,
-    timelineTag: "#timeline"
-};
-
-export const DEFAULT_DATA: FantasyCalendarData = {
-    addToDefaultIfMissing: true,
-    calendars: [],
-    configDirectory: null,
-    currentCalendar: null,
-    dailyNotes: false,
-    dateFormat: "YYYY-MM-DD",
-    defaultCalendar: null,
-    eventPreview: false,
-    exit: {
-        saving: false,
-        event: false,
-        calendar: false
-    },
-    eventFrontmatter: false,
-    parseDates: false,
-    settingsToggleState: {
-        calendars: false,
-        events: false,
-        advanced: true
-    },
-    showIntercalary: false,
-    version: {
-        major: null,
-        minor: null,
-        patch: null
-    },
-    debug: false
-};
-
 export default class FantasyCalendar extends Plugin {
     api = new API(this);
-    settingsLoaded: boolean;
+    watcher: Watcher;
     async addNewCalendar(calendar: Calendar, existing?: Calendar) {
         let shouldParse =
             !existing ||
@@ -147,11 +85,16 @@ export default class FantasyCalendar extends Plugin {
             this.data.defaultCalendar = calendar.id;
         }
         if (shouldParse) this.watcher.start(calendar);
-        await this.saveCalendar();
+        await this.saveCalendars();
         /* this.watcher.registerCalendar(calendar); */
     }
-    data: FantasyCalendarData;
-    watcher = new Watcher(this);
+    private $settingsService: SettingsService;
+    get data() {
+        return this.$settingsService.getData();
+    }
+    get calendars() {
+        return this.$settingsService.getCalendars();
+    }
     get currentCalendar() {
         return this.data.calendars.find(
             (c) => c.id == this.data.currentCalendar
@@ -209,7 +152,10 @@ export default class FantasyCalendar extends Plugin {
     }
     async onload() {
         console.log("Loading Fantasy Calendars v" + this.manifest.version);
+        this.$settingsService = new SettingsService(this.app, this.manifest);
+        await this.$settingsService.loadData();
 
+        this.watcher = new Watcher(this);
         (window["FantasyCalendarAPI"] = this.api) &&
             this.register(() => delete window["FantasyCalendarAPI"]);
 
@@ -220,6 +166,7 @@ export default class FantasyCalendar extends Plugin {
         this.registerView(FULL_VIEW, (leaf: WorkspaceLeaf) => {
             return new FantasyCalendarView(this, leaf, { full: true });
         });
+
         this.app.workspace.onLayoutReady(async () => {
             await this.loadSettings();
 
@@ -333,80 +280,32 @@ export default class FantasyCalendar extends Plugin {
         this.app.workspace.getLeaf(false).setViewState({ type: FULL_VIEW });
         if (this.full) this.app.workspace.revealLeaf(this.full.leaf);
     }
-    async loadData(): Promise<FantasyCalendarData> {
-        if (this.configDirectory) {
-            if (await this.app.vault.adapter.exists(this.configFilePath)) {
-                return JSON.parse(
-                    await this.app.vault.adapter.read(this.configFilePath)
-                );
-            }
-        }
-        if (
-            await this.app.vault.adapter.exists(
-                `${this.manifest.dir}/temp.json`
-            )
-        ) {
-            return JSON.parse(
-                await this.app.vault.adapter.read(
-                    `${this.manifest.dir}/temp.json`
-                )
-            );
-        }
-        return (await super.loadData()) as FantasyCalendarData;
-    }
     async loadSettings() {
-        this.data = {
-            ...copy(DEFAULT_DATA),
+        let data = {
             ...(await this.loadData())
         };
-        if (!this.data.defaultCalendar && this.data.calendars.length) {
-            this.data.defaultCalendar = this.data.calendars[0].id;
-        }
-        if (
-            this.data.calendars.length &&
-            !this.data.calendars.find(
-                (cal) => cal.id == this.data.defaultCalendar
-            )
-        ) {
-            this.data.defaultCalendar = this.data.calendars[0].id;
-        }
-
-        if ((this.data as any).autoParse && this.data.calendars.length) {
-            for (const calendar of this.data.calendars) {
-                calendar.autoParse = (this.data as any).autoParse;
-                calendar.path = (this.data as any).path;
-            }
-            delete (this.data as any).autoParse;
-            delete (this.data as any).path;
-        }
-
-        for (const calendar of this.data.calendars) {
+        if (data && data.configDirectory) {
             if (
-                calendar &&
-                calendar.static &&
-                calendar.static.eras &&
-                calendar.static.eras.length &&
-                calendar.static.eras.some((era) => !era.id)
+                await this.app.vault.adapter.exists(
+                    `${this.data.configDirectory}/data.json`
+                )
             ) {
-                calendar.static.eras = calendar.static.eras.map((era) => {
-                    return {
-                        ...copy(era),
-                        id: era.id ?? nanoid(6),
-                        restart: era.restart ?? false,
-                        endsYear: era.endsYear ?? false,
-                        event: era.event ?? false
-                    };
-                });
+                try {
+                    data = JSON.parse(
+                        await this.app.vault.adapter.read(
+                            `${this.data.configDirectory}/data.json`
+                        )
+                    );
+                } catch (e) {}
             }
         }
-        this.data.eventFrontmatter = false;
-        await this.saveSettings();
-
-        this.settingsLoaded = true;
-        this.app.workspace.trigger("fantasy-calendars-settings-loaded");
+        if (data && !data.transitioned) {
+            await this.$settingsService.saveData(data);
+            await super.saveData({ transitioned: true });
+        }
     }
     onSettingsLoad(callback: () => any) {
-        if (this.settingsLoaded) {
+        if (this.$settingsService.loaded) {
             callback();
         } else {
             this.app.workspace.on("fantasy-calendars-settings-loaded", () =>
@@ -415,60 +314,12 @@ export default class FantasyCalendar extends Plugin {
         }
     }
 
-    async saveCalendar() {
+    async saveCalendars() {
         await this.saveSettings();
         this.app.workspace.trigger("fantasy-calendars-updated");
     }
-    get configDirectory() {
-        if (!this.data || !this.data.configDirectory) return;
-        return `${this.data.configDirectory}/plugins/fantasy-calendar`;
-    }
-    get configFilePath() {
-        if (!this.data.configDirectory) return;
-        return `${this.configDirectory}/data.json`;
-    }
     async saveSettings() {
-        await this.save(this.data);
-        this.app.workspace.trigger("fantasy-calendar-settings-change");
+        await this.$settingsService.saveData();
     }
-    save = debounce(async (data: FantasyCalendarData) => {
-        if (this.configDirectory) {
-            try {
-                if (
-                    !(await this.app.vault.adapter.exists(this.configDirectory))
-                ) {
-                    await this.app.vault.adapter.mkdir(this.configDirectory);
-                }
-                await this.app.vault.adapter.write(
-                    this.configFilePath,
-                    JSON.stringify(data)
-                );
-            } catch (e) {
-                console.error(e);
-                new Notice(
-                    "There was an error saving into the configured directory."
-                );
-            }
-        }
-        await this.saveData(data);
-    }, 200);
-    async saveData(data: FantasyCalendarData, directory = this.manifest.dir) {
-        try {
-            await this.app.vault.adapter.write(
-                `${directory}/temp.json`,
-                JSON.stringify(data, null, null)
-            );
-            if (await this.app.vault.adapter.exists(`${directory}/data.json`)) {
-                await this.app.vault.adapter.remove(`${directory}/data.json`);
-            }
-            await this.app.vault.adapter.copy(
-                `${directory}/temp.json`,
-                `${directory}/data.json`
-            );
-            await this.app.vault.adapter.remove(`${directory}/temp.json`);
-        } catch (e) {
-            console.log("🚀 ~ file: main.ts:499 ~ e:", e);
-            await super.saveData(data);
-        }
-    }
+    async saveData(data: FantasyCalendarData) {}
 }

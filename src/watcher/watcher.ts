@@ -176,7 +176,7 @@ export class Watcher extends Component {
                         this.addToTree(calendar, event);
                     }
                 }
-                await this.plugin.saveCalendar();
+                await this.plugin.saveCalendars();
                 this.plugin.app.workspace.trigger(
                     "fantasy-calendars-event-update",
                     this.tree
@@ -284,7 +284,7 @@ export class Watcher extends Component {
                         this.tree
                     );
                     this.tree = new Map();
-                    await this.plugin.saveCalendar();
+                    await this.plugin.saveCalendars();
                 }
             }
         );

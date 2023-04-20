@@ -12,7 +12,6 @@ import {
 
 import copy from "fast-copy";
 
-import { DEFAULT_CALENDAR } from "../main";
 import type FantasyCalendar from "../main";
 import Importer from "./import/importer";
 
@@ -25,6 +24,8 @@ import { FolderSuggestionModal } from "src/suggester/folder";
 import { FantasyCalendarModal } from "./modals/modal";
 import { Writable } from "svelte/store";
 import createStore from "./creator/stores/calendar";
+import { DEFAULT_CALENDAR } from "./settings.constants";
+import { nanoid } from "src/utils/functions";
 
 export enum Recurring {
     none = "None",
@@ -232,7 +233,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
             .addToggle((t) => {
                 t.setValue(this.data.showIntercalary).onChange(async (v) => {
                     this.data.showIntercalary = v;
-                    await this.plugin.saveCalendar();
+                    await this.plugin.saveCalendars();
                 });
             });
         new Setting(this.calendarsEl)
@@ -349,7 +350,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                         );
                         if (edited) {
                             this.plugin.addNewCalendar(edited, calendar);
-                            await this.plugin.saveCalendar();
+                            await this.plugin.saveCalendars();
                             this.display();
                         }
                     });
@@ -371,7 +372,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
                                 this.plugin.data.calendars[0]?.id;
                             this.plugin.watcher.start();
                         }
-                        await this.plugin.saveCalendar();
+                        await this.plugin.saveCalendars();
 
                         this.display();
                     });
@@ -555,6 +556,7 @@ export default class FantasyCalendarSettings extends PluginSettingTab {
     ): Promise<Calendar | void> {
         /* this.containerEl.empty(); */
         const clone = copy(calendar);
+        clone.id = `ID_${nanoid(10)}`;
 
         if (Platform.isMobile) {
             const modal = new MobileCreatorModal(this.plugin, clone);
