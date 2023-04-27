@@ -471,6 +471,25 @@ In the meantime, the plugin may be installed via the [Obsidian BRAT plugin](http
 
 You can follow the same procedure to update the plugin.
 
+### Building from Source
+
+After installing the plugin, you can use `npm` to build new `main.js` and `styles.css` files from source.
+
+-   Open the source directory in your terminal and run `npm install`.
+-   Running `npm run build` will build the `main.js` and `styles.css` files inside the source directory.
+-   Navigate to your `fantasy-calendar` folder in your vault's plugins folder and replace the `main.js` and `styles.css` files with the newly generated ones.
+-   Reload Obsidian to use the new files. This can be done automatically with the [Hot-Reload Plugin for Obsidian](https://github.com/pjeby/hot-reload).
+
+You can alternatively use the `npm run dev` command for a more streamlined workflow if you set up your `.env` file first.
+
+-   Open the source directory and create a file called `.env`.
+-   Add the following line to the file:
+```
+OUTDIR="/absolute/path/to/your/vault/.obsidian/plugins/fantasy-calendar"
+```
+-   In the source directory, run `npm run dev`. This builds the `main.js` and `styles.css` files and puts them in the folder you specified in your `.env` file.
+-   The `dev` script will automatically rebuild those files whenever you save changes.
+
 # Warning
 
 This plugin comes with no guarantee of stability and bugs may delete data.
