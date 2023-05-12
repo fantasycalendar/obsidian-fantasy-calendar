@@ -39,8 +39,8 @@ export function createCalendarStore(calendar: Calendar) {
 
         //Current date
         current,
-        currentDisplay: derived([current, months], ([current, months]) => {
-            return dateString(current, months);
+        currentDisplay: derived([current, store], ([current, calendar]) => {
+            return dateString(current, calendar);
         }),
         setCurrent: (date: FcDate) =>
             update((cal) => {
@@ -52,9 +52,9 @@ export function createCalendarStore(calendar: Calendar) {
         displaying,
         goToToday: () => displaying.set({ ...calendar.current }),
         displayingDisplay: derived(
-            [displaying, months],
-            ([display, months]) => {
-                return dateString(display, months);
+            [displaying, store],
+            ([display, calendar]) => {
+                return dateString(display, calendar);
             }
         ),
         displayingMonth: derived([displaying], ([date]) =>

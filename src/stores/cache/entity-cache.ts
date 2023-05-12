@@ -1,29 +1,53 @@
 import type { FcDate } from "src/@types";
-import { Readable, Writable, get, readable } from "svelte/store";
+import { Readable, Writable, derived, get, writable } from "svelte/store";
 
-interface CacheItem<T> {
-    entities: Readable<T[]>;
-    derived: T[];
-    dirty: Writable<boolean>;
+abstract class CacheItem<T> {
+    constructor(public toConsider: Readable<T[]>) {}
+    derived: T[] = [];
+    dirty: Writable<boolean> = writable(true);
+    entities: Readable<T[]> = derived(
+        [this.toConsider, this.dirty],
+        ([entities, dirty]) => {
+            this.derived = this.update([entities, dirty]);
+            this.dirty.set(false);
+            return this.derived;
+        }
+    );
+    abstract update([entities, dirty]: [T[], boolean]): T[];
 }
-interface Cache<T> extends CacheItem<T> {
+abstract class Cache<T> extends CacheItem<T> {
     cache: Map<number, CacheItem<T>>;
 }
-/* type EntityCache<T> = Map<number, YearCache<T>>; */
-export interface YearCache<T> extends Cache<T> {
-    cache: Map<number, MonthCache<T>>;
+export abstract class YearCache<T> extends Cache<T> {
+    constructor(public year: number, toConsider: Readable<T[]>) {
+        super(toConsider);
+    }
+    cache: Map<number, MonthCache<T>> = new Map();
 }
-export interface MonthCache<T> extends Cache<T> {
-    cache: Map<number, DayCache<T>>;
+export abstract class MonthCache<T> extends Cache<T> {
+    constructor(
+        public month: number,
+        public year: number,
+        toConsider: Readable<T[]>
+    ) {
+        super(toConsider);
+    }
+    cache: Map<number, DayCache<T>> = new Map();
 }
-export interface DayCache<T> extends CacheItem<T> {}
+export abstract class DayCache<T> extends CacheItem<T> {
+    constructor(
+        public day: number,
+        public month: number,
+        public year: number,
+        toConsider: Readable<T[]>
+    ) {
+        super(toConsider);
+    }
+}
 
 export abstract class EntityCache<T> {
     cache: Map<number, YearCache<T>> = new Map();
-    constructor(public entities: Readable<T[]>) {
-        //@ts-expect-error
-        window.EntityCache = this;
-    }
+    constructor(public entities: Readable<T[]>) {}
 
     abstract getYearCache(year: number): YearCache<T>;
     abstract getMonthCache(month: number, year: number): MonthCache<T>;
