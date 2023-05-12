@@ -10,7 +10,7 @@ import {
 } from "src/utils/functions";
 import type {
     Calendar,
-    CurrentCalendarData,
+    FcDate,
     Month,
     FcEvent,
     LeapDay,
@@ -62,7 +62,7 @@ export default class CalendarHelper extends Events {
     /**
      * Get a day helper from cache for a given date calendar.
      */
-    getDayForDate(date: CurrentCalendarData): DayHelper {
+    getDayForDate(date: FcDate): DayHelper {
         const month = this.getMonth(date.month, date.year);
         const day = month.days[date.day - 1];
         return day;
@@ -242,7 +242,7 @@ export default class CalendarHelper extends Events {
      *
      * Hash takes the form of `YYYYMMDD`, with months and days padded to the maximum value.
      */
-    hash(date: Partial<CurrentCalendarData>) {
+    hash(date: Partial<FcDate>) {
         if (date.year == null || date.month == null || date.day == null)
             return null;
         const months = `${this.data.months.length}`.length;
@@ -312,7 +312,7 @@ export default class CalendarHelper extends Events {
      * Used to track currently displayed date on the calendar.
      * Probably just need to track month and year... or a MonthHelper.
      */
-    displayed: CurrentCalendarData = {
+    displayed: FcDate = {
         year: null,
         month: null,
         day: null
@@ -321,7 +321,7 @@ export default class CalendarHelper extends Events {
      * Used to track current viewed date (day view) on the calendar.
      * Probably just need to track a DayHelper.
      */
-    viewing: CurrentCalendarData = {
+    viewing: FcDate = {
         year: null,
         month: null,
         day: null
@@ -720,7 +720,7 @@ export default class CalendarHelper extends Events {
             .reduce((a, b) => a + b, 0);
     }
 
-    dayNumberForDate(date: CurrentCalendarData) {
+    dayNumberForDate(date: FcDate) {
         return this.daysBeforeMonth(date.month, date.year, true) + date.day;
     }
 

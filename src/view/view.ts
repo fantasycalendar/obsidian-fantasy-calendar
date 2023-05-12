@@ -16,7 +16,7 @@ import {
     TFile,
     WorkspaceLeaf
 } from "obsidian";
-import type { Calendar, CurrentCalendarData, FcEvent } from "src/@types";
+import type { Calendar, FcDate, FcEvent } from "src/@types";
 import type { DayHelper } from "src/helper";
 import CalendarHelper from "src/helper";
 import { CreateEventModal } from "src/settings/modals/event/event";
@@ -184,7 +184,7 @@ export default class FantasyCalendarView extends ItemView {
 
         this.build();
     }
-    createEventForDay(date: CurrentCalendarData) {
+    createEventForDay(date: FcDate) {
         const modal = new CreateEventModal(
             this.plugin,
             this.calendar,
@@ -566,7 +566,7 @@ export default class FantasyCalendarView extends ItemView {
             }
         );
 
-        this._app.$on("event", (e: CustomEvent<CurrentCalendarData>) => {
+        this._app.$on("event", (e: CustomEvent<FcDate>) => {
             const date = e.detail;
             this.createEventForDay(date);
         });
@@ -581,7 +581,7 @@ export default class FantasyCalendarView extends ItemView {
             this.triggerHelperEvent("day-update", false);
         });
     }
-    openDay(date: CurrentCalendarData) {
+    openDay(date: FcDate) {
         this.helper.viewing.day = date.day;
         this.helper.viewing.month = date.month;
         this.helper.viewing.year = date.year;
@@ -692,7 +692,7 @@ class SwitchModal extends FantasyCalendarModal {
 
 class ChangeDateModal extends FantasyCalendarModal {
     confirmed: boolean = false;
-    date: CurrentCalendarData;
+    date: FcDate;
     dateFieldEl: HTMLDivElement;
     tempCurrentDays: number;
     setCurrent: boolean = false;

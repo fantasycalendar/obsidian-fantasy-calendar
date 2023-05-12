@@ -1,4 +1,4 @@
-import type { Calendar, CurrentCalendarData, LeapDay, Month } from "../@types";
+import type { Calendar, FcDate, LeapDay, Month } from "../@types";
 
 export function daysBetween(date1: Date, date2: Date) {
     const d1 = window.moment(date1);
@@ -79,9 +79,9 @@ export function ordinal(i: number) {
     return i + "th";
 }
 export function dateString(
-    date: CurrentCalendarData,
+    date: FcDate,
     months: Month[],
-    end?: CurrentCalendarData
+    end?: FcDate
 ) {
     if (!date || date.day == undefined) {
         return "";
@@ -164,8 +164,8 @@ export function isValidYear(year: number, calendar: Calendar) {
 }
 
 export function areDatesEqual(
-    date: CurrentCalendarData,
-    date2: CurrentCalendarData
+    date: FcDate,
+    date2: FcDate
 ) {
     if (date.day != date2.day) return false;
     if (

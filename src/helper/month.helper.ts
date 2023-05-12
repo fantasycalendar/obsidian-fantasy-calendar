@@ -1,4 +1,4 @@
-import { LeapDay, FcEvent, CurrentCalendarData, Moon, Phase, Month } from "src/@types";
+import type { LeapDay, FcEvent, FcDate, Moon, Phase, Month } from "src/@types";
 import CalendarHelper from ".";
 import { DayHelper } from "./day.helper";
 
@@ -33,7 +33,7 @@ export class MonthHelper {
     return this.data.type;
   }
   events: FcEvent[];
-  getEventsOnDay(day: CurrentCalendarData) {
+  getEventsOnDay(day: FcDate) {
     if (!this.events || !this.events.length || this.shouldUpdate) {
       this.days.forEach((day) => (day.shouldUpdate = true));
       this.events = this.calendar.getEventsForMonth(this);
@@ -81,7 +81,7 @@ export class MonthHelper {
   }
   shouldUpdateMoons = false;
   moons: Array<[Moon, Phase]>[];
-  getMoonsForDay(day: CurrentCalendarData) {
+  getMoonsForDay(day: FcDate) {
     if (!this.moons || !this.moons.length || this.shouldUpdateMoons) {
       this.moons = this.calendar.getMoonsForMonth(this);
     }

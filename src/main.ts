@@ -4,17 +4,18 @@ import FantasyCalendarSettings from "./settings/settings";
 
 import type { Calendar, FantasyCalendarData } from "./@types";
 
-import FantasyCalendarView, {
+/* import FantasyCalendarView, {
     VIEW_TYPE,
     FULL_VIEW
-    /* FullCalendarView */
-} from "./view/view";
+} from "./view/view"; */
+import FantasyCalendarView, { VIEW_TYPE } from "./calendar/view";
 
 import { CalendarEventTree, Watcher } from "./watcher/watcher";
 import { API } from "./api/api";
 import copy from "fast-copy";
 import { nanoid } from "./utils/functions";
 import { FcEventHelper } from "./helper/event.helper";
+import { CalendarStore, createCalendarStore } from "./stores/calendar.store";
 
 declare module "obsidian" {
     interface Workspace {
@@ -80,12 +81,12 @@ export const DEFAULT_CALENDAR: Calendar = {
         displayMoons: true,
         displayDayNumber: false,
         leapDays: [],
-        eras: []
+        eras: [],
     },
     current: {
         year: null,
         month: null,
-        day: null
+        day: null,
     },
     events: [],
     categories: [],
@@ -93,7 +94,7 @@ export const DEFAULT_CALENDAR: Calendar = {
     path: "/",
     supportTimelines: false,
     syncTimelines: true,
-    timelineTag: "timeline"
+    timelineTag: "timeline",
 };
 
 export const DEFAULT_DATA: FantasyCalendarData = {
@@ -108,22 +109,22 @@ export const DEFAULT_DATA: FantasyCalendarData = {
     exit: {
         saving: false,
         event: false,
-        calendar: false
+        calendar: false,
     },
     eventFrontmatter: false,
     parseDates: false,
     settingsToggleState: {
         calendars: false,
         events: false,
-        advanced: true
+        advanced: true,
     },
     showIntercalary: false,
     version: {
         major: null,
         minor: null,
-        patch: null
+        patch: null,
     },
-    debug: false
+    debug: false,
 };
 
 export default class FantasyCalendar extends Plugin {
@@ -158,6 +159,14 @@ export default class FantasyCalendar extends Plugin {
             (c) => c.id == this.data.currentCalendar
         );
     }
+    private readonly stores: WeakMap<Calendar, CalendarStore> = new WeakMap();
+    getStore(calendar: Calendar) {
+        if (!calendar) return null;
+        if (!this.stores.has(calendar)) {
+            this.stores.set(calendar, createCalendarStore(calendar));
+        }
+        return this.stores.get(calendar);
+    }
     get canUseDailyNotes() {
         return this.dailyNotes._loaded;
     }
@@ -173,9 +182,9 @@ export default class FantasyCalendar extends Plugin {
     timelineTag(calendar: Calendar) {
         let tag = calendar.timelineTag;
         if (this.syncTimelines(calendar)) {
-            tag =
-                this.app.plugins.getPlugin("obsidian-timelines").settings
-                    .timelineTag.replace("#", "");
+            tag = this.app.plugins
+                .getPlugin("obsidian-timelines")
+                .settings.timelineTag.replace("#", "");
         }
         return tag ?? calendar.timelineTag ?? "";
     }
@@ -199,12 +208,12 @@ export default class FantasyCalendar extends Plugin {
         if (leaf && leaf.view && leaf.view instanceof FantasyCalendarView)
             return leaf.view;
     }
-    get full() {
+    /* get full() {
         const leaves = this.app.workspace.getLeavesOfType(FULL_VIEW);
         const leaf = leaves.length ? leaves[0] : null;
         if (leaf && leaf.view && leaf.view instanceof FantasyCalendarView)
             return leaf.view;
-    }
+    } */
     async onload() {
         console.log("Loading Fantasy Calendars v" + this.manifest.version);
 
@@ -213,11 +222,11 @@ export default class FantasyCalendar extends Plugin {
 
         this.registerView(
             VIEW_TYPE,
-            (leaf: WorkspaceLeaf) => new FantasyCalendarView(this, leaf)
+            (leaf: WorkspaceLeaf) => new FantasyCalendarView(leaf, this)
         );
-        this.registerView(FULL_VIEW, (leaf: WorkspaceLeaf) => {
+        /* this.registerView(FULL_VIEW, (leaf: WorkspaceLeaf) => {
             return new FantasyCalendarView(this, leaf, { full: true });
-        });
+        }); */
         this.app.workspace.onLayoutReady(async () => {
             await this.loadSettings();
 
@@ -229,11 +238,11 @@ export default class FantasyCalendar extends Plugin {
 
             this.addCalendarView(true);
         });
-        this.addRibbonIcon(VIEW_TYPE, "Open Large Fantasy Calendar", (evt) => {
+        /* this.addRibbonIcon(VIEW_TYPE, "Open Large Fantasy Calendar", (evt) => {
             this.app.workspace
                 .getLeaf(evt.getModifierState(MODIFIER_KEY))
                 .setViewState({ type: FULL_VIEW });
-        });
+        }); */
     }
 
     async onunload() {
@@ -241,9 +250,9 @@ export default class FantasyCalendar extends Plugin {
         this.app.workspace
             .getLeavesOfType(VIEW_TYPE)
             .forEach((leaf) => leaf.detach());
-        this.app.workspace
+        /* this.app.workspace
             .getLeavesOfType(FULL_VIEW)
-            .forEach((leaf) => leaf.detach());
+            .forEach((leaf) => leaf.detach()); */
         this.watcher.unload();
     }
 
@@ -253,15 +262,15 @@ export default class FantasyCalendar extends Plugin {
             name: "Open Fantasy Calendar",
             callback: () => {
                 this.addCalendarView();
-            }
+            },
         });
 
-        this.addCommand({
+        /*         this.addCommand({
             id: "open-big-fantasy-calendar",
             name: "Open Large Fantasy Calendar",
             callback: () => {
                 this.addFullCalendarView();
-            }
+            },
         });
 
         this.addCommand({
@@ -275,7 +284,7 @@ export default class FantasyCalendar extends Plugin {
                     }
                     return true;
                 }
-            }
+            },
         });
         this.addCommand({
             id: "view-date",
@@ -288,7 +297,7 @@ export default class FantasyCalendar extends Plugin {
                     }
                     return true;
                 }
-            }
+            },
         });
         this.addCommand({
             id: "view-date",
@@ -313,28 +322,28 @@ export default class FantasyCalendar extends Plugin {
                         }
                     }
                 }
-            }
-        });
+            },
+        }); */
     }
 
     async addCalendarView(startup: boolean = false) {
         if (startup && this.app.workspace.getLeavesOfType(VIEW_TYPE)?.length)
             return;
         await this.app.workspace.getRightLeaf(false).setViewState({
-            type: VIEW_TYPE
+            type: VIEW_TYPE,
         });
         if (this.view) this.app.workspace.revealLeaf(this.view.leaf);
     }
-    async addFullCalendarView(startup: boolean = false) {
+    /*     async addFullCalendarView(startup: boolean = false) {
         if (startup && this.app.workspace.getLeavesOfType(FULL_VIEW)?.length)
             return;
         this.app.workspace.getLeaf(false).setViewState({ type: FULL_VIEW });
         if (this.full) this.app.workspace.revealLeaf(this.full.leaf);
-    }
+    } */
     async loadSettings() {
         this.data = {
             ...copy(DEFAULT_DATA),
-            ...(await this.loadData())
+            ...(await this.loadData()),
         };
         if (
             this.configDirectory &&
@@ -349,7 +358,8 @@ export default class FantasyCalendar extends Plugin {
             );
         }
         if (this.data.calendars.length) {
-            if (!this.data.defaultCalendar ||
+            if (
+                !this.data.defaultCalendar ||
                 !this.data.calendars.find(
                     (cal) => cal.id == this.data.defaultCalendar
                 )
@@ -379,13 +389,14 @@ export default class FantasyCalendar extends Plugin {
                         id: era.id ?? nanoid(6),
                         restart: era.restart ?? false,
                         endsYear: era.endsYear ?? false,
-                        event: era.event ?? false
+                        event: era.event ?? false,
                     };
                 });
             }
             if (!this.data.version.major || this.data.version.major < 3) {
                 // Ensure events in existing calendars have sort keys
-                if (this.data.debug) console.log("Updating cached events for %s", calendar.name);
+                if (this.data.debug)
+                    console.log("Updating cached events for %s", calendar.name);
                 const helper = new FcEventHelper(calendar, false, this.format);
                 calendar.events.forEach((e) => {
                     e.sort = helper.timestampForFcEvent(e);
@@ -453,7 +464,7 @@ export default class FantasyCalendar extends Plugin {
         return {
             major: Number(v[0]),
             minor: Number(v[1]),
-            patch: Number(v[2])
-        }
+            patch: Number(v[2]),
+        };
     }
 }

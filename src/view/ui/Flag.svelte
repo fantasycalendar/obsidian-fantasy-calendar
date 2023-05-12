@@ -1,13 +1,13 @@
 <script lang="ts">
     import { Platform, setIcon } from "obsidian";
 
-    import type { CurrentCalendarData, Event, EventCategory } from "src/@types";
+    import type { FcDate, Event, EventCategory } from "src/@types";
     import { DEFAULT_CATEGORY_COLOR } from "src/utils/constants";
     import { createEventDispatcher } from "svelte";
     const dispatch = createEventDispatcher();
 
     export let event: Event;
-    export let date: CurrentCalendarData;
+    export let date: FcDate;
 
     export let dayView: boolean = false;
     let multi = false,

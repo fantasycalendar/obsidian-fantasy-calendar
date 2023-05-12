@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { Calendar, CurrentCalendarData } from "src/@types";
+    import type { Calendar, FcDate } from "src/@types";
 
     import { isValidDay, isValidMonth, isValidYear } from "src/utils/functions";
     import { createEventDispatcher } from "svelte";
@@ -13,7 +13,7 @@
     const dispatch = createEventDispatcher();
 
     export let calendar: Calendar;
-    export let date: CurrentCalendarData;
+    export let date: FcDate;
 
     $: months = calendar.static.months;
     $: years = calendar.static.years ?? [];

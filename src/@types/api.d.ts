@@ -2,7 +2,7 @@ import {
     Moon,
     Phase,
     FcEvent,
-    CurrentCalendarData,
+    FcDate,
     LeapDay,
     FcEventCategory
 } from ".";
@@ -10,7 +10,7 @@ import {
 declare class API {
     getCalendars(): Calendar[];
     getMoons(
-        date?: CurrentCalendarData,
+        date?: FcDate,
         name?: string
     ): Array<{ moon: Moon; phase: Phase; icon: HTMLSpanElement }>;
     getDay(
@@ -36,7 +36,7 @@ declare class API {
 export type Day = {
     moons: [Moon, Phase][];
     events: FcEvent[];
-    date: CurrentCalendarData;
+    date: FcDate;
     longDate: {
         day: number;
         month: string;

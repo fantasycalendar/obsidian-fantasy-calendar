@@ -1,13 +1,13 @@
 <script lang="ts">
     import Flag from "./Flag.svelte";
-    import type { CurrentCalendarData, Event, EventCategory } from "src/@types";
+    import type { FcDate, Event, EventCategory } from "src/@types";
     import { createEventDispatcher, onMount, tick } from "svelte";
     import CalendarHelper from "src/helper";
 
     export let events: Event[] = [];
     export let categories: EventCategory[];
     export let dayView: boolean = false;
-    export let date: CurrentCalendarData;
+    export let date: FcDate;
     export let calendar: CalendarHelper;
 
     $: events = [...events];
