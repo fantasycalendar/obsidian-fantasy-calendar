@@ -1,16 +1,16 @@
 import {
     Moon,
     Phase,
-    Event,
-    CurrentCalendarData,
+    FcEvent,
+    FcDate,
     LeapDay,
-    EventCategory
+    FcEventCategory
 } from ".";
 
 declare class API {
     getCalendars(): Calendar[];
     getMoons(
-        date?: CurrentCalendarData,
+        date?: FcDate,
         name?: string
     ): Array<{ moon: Moon; phase: Phase; icon: HTMLSpanElement }>;
     getDay(
@@ -28,15 +28,15 @@ declare class API {
     ): Day;
 
     addCategoryToCalendar(
-        category: EventCategory,
+        category: FcEventCategory,
         calendar: Calendar | string = this.plugin.defaultCalendar
     ): Promise<void>;
 }
 
 export type Day = {
     moons: [Moon, Phase][];
-    events: Event[];
-    date: CurrentCalendarData;
+    events: FcEvent[];
+    date: FcDate;
     longDate: {
         day: number;
         month: string;

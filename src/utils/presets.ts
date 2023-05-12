@@ -8,7 +8,7 @@ export const PRESET_CALENDARS: Calendar[] = [
         path: "/",
         supportTimelines: false,
         syncTimelines: false,
-        timelineTag: "#timeline",
+        timelineTag: "timeline",
         static: {
             displayDayNumber: false,
             incrementDay: true,
@@ -210,7 +210,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Winter Solstice",
@@ -223,7 +227,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Spring Equinox",
@@ -236,7 +244,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Autumn Equinox",
@@ -249,7 +261,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Christmas",
@@ -262,7 +278,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 11
                 },
-                category: "christian-holidays"
+                category: "christian-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Paschal Full Moon",
@@ -275,7 +295,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: "christian-holidays"
+                category: "christian-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Easter",
@@ -288,7 +312,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: "christian-holidays"
+                category: "christian-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Easter Monday",
@@ -301,7 +329,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: "christian-holidays"
+                category: "christian-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Good Friday",
@@ -314,7 +346,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: "christian-holidays"
+                category: "christian-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Pentecost",
@@ -327,7 +363,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: "christian-holidays"
+                category: "christian-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "New Year's Day",
@@ -340,7 +380,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 0
                 },
-                category: "secular-holidays"
+                category: "secular-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Valentine's Day",
@@ -353,7 +397,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 1
                 },
-                category: "secular-holidays"
+                category: "secular-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Halloween",
@@ -366,7 +414,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 9
                 },
-                category: "secular-holidays"
+                category: "secular-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Work on the first version of this calendar started.",
@@ -379,7 +431,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: 2019,
                     month: 5
                 },
-                category: "miscellaneous-events"
+                category: "miscellaneous-events",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Work on this version of the Gregorian Calendar started.",
@@ -392,7 +448,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: 2020,
                     month: 0
                 },
-                category: "miscellaneous-events"
+                category: "miscellaneous-events",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Introduction of the Gregorian Calendar",
@@ -405,7 +465,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: 1582,
                     month: 9
                 },
-                category: "historical-events"
+                category: "historical-events",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             }
         ],
         id: null,
@@ -444,7 +508,7 @@ export const PRESET_CALENDARS: Calendar[] = [
         path: "/",
         supportTimelines: false,
         syncTimelines: false,
-        timelineTag: "#timeline",
+        timelineTag: "timeline",
         static: {
             displayDayNumber: false,
             incrementDay: false,
@@ -638,7 +702,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Spring Equinox",
@@ -651,7 +719,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Summer Solstice",
@@ -664,7 +736,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Autumn Equinox",
@@ -677,7 +753,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Great Moons Glory",
@@ -690,7 +770,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Dark Night",
@@ -703,7 +787,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Agelong",
@@ -716,7 +804,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 8
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Blood Moon Festival",
@@ -729,7 +821,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 3
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Breadgiving Day",
@@ -742,7 +838,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 0
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Brewfest",
@@ -755,7 +855,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 12
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Faerieluck",
@@ -768,7 +872,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 2
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Feast of Edoira",
@@ -781,7 +889,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 4
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Desportium of Magic",
@@ -794,7 +906,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 4
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Holy Day of Pelor",
@@ -807,7 +923,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 8
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Holy Day of Serenity",
@@ -820,7 +940,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 9
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             }
         ],
         id: null,
@@ -859,7 +983,7 @@ export const PRESET_CALENDARS: Calendar[] = [
         path: "/",
         supportTimelines: false,
         syncTimelines: false,
-        timelineTag: "#timeline",
+        timelineTag: "timeline",
         static: {
             displayDayNumber: false,
             firstWeekDay: 0,
@@ -1102,7 +1226,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Winter Solstice",
@@ -1115,7 +1243,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Spring Equinox",
@@ -1128,7 +1260,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Autumn Equinox",
@@ -1141,7 +1277,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Eternal Kiss",
@@ -1154,7 +1294,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Longnight",
@@ -1167,7 +1311,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 0
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Foundation Day",
@@ -1180,7 +1328,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 0
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Pjallarane Day",
@@ -1193,7 +1345,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 0
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Vault Day",
@@ -1206,7 +1362,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 0
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Ruby Prince's Birthday",
@@ -1219,7 +1379,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 0
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Merrymead",
@@ -1232,7 +1396,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 1
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "King Eodred II's Birthday",
@@ -1245,7 +1413,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 1
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Loyalty Day",
@@ -1258,7 +1430,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 1
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Fateless Day",
@@ -1271,7 +1447,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 1
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Golemwalk Parade",
@@ -1284,7 +1464,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 2
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Day of Bones",
@@ -1297,7 +1481,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 2
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Sable Company Founding Day",
@@ -1310,7 +1498,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 2
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Night of Tears",
@@ -1323,7 +1515,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 2
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Kaliashahrim",
@@ -1336,7 +1532,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 2
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Conquest Day",
@@ -1349,7 +1549,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 2
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Days of Wrath",
@@ -1362,7 +1566,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Firstbloom",
@@ -1375,7 +1583,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "First Cut",
@@ -1388,7 +1600,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Currentseve",
@@ -1401,7 +1617,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 3
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Taxfest",
@@ -1414,7 +1634,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 3
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Wrights of Augustana",
@@ -1427,7 +1651,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 3
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Gala of Sails",
@@ -1440,7 +1668,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 3
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Remembrance Moon",
@@ -1453,7 +1685,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 4
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Angel Day",
@@ -1466,7 +1702,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 4
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Old-Mage Day",
@@ -1479,7 +1719,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 4
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Multiple Events",
@@ -1492,7 +1736,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Burning Blades",
@@ -1505,7 +1753,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 5
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Liberty Day",
@@ -1518,7 +1770,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 5
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Talon Tag",
@@ -1531,7 +1787,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 5
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Riverwind Festival",
@@ -1544,7 +1804,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 5
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Inheritor's Ascendance ",
@@ -1557,7 +1821,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 7
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "First Crusader Day",
@@ -1570,7 +1838,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 7
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Day of Silenced Whispers",
@@ -1583,7 +1855,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 7
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Founding Day",
@@ -1596,7 +1872,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 7
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Armasse",
@@ -1609,7 +1889,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 7
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Saint Alika's Birthday",
@@ -1622,7 +1906,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 7
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Archerfeast",
@@ -1635,7 +1923,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 6
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Founding Festival",
@@ -1648,7 +1940,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 6
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Burning Night",
@@ -1661,7 +1957,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 6
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Kianidi Festival",
@@ -1674,7 +1974,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 6
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Harvest Moon",
@@ -1686,7 +1990,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 8
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Multiple Events",
@@ -1699,7 +2007,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Signing Day",
@@ -1712,7 +2024,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 8
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Crabfest",
@@ -1725,7 +2041,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 8
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Feast of Szurpade",
@@ -1738,7 +2058,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 8
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Day of Sundering",
@@ -1751,7 +2075,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 8
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Admani Upastuti",
@@ -1764,7 +2092,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 9
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Ascendance Day",
@@ -1777,7 +2109,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 9
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Bastion Day",
@@ -1790,7 +2126,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: 4712,
                     month: 9
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Jestercap",
@@ -1803,7 +2143,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 9
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Feast of the Survivors",
@@ -1816,7 +2160,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 9
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Kraken Carnival",
@@ -1829,7 +2177,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 9
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Independence Day",
@@ -1842,7 +2194,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 10
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Seven Veils",
@@ -1855,7 +2211,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 10
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Abjurant Day",
@@ -1868,7 +2228,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 10
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Great Fire Remembrance",
@@ -1881,7 +2245,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 10
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Even-Tongued Day",
@@ -1894,7 +2262,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 10
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Evoking Day",
@@ -1907,7 +2279,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 10
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Baptism of Ice",
@@ -1920,7 +2296,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 10
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Transmutatum",
@@ -1933,7 +2313,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 10
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Winter Week",
@@ -1946,7 +2330,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 11
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "The Shadowchaining",
@@ -1959,7 +2347,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 11
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Pseudodragon Festival",
@@ -1972,7 +2364,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 11
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Ascension Day",
@@ -1985,7 +2381,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 11
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Winterbloom",
@@ -1998,7 +2398,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 11
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Final Day",
@@ -2011,7 +2415,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 11
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Night of the Pale",
@@ -2024,7 +2432,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 11
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Turning Day",
@@ -2037,7 +2449,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 11
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Ritual of Stardust",
@@ -2050,7 +2466,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Planting Week",
@@ -2063,7 +2483,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Ascendance Night",
@@ -2076,7 +2500,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 4
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Azvadeva Dejal",
@@ -2089,7 +2517,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 4
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Goblin Flea Market",
@@ -2102,7 +2534,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Breaching Festival",
@@ -2115,7 +2551,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 4
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Silverglazer Sunday",
@@ -2128,7 +2568,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Batul al-Alim",
@@ -2141,7 +2585,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 1
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             }
         ],
         id: null,
@@ -2180,7 +2628,7 @@ export const PRESET_CALENDARS: Calendar[] = [
         path: "/",
         supportTimelines: false,
         syncTimelines: false,
-        timelineTag: "#timeline",
+        timelineTag: "timeline",
         static: {
             displayDayNumber: false,
             firstWeekDay: 0,
@@ -2416,7 +2864,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Revelation Day - Blood of Vol",
@@ -2429,7 +2881,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 0
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Winter Solstice",
@@ -2441,7 +2897,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 0
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Rebirth Eve - The Silver Flame",
@@ -2454,7 +2914,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 0
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Crystalfall - Sharn",
@@ -2467,7 +2931,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: 998,
                     month: 1
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Bright Souls' Day - The Silver Flame",
@@ -2480,7 +2948,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 1
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "The Day of Mourning - Sharn",
@@ -2493,7 +2965,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: 995,
                     month: 1
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Tirasday - The Silver Flame",
@@ -2506,7 +2982,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 2
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Sun's Blessing - The Sovereign Host",
@@ -2519,7 +2999,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 2
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Initiation Day - The Silver Flame",
@@ -2532,7 +3016,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 3
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Baker's Night - The Silver Flame",
@@ -2545,7 +3033,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 4
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Aureon's Crown - Sharn and The Sovereign Host",
@@ -2558,7 +3050,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 4
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Promisetide - The Silver Flame",
@@ -2571,7 +3067,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 4
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Brightblade - Sharn and The Sovereign Host",
@@ -2584,7 +3084,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 5
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "First Dawn - The Silver Flame",
@@ -2597,7 +3101,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: 915,
                     month: 5
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Silvertide - The Silver Flame",
@@ -2610,7 +3118,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 6
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "The Race of Eight Winds - Sharn",
@@ -2623,7 +3135,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: 201,
                     month: 6
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "The Hunt - Sharn and The Sovereign Host",
@@ -2636,7 +3152,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 7
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Victory Day - The Silver Flame",
@@ -2649,7 +3169,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: 881,
                     month: 7
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Fathen's Fall - Sharn",
@@ -2662,7 +3186,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: 881,
                     month: 7
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Boldrei's Feast - Sharn and The Sovereign Host",
@@ -2675,7 +3203,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 8
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "The Ascension - Sharn",
@@ -2688,7 +3220,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 9
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Wildnight - Sharn",
@@ -2701,7 +3237,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 9
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Saint Voltros's Day - The Silver Flame",
@@ -2714,7 +3254,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 9
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Thronehold - Sharn",
@@ -2727,7 +3271,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: 997,
                     month: 10
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Rampartide - The Silver Flame",
@@ -2740,7 +3288,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 10
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Long Shadows - Sharn",
@@ -2753,7 +3305,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 11
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Khybersef - The Silver Flame",
@@ -2766,7 +3322,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 11
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Spring Equinox",
@@ -2779,7 +3339,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Summer Solstice",
@@ -2792,7 +3356,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Autumn Equinox",
@@ -2805,7 +3373,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             }
         ],
         id: null,
@@ -2818,7 +3390,7 @@ export const PRESET_CALENDARS: Calendar[] = [
         path: "/",
         supportTimelines: false,
         syncTimelines: false,
-        timelineTag: "#timeline",
+        timelineTag: "timeline",
         static: {
             displayDayNumber: false,
             firstWeekDay: 0,
@@ -3019,7 +3591,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: "natural-event"
+                category: "natural-event",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Summer Solstice",
@@ -3032,7 +3608,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: "natural-event"
+                category: "natural-event",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Spring Equinox",
@@ -3045,7 +3625,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: "natural-event"
+                category: "natural-event",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Autumnal Equinox",
@@ -3058,7 +3642,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "New Year's Day",
@@ -3070,7 +3658,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Paschal Full Moon",
@@ -3083,7 +3675,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: "natural-event"
+                category: "natural-event",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             }
         ],
         id: null,
@@ -3102,7 +3698,7 @@ export const PRESET_CALENDARS: Calendar[] = [
         path: "/",
         supportTimelines: false,
         syncTimelines: false,
-        timelineTag: "#timeline",
+        timelineTag: "timeline",
         static: {
             displayDayNumber: false,
             firstWeekDay: 2,
@@ -3305,7 +3901,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Summer Solstice",
@@ -3318,7 +3918,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Autumn Equinox",
@@ -3331,7 +3935,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Winter Solstice",
@@ -3344,7 +3952,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: null
+                category: null,
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "New Dawn",
@@ -3357,7 +3969,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 0
                 },
-                category: "religious-holidays"
+                category: "religious-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Hillsgold",
@@ -3370,7 +3986,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 0
                 },
-                category: "secular-holidays"
+                category: "secular-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Day of Challenging",
@@ -3383,7 +4003,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 1
                 },
-                category: "religious-holidays"
+                category: "religious-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Renewal Festival",
@@ -3396,7 +4020,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 2
                 },
-                category: "secular-holidays"
+                category: "secular-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Wild's Grandeur",
@@ -3409,7 +4037,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 2
                 },
-                category: "religious-holidays"
+                category: "religious-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Harvest's Rise",
@@ -3422,7 +4054,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 3
                 },
-                category: "secular-holidays"
+                category: "secular-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Merryfrond's Day",
@@ -3435,7 +4071,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 3
                 },
-                category: "secular-holidays"
+                category: "secular-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Deep Solace",
@@ -3448,7 +4088,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 4
                 },
-                category: "religious-holidays"
+                category: "religious-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Zenith",
@@ -3461,7 +4105,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 4
                 },
-                category: "secular-holidays"
+                category: "secular-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Artisan's Faire",
@@ -3474,7 +4122,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 5
                 },
-                category: "secular-holidays"
+                category: "secular-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Elvendawn",
@@ -3487,7 +4139,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 5
                 },
-                category: "religious-holidays"
+                category: "religious-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Highsummer",
@@ -3500,7 +4156,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 6
                 },
-                category: "religious-holidays"
+                category: "religious-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Morn of Largesse",
@@ -3513,7 +4173,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 6
                 },
-                category: "secular-holidays"
+                category: "secular-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Harvest's Close",
@@ -3526,7 +4190,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 7
                 },
-                category: "secular-holidays"
+                category: "secular-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "The Hazel Festival",
@@ -3539,7 +4207,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 8
                 },
-                category: "secular-holidays"
+                category: "secular-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Civilization's Dawn",
@@ -3552,7 +4224,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 8
                 },
-                category: "religious-holidays"
+                category: "religious-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Night of Ascension",
@@ -3565,7 +4241,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 9
                 },
-                category: "religious-holidays"
+                category: "religious-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Zan's Cup",
@@ -3578,7 +4258,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 9
                 },
-                category: "secular-holidays"
+                category: "secular-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Barren Eve",
@@ -3591,7 +4275,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 10
                 },
-                category: "secular-holidays"
+                category: "secular-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Embertide",
@@ -3604,7 +4292,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 10
                 },
-                category: "religious-holidays"
+                category: "religious-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Winter's Crest",
@@ -3617,7 +4309,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 10
                 },
-                category: "secular-holidays"
+                category: "secular-holidays",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             }
         ],
         id: null,
@@ -3641,7 +4337,7 @@ export const PRESET_CALENDARS: Calendar[] = [
         path: "/",
         supportTimelines: false,
         syncTimelines: false,
-        timelineTag: "#timeline",
+        timelineTag: "timeline",
         static: {
             displayDayNumber: false,
             firstWeekDay: 0,
@@ -3816,7 +4512,7 @@ export const PRESET_CALENDARS: Calendar[] = [
             ],
             leapDays: [
                 {
-                    name: "Shieldsmeet",
+                    name: "Shieldmeet",
                     type: "leapday",
                     interval: [
                         {
@@ -3849,7 +4545,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: "natural-events"
+                category: "natural-events",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Vernal Equinox",
@@ -3861,7 +4561,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: "natural-events"
+                category: "natural-events",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Summer Solstice",
@@ -3873,7 +4577,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: "natural-events"
+                category: "natural-events",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Autumnal Equinox",
@@ -3885,7 +4593,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: null
                 },
-                category: "natural-events"
+                category: "natural-events",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Shieldmeet",
@@ -3898,7 +4610,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 9
                 },
-                category: "festivals"
+                category: "festivals",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Feast of the Moon",
@@ -3911,7 +4627,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 15
                 },
-                category: "festivals"
+                category: "festivals",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Highharvesttide",
@@ -3924,7 +4644,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 12
                 },
-                category: "festivals"
+                category: "festivals",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Greengrass",
@@ -3937,7 +4661,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 5
                 },
-                category: "festivals"
+                category: "festivals",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Midwinter",
@@ -3950,7 +4678,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 1
                 },
-                category: "festivals"
+                category: "festivals",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             },
             {
                 name: "Midsummer",
@@ -3963,7 +4695,11 @@ export const PRESET_CALENDARS: Calendar[] = [
                     year: null,
                     month: 9
                 },
-                category: "festivals"
+                category: "festivals",
+                sort: {
+                    timestamp: Number.MIN_VALUE,
+                    order: ''
+                }
             }
         ],
         id: null,

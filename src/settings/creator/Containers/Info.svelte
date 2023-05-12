@@ -5,7 +5,7 @@
         ExtraButtonComponent,
         normalizePath,
         TextComponent as ObsidianTextComponent,
-        TFolder
+        TFolder,
     } from "obsidian";
     import { FolderSuggestionModal } from "src/suggester/folder";
     import { getContext } from "svelte";
@@ -40,7 +40,7 @@
         if (!$calendar.path) $calendar.path = "/";
         text.setPlaceholder($calendar.path ?? "/");
         const modal = new FolderSuggestionModal(plugin.app, text, [
-            ...(folders as TFolder[])
+            ...(folders as TFolder[]),
         ]);
 
         modal.onClose = async () => {
@@ -60,29 +60,29 @@
 
     $: timelinesDesc = createFragment((e) => {
         e.createSpan({
-            text: "Support "
+            text: "Support ",
         });
         e.createEl("code", { text: "<span>" });
         e.createSpan({ text: " elements used by the " });
         e.createEl("a", {
             text: "Obsidian Timelines",
-            href: "obsidian://show-plugin?id=obsidian-timelines"
+            href: "obsidian://show-plugin?id=obsidian-timelines",
         });
         e.createSpan({
-            text: " plugin (by Darakah)."
+            text: " plugin (by Darakah).",
         });
     });
     $: timelinesTagDesc = createFragment((e) => {
         e.createSpan({
-            text: "Tag to specify which notes to include in created timelines, e.g. "
+            text: "Tag to specify which notes to include in created timelines, e.g. ",
         });
         e.createEl("code", { text: "timeline" });
         e.createSpan({
-            text: " to use the "
+            text: " to use the ",
         });
         e.createEl("code", { text: "#timeline" });
         e.createSpan({
-            text: " tag."
+            text: " tag.",
         });
     });
 

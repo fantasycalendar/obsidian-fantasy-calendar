@@ -1,12 +1,12 @@
 <script lang="ts">
-    import type { Calendar, Event } from "src/@types";
+    import type { Calendar, FcEvent } from "src/@types";
     import type FantasyCalendar from "src/main";
 
     import { TextComponent, TFile } from "obsidian";
     import PathSuggestionModal from "src/suggester/path";
     import { nanoid } from "src/utils/functions";
 
-    export let event: Event;
+    export let event: FcEvent;
     export let calendar: Calendar;
     export let plugin: FantasyCalendar;
 

@@ -8,7 +8,7 @@ import {
     TextAreaComponent,
     TFile
 } from "obsidian";
-import type { Calendar, Event } from "../../../@types";
+import type { Calendar, FcEvent } from "../../../@types";
 
 import { dateString, nanoid } from "../../../utils/functions";
 
@@ -19,10 +19,11 @@ import PathSuggestionModal from "../../../suggester/path";
 import copy from "fast-copy";
 import FantasyCalendar from "src/main";
 import { FantasyCalendarModal } from "../modal";
+import { FcEventHelper } from "src/helper/event.helper";
 
 export class CreateEventModal extends FantasyCalendarModal {
     saved = false;
-    event: Event = {
+    event: FcEvent = {
         name: null,
         description: null,
         date: {
@@ -32,7 +33,11 @@ export class CreateEventModal extends FantasyCalendarModal {
         },
         id: nanoid(6),
         note: null,
-        category: null
+        category: null,
+        sort: {
+            timestamp: null,
+            order: null
+        }
     };
     editing: boolean;
     infoEl: HTMLDivElement;
@@ -49,7 +54,7 @@ export class CreateEventModal extends FantasyCalendarModal {
     constructor(
         public plugin: FantasyCalendar,
         public calendar: Calendar,
-        event?: Event,
+        event?: FcEvent,
         date?: { month: number; day: number; year: number }
     ) {
         super(plugin.app);
@@ -92,6 +97,11 @@ export class CreateEventModal extends FantasyCalendarModal {
                             return;
                         }
 
+                        const helper = new FcEventHelper(this.calendar, false, this.plugin.format);
+
+                        // refresh timestamp for date change
+                        this.event.sort = helper.timestampForFcEvent(this.event, this.event.sort);
+
                         if (this.event.end) {
                             this.event.end = {
                                 year:
@@ -130,7 +140,10 @@ export class CreateEventModal extends FantasyCalendarModal {
                                 this.event.date = { ...temp };
                             }
                         }
+
                         this.saved = true;
+
+                        // Saving this note to frontmatter
                         if (
                             false
                             /* this.plugin.data.eventFrontmatter &&
@@ -143,24 +156,13 @@ export class CreateEventModal extends FantasyCalendarModal {
                                     path,
                                     ""
                                 );
-                            const date = this.plugin.format
-                                .replace(/[Yy]+/g, `${this.event.date.year}`)
-                                .replace(/[Mm]+/g, `${this.event.date.month}`)
-                                .replace(/[Dd]+/g, `${this.event.date.day}`);
 
                             const frontmatter = [
                                 `fc-calendar: ${this.calendar.name}`,
-                                `fc-date: ${date}`
+                                `fc-date: ${helper.toFcDateString(this.event.date)}`
                             ];
                             if (this.event.end) {
-                                const end = this.plugin.format
-                                    .replace(/[Yy]+/g, `${this.event.end.year}`)
-                                    .replace(
-                                        /[Mm]+/g,
-                                        `${this.event.end.month}`
-                                    )
-                                    .replace(/[Dd]+/g, `${this.event.end.day}`);
-                                frontmatter.push(`fc-end: ${end}`);
+                                frontmatter.push(`fc-end: ${helper.toFcDateString(this.event.end)}`);
                             }
                             if (this.event.category) {
                                 const category = this.calendar.categories.find(
@@ -203,10 +205,6 @@ export class CreateEventModal extends FantasyCalendarModal {
                                     `---${frontmatter.join("\n")}---`
                                 );
                             }
-                        }
-
-                        if (!this.event.name) {
-                            this.event.name = "Event";
                         }
 
                         this.close();

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { CurrentCalendarData } from "src/@types";
+    import type { Calendar, FcDate } from "src/@types";
 
     import { getContext } from "svelte";
     import {

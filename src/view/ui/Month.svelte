@@ -1,6 +1,7 @@
 <script lang="ts">
-    import type { DayHelper, MonthHelper } from "src/helper";
+    import { MonthHelper } from "src/helper/month.helper";
     import Day from "./Day.svelte";
+    import { DayHelper } from "src/helper/day.helper";
 
     export let yearView: boolean = false;
     export let month: MonthHelper;

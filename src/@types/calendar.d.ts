@@ -1,15 +1,20 @@
 import { Moon } from ".";
-import { Event, EventCategory } from ".";
+import { FcEvent, FcEventCategory } from ".";
+
+export interface FcDate {
+    day: number;
+    month: number;
+    year: number;
+}
 
 export interface Calendar {
     id: string;
     name: string;
     description: string;
     static: StaticCalendarData;
-    current: CurrentCalendarData;
-    _current?: CurrentCalendarData;
-    events: Event[];
-    categories: EventCategory[];
+    current: FcDate;
+    events: FcEvent[];
+    categories: FcEventCategory[];
     date?: number;
     displayWeeks?: boolean;
     autoParse: boolean;
@@ -17,6 +22,7 @@ export interface Calendar {
     supportTimelines: boolean;
     syncTimelines: boolean;
     timelineTag: string;
+    dateFormat?: string;
 }
 export interface StaticCalendarData {
     firstWeekDay: number;
@@ -34,7 +40,7 @@ export interface StaticCalendarData {
     years?: Year[];
 }
 
-export interface CurrentCalendarData {
+export interface FcDate {
     year: number;
     month: number;
     day: number;
@@ -46,22 +52,28 @@ export interface TimeSpan {
     id: string;
 }
 
-export interface Day extends TimeSpan {
-    type: "day"
+interface BaseDay extends TimeSpan {
+    type: "day" | "leapday";
 }
-export interface Year extends TimeSpan {
-    type: "year"
+export interface Day extends BaseDay {
+    type: "day";
 }
+export interface Year extends TimeSpan {}
 export type Week = Day[];
-export interface Month extends TimeSpan {
+interface BaseMonth extends TimeSpan {
     length: number;
-    type: "month";
+    interval: number;
+    offset: number;
+    type: "month" | "intercalary";
 }
-export interface IntercalaryMonth extends Month {
-    length: 1;
+export interface RegularMonth extends BaseMonth {
+    type: "month";
+    week?: Week;
+}
+export interface IntercalaryMonth extends BaseMonth {
     type: "intercalary";
 }
-
+export type Month = RegularMonth | IntercalaryMonth;
 interface LeapDayCondition {
     ignore: boolean; //ignore offset
     exclusive: boolean; //causes failure if true
@@ -70,7 +82,7 @@ interface LeapDayCondition {
 
 /**
 Example Condition
-  
+
 400,!100,4 - Every 4 years, unless it is divisible by 100, but again if it is divisible by 400.
 
 [
@@ -92,7 +104,8 @@ Example Condition
 ]
 
  */
-export interface LeapDay extends Day {
+export interface LeapDay extends BaseDay {
+    type: "leapday";
     interval: LeapDayCondition[];
     timespan: number;
     intercalary: boolean;
@@ -116,7 +129,7 @@ export interface Era {
     restart: boolean;
     endsYear: boolean;
     event: boolean;
-    start: CurrentCalendarData;
+    start: FcDate;
     eventDescription?: string;
     eventCategory?: string;
 }

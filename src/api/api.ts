@@ -1,8 +1,8 @@
 import { Notice } from "obsidian";
 import type {
     Calendar,
-    CurrentCalendarData,
-    EventCategory,
+    FcDate,
+    FcEventCategory,
     Moon,
     Phase
 } from "src/@types";
@@ -19,7 +19,7 @@ export class API implements APIDefinition {
     getCalendars() {
         return this.plugin.data.calendars;
     }
-    getMoons(date?: CurrentCalendarData, name?: string) {
+    getMoons(date?: FcDate, name?: string) {
         const calendar = name
             ? this.plugin.data.calendars.find(
                   ({ name: c_name }) => c_name == name
@@ -132,7 +132,7 @@ export class API implements APIDefinition {
     }
 
     async addCategoryToCalendar(
-        category: EventCategory,
+        category: FcEventCategory,
         calendar: Calendar | string = this.plugin.defaultCalendar
     ) {
         if (!category) {
