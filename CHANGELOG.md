@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.0](https://github.com/fantasycalendar/obsidian-fantasy-calendar/compare/3.1.0...4.0.0) (2023-05-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* Beta
+
+### Features
+
+* Beta ([6b37ced](https://github.com/fantasycalendar/obsidian-fantasy-calendar/commit/6b37ced3281118d5b9ee4425ba0dd58dedc57489))
+
 ## [3.1.0](https://github.com/valentine195/obsidian-fantasy-calendar/compare/3.0.0...3.1.0) (2023-04-20)
 
 
