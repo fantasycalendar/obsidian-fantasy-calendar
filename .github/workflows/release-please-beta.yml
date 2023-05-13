@@ -3,7 +3,7 @@ on:
 
     push:
         branches:
-            - "master"
+            - "beta"
 env:
     PLUGIN_NAME: fantasy-calendar
 
@@ -25,6 +25,7 @@ jobs:
               id: release
               with:
                   command: manifest
+                  config-file: ./release-please-config-beta.json
 
     upload-build:
         runs-on: ubuntu-latest
