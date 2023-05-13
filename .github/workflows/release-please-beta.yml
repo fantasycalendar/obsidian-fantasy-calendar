@@ -26,7 +26,7 @@ jobs:
               with:
                   command: manifest
                   config-file: release-please-config-beta.json
-                  default-branch: beta
+                  manifest-file: .release-please-manifest-beta.json
 
     upload-build:
         runs-on: ubuntu-latest
