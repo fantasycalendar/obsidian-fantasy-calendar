@@ -97,7 +97,6 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
-                  secrets: inherit
                   name: Fantasy Calendar
                   webhook-urls: ${{ secrets.OBSIDIAN_WEBHOOK }}
     notify-ttrpg:
@@ -109,6 +108,5 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
-                  secrets: inherit
                   name: Fantasy Calendar
                   webhook-urls: ${{ secrets.TTRPG_WEBHOOK }}
