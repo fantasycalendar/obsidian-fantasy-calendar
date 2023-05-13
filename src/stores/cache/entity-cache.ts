@@ -53,6 +53,19 @@ export abstract class EntityCache<T> {
     abstract getMonthCache(month: number, year: number): MonthCache<T>;
     abstract getDayCache(day: number, month: number, year: number): DayCache<T>;
 
+    public invalidate(date: FcDate) {
+        if (!this.cache.has(date.year)) return;
+        const year = this.cache.get(date.year);
+        year.dirty.set(true);
+
+        if (!year.cache.has(date.month)) return;
+        const month = year.cache.get(date.month);
+        month.dirty.set(true);
+
+        if (!month.cache.has(date.day)) return;
+        const day = month.cache.get(date.day);
+        day.dirty.set(true);
+    }
     public getItemsOrRecalculate(date: FcDate): Readable<T[]> {
         const { day, month, year } = date;
         if (!this.cache.has(year)) {

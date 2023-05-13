@@ -1,14 +1,14 @@
 <script lang="ts">
-    import { ExtraButtonComponent } from "obsidian";
+    import { ExtraButtonComponent, Menu } from "obsidian";
     import { createEventDispatcher } from "svelte";
     import { getTypedContext } from "../view";
 
-    const dispatch = createEventDispatcher();
-
-    const store = getTypedContext("store");
-
-    const { displayingMonth, displayingYear, currentDisplay } = $store;
-
+    const global = getTypedContext("store");
+    const plugin = getTypedContext("plugin");
+    const store = $global;
+    const { displayingMonth, displayingYear, currentDisplay, staticStore } =
+        store;
+    const { staticConfiguration } = staticStore;
     const left = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("left-arrow");
     };
@@ -17,6 +17,46 @@
     };
     const settings = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("gear");
+    };
+    const openSettings = (evt: MouseEvent) => {
+        const menu = new Menu(app);
+
+        menu.setNoIcon();
+        menu.addItem((item) => {
+            item.setTitle(
+                `${$store.displayWeeks ? "Hide" : "Show"} Weeks`
+            ).onClick(async () => {
+                $store.displayWeeks = !$store.displayWeeks;
+                plugin.saveCalendars();
+            });
+        });
+        menu.addItem((item) => {
+            item.setTitle(`Open ${true ? "Month" : "Year"}`).onClick(() => {});
+        });
+        menu.addItem((item) => {
+            item.setTitle(
+                $store.static.displayMoons ? "Hide Moons" : "Display Moons"
+            ).onClick(() => {
+                $store.static.displayMoons = !$store.static.displayMoons;
+            });
+        });
+        menu.addItem((item) => {
+            item.setTitle(
+                $store.static.displayDayNumber
+                    ? "Hide Day Number"
+                    : "Display Day Number"
+            ).onClick(async () => {
+                $store.static.displayDayNumber =
+                    !$store.static.displayDayNumber;
+            });
+        });
+        menu.addItem((item) => {
+            item.setTitle("View Day").onClick(() => {
+                /* openDate(); */
+            });
+        });
+
+        menu.showAtMouseEvent(evt);
     };
 </script>
 
@@ -32,11 +72,11 @@
             <div
                 class="arrow calendar-clickable"
                 use:left
-                on:click={() => $store.goToPrevious()}
+                on:click={() => store.goToPrevious()}
             />
             <div
                 class="reset-button calendar-clickable"
-                on:click={() => $store.goToToday()}
+                on:click={() => store.displayDate()}
                 aria-label="Today is {$currentDisplay}"
             >
                 <span>Today</span>
@@ -44,13 +84,13 @@
             <div
                 class="arrow right calendar-clickable"
                 use:right
-                on:click={(evt) => $store.goToNext()}
+                on:click={(evt) => store.goToNext()}
             />
             <div
                 class="calendar-clickable"
                 use:settings
                 aria-label="Calendar Settings"
-                on:click={(evt) => dispatch("settings", evt)}
+                on:click={(evt) => openSettings(evt)}
             />
         </div>
     </div>

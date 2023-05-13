@@ -1,3 +1,10 @@
+import { addIcon } from "obsidian";
+
+export const REVEAL_ICON = "fantasy-calendar-reveal";
+addIcon(
+    REVEAL_ICON,
+    `<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="calendar-day" class="svg-inline--fa fa-calendar-day fa-w-14" role="img" viewBox="0 0 448 512"><path fill="currentColor" d="M0 464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V192H0v272zm64-192c0-8.8 7.2-16 16-16h96c8.8 0 16 7.2 16 16v96c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16v-96zM400 64h-48V16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v48H160V16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v48H48C21.5 64 0 85.5 0 112v48h448v-48c0-26.5-21.5-48-48-48z"/></svg>`
+);
 export const DEFAULT_CATEGORY_COLOR = "#808080";
 
 export const MOON_SHADOWS = [
@@ -48,7 +55,7 @@ export const MOON_SHADOWS = [
     "M16,26.72a11.16,11.16,0,0,1-1.54-.12c-2.19-.84-6-3.34-6-10.72,0-7.12,3.5-9.59,5.72-10.44A10.43,10.43,0,0,1,16,5.28a10.72,10.72,0,0,1,0,21.44Z",
     "M16,26.72a10.69,10.69,0,0,1-2.28-.25C11.35,25.55,8,23,8,16.17c0-7.3,3.78-9.84,6.15-10.72A11.26,11.26,0,0,1,16,5.28a10.72,10.72,0,0,1,0,21.44Z",
     "M16,26.72a10.63,10.63,0,0,1-3.4-.56C10.23,25,7.5,22.33,7.5,16s2.73-9,5.1-10.16A10.72,10.72,0,1,1,16,26.72Z",
-    "M16,26.72a10.52,10.52,0,0,1-3.77-.7C9.77,24.81,7,22.1,7,16S9.77,7.19,12.23,6A10.52,10.52,0,0,1,16,5.28a10.72,10.72,0,0,1,0,21.44Z"
+    "M16,26.72a10.52,10.52,0,0,1-3.77-.7C9.77,24.81,7,22.1,7,16S9.77,7.19,12.23,6A10.52,10.52,0,0,1,16,5.28a10.72,10.72,0,0,1,0,21.44Z",
 ];
 
 export const SHADOW_MAP = {
@@ -91,7 +98,7 @@ export const SHADOW_MAP = {
     "Waning Crescent Fading": MOON_SHADOWS[43],
     "Waning Crescent Faded": MOON_SHADOWS[44],
     "New Moon Rising": MOON_SHADOWS[45],
-    "New Moon Risen": MOON_SHADOWS[46]
+    "New Moon Risen": MOON_SHADOWS[46],
 };
 
 export const MOON_PHASES: {
@@ -107,7 +114,7 @@ export const MOON_PHASES: {
         "Full Moon",
         "Waning Gibbous",
         "Last Quarter",
-        "Waning Crescent"
+        "Waning Crescent",
     ],
 
     16: [
@@ -126,7 +133,7 @@ export const MOON_PHASES: {
         "Last Quarter",
         "Last Quarter Fading",
         "Waning Crescent",
-        "Waning Crescent Fading"
+        "Waning Crescent Fading",
     ],
 
     24: [
@@ -153,7 +160,7 @@ export const MOON_PHASES: {
         "Waning Crescent Rising",
         "Waning Crescent",
         "Waning Crescent Fading",
-        "New Moon Rising"
+        "New Moon Rising",
     ],
 
     40: [
@@ -196,8 +203,8 @@ export const MOON_PHASES: {
         "Waning Crescent Fading",
         "Waning Crescent Faded",
         "New Moon Rising",
-        "New Moon Risen"
-    ]
+        "New Moon Risen",
+    ],
 };
 
 export type Phase =

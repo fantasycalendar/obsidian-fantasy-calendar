@@ -6,6 +6,9 @@ export interface Moon {
     shadowColor: string;
     id: string;
 }
+export interface MoonState extends Moon {
+    phase: Phase;
+}
 export type Phase =
     | "New Moon"
     | "New Moon Fading"

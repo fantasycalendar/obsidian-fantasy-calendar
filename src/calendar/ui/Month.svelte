@@ -1,14 +1,12 @@
 <script lang="ts">
-    import type { Month } from "src/@types";
     import { getTypedContext } from "../view";
-    import { weekdaysMin } from "moment";
     import Day from "./Day.svelte";
 
     export let year: number;
     export let month: number;
 
     const store = getTypedContext("store");
-    const { yearCalculator, previousMonth, staticStore } = $store;
+    const { yearCalculator, previousMonth, staticStore, nextMonth } = $store;
     const { staticConfiguration } = staticStore;
     $: displayedMonth = yearCalculator
         .getYearFromCache(year)
@@ -27,7 +25,7 @@
                     props: {
                         adjacent: true,
                         number: $previousDays - $previousLastDay + i + 1,
-                        month: displayedMonth,
+                        month: $previousMonth,
                     },
                 });
             }
@@ -60,7 +58,7 @@
                     props: {
                         adjacent: true,
                         number: i + 1,
-                        month: displayedMonth,
+                        month: $nextMonth,
                     },
                 });
             }
@@ -89,6 +87,7 @@
 <style scoped>
     .month {
         width: 100%;
+        table-layout: fixed;
     }
     .weekday {
         background-color: var(--color-background-heading);

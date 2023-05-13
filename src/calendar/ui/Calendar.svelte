@@ -1,15 +1,25 @@
 <script lang="ts">
-    import type { CalendarStore } from "src/stores/calendar.store";
     import Nav from "./Nav.svelte";
     import Month from "./Month.svelte";
     import { ExtraButtonComponent, Menu } from "obsidian";
     import { getTypedContext } from "../view";
+    import DayView from "./DayView.svelte";
 
     const global = getTypedContext("store");
     $: store = $global;
     $: displaying = store.displaying;
+    
+    $: viewing = store.viewing;
+
     const plugin = getTypedContext("plugin");
-    $: otherCalendars = plugin.data.calendars;
+    let otherCalendars = plugin.data.calendars;
+
+    //don't like this... find a better way
+    plugin.app.workspace.on(
+        "fantasy-calendars-updated",
+        () => (otherCalendars = plugin.data.calendars)
+    );
+
     const drop = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("chevrons-up-down");
     };
@@ -37,7 +47,13 @@
         {/if}
     </div>
     <Nav />
-    <Month year={$displaying.year} month={$displaying.month}/>
+    {#key $displaying}
+        <Month year={$displaying.year} month={$displaying.month} />
+    {/key}
+    {#if $viewing}
+        <hr />
+        <DayView />
+    {/if}
 {/key}
 
 <style scoped>

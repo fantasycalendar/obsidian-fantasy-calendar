@@ -167,7 +167,7 @@ export default class FantasyCalendar extends Plugin {
     getStore(calendar: Calendar) {
         if (!calendar) return null;
         if (!this.stores.has(calendar)) {
-            this.stores.set(calendar, createCalendarStore(calendar));
+            this.stores.set(calendar, createCalendarStore(calendar, this));
         }
         return this.stores.get(calendar);
     }
@@ -349,7 +349,7 @@ export default class FantasyCalendar extends Plugin {
     } */
     async loadSettings() {
         let data = {
-            ...(await this.loadData())
+            ...(await this.loadData()),
         };
         if (data && data.configDirectory) {
             if (
@@ -367,17 +367,23 @@ export default class FantasyCalendar extends Plugin {
             }
             if (!this.data.version.major || this.data.version.major < 3) {
                 for (const calendar of this.data.calendars) {
-                    
-                // Ensure events in existing calendars have sort keys
-                if (this.data.debug)
-                    console.log("Updating cached events for %s", calendar.name);
-                const helper = new FcEventHelper(calendar, false, this.format);
-                calendar.events.forEach((e) => {
-                    e.sort = helper.timestampForFcEvent(e);
-                    const x: any = e;
-                    delete x["timestamp"];
-                    delete x["auto"];
-                });
+                    // Ensure events in existing calendars have sort keys
+                    if (this.data.debug)
+                        console.log(
+                            "Updating cached events for %s",
+                            calendar.name
+                        );
+                    const helper = new FcEventHelper(
+                        calendar,
+                        false,
+                        this.format
+                    );
+                    calendar.events.forEach((e) => {
+                        e.sort = helper.timestampForFcEvent(e);
+                        const x: any = e;
+                        delete x["timestamp"];
+                        delete x["auto"];
+                    });
                 }
             }
         }

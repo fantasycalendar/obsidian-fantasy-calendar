@@ -3,7 +3,7 @@ import {
     FuzzyMatch,
     FuzzySuggestModal,
     Scope,
-    SuggestModal
+    SuggestModal,
 } from "obsidian";
 import { createPopper, Instance as PopperInstance } from "@popperjs/core";
 declare module "obsidian" {
@@ -13,6 +13,9 @@ declare module "obsidian" {
             popScope(scope: Scope): void;
         };
     }
+}
+declare global {
+    var app: App;
 }
 class Suggester<T> {
     owner: SuggestModal<T>;
@@ -195,16 +198,16 @@ export abstract class SuggestionModal<T> extends FuzzySuggestModal<T> {
                 {
                     name: "offset",
                     options: {
-                        offset: [0, 10]
-                    }
+                        offset: [0, 10],
+                    },
                 },
                 {
                     name: "flip",
                     options: {
-                        fallbackPlacements: ["top"]
-                    }
-                }
-            ]
+                        fallbackPlacements: ["top"],
+                    },
+                },
+            ],
         });
     }
 

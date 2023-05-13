@@ -53,8 +53,6 @@ export class MonthStore {
     lastDay = derived(
         [this.year.firstDay, this.daysBefore, this.weekdays, this.days],
         ([firstDayOfYear, daysBefore, weekdays, days]) => {
-            console.log("🚀 ~ file: month.store.ts:71 ~ days:", days);
-
             return wrap(
                 (daysBefore % weekdays.length) + firstDayOfYear + days,
                 weekdays.length
