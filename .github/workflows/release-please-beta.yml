@@ -25,7 +25,7 @@ jobs:
               id: release
               with:
                   command: manifest
-                  config-file: ./release-please-config-beta.json
+                  config-file: release-please-config-beta.json
                   default-branch: beta
 
     upload-build:
