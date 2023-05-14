@@ -2,14 +2,20 @@
     import { ExtraButtonComponent, Menu } from "obsidian";
     import { createEventDispatcher } from "svelte";
     import { getTypedContext } from "../view";
+    import { ViewState } from "src/stores/calendar.store";
+    import Month from "./Month.svelte";
 
     const global = getTypedContext("store");
     const ephemeral = getTypedContext("ephemeralStore");
     const plugin = getTypedContext("plugin");
     const store = $global;
     const { displayingMonth, displayingYear } = ephemeral;
-    const { staticStore, currentDisplay } = store;
-    const { staticConfiguration } = staticStore;
+    const { currentDisplay } = store;
+    $: displayMoons = ephemeral.displayMoons;
+    $: displayWeeks = ephemeral.displayWeeks;
+    $: displayDayNumber = ephemeral.displayDayNumber;
+    $: viewState = ephemeral.viewState;
+
     const left = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("left-arrow");
     };
@@ -30,34 +36,37 @@
             });
         });
         menu.addItem((item) => {
-            item.setTitle(`Show ${true ? "Month" : "Year"} View`).onClick(
-                () => {}
-            );
+            item.setTitle(
+                `Show ${$viewState == ViewState.Year ? "Month" : "Year"} View`
+            ).onClick(() => {
+                if ($viewState == ViewState.Year) {
+                    $viewState = ViewState.Month;
+                } else {
+                    $viewState = ViewState.Year;
+                }
+            });
         });
         menu.addSeparator();
         menu.addItem((item) => {
             item.setTitle(
-                `${$store.displayWeeks ? "Hide" : "Display"} Week Numbers`
+                `${$displayWeeks ? "Hide" : "Display"} Week Numbers`
             ).onClick(async () => {
-                $store.displayWeeks = !$store.displayWeeks;
+                $displayWeeks = !$displayWeeks;
                 plugin.saveCalendars();
             });
         });
         menu.addItem((item) => {
             item.setTitle(
-                $store.static.displayMoons ? "Hide Moons" : "Display Moons"
+                $displayMoons ? "Hide Moons" : "Display Moons"
             ).onClick(() => {
-                $store.static.displayMoons = !$store.static.displayMoons;
+                $displayMoons = !$displayMoons;
             });
         });
         menu.addItem((item) => {
             item.setTitle(
-                $store.static.displayDayNumber
-                    ? "Hide Day Number"
-                    : "Display Day Number"
+                $displayDayNumber ? "Hide Day Number" : "Display Day Number"
             ).onClick(async () => {
-                $store.static.displayDayNumber =
-                    !$store.static.displayDayNumber;
+                $displayDayNumber = !$displayDayNumber;
             });
         });
 
@@ -68,7 +77,9 @@
 <div class="fantasy-nav nav">
     <div class="title-container">
         <h3 class="fantasy-title title">
-            <span class="fantasy-month month">{$displayingMonth.name}</span>
+            {#if $viewState == ViewState.Month}
+                <span class="fantasy-month month">{$displayingMonth.name}</span>
+            {/if}
             <span class="fantasy-year year">{$displayingYear}</span>
         </h3>
     </div>

@@ -11,8 +11,6 @@
     const global = getTypedContext("store");
     const ephemeral = getTypedContext("ephemeralStore");
     $: store = $global;
-    $: config = store.staticStore.staticConfiguration;
-    $: displayDayNumber = $config.displayDayNumber;
     $: viewing = ephemeral.viewing;
     $: date = dateString($viewing, $store);
     $: yearCalculator = store.yearCalculator;
@@ -23,6 +21,8 @@
     $: daysBeforeDay = $daysBeforeMonth + $viewing.day;
     $: events = store.eventCache.getItemsOrRecalculate($viewing);
     $: moons = store.moonCache.getItemsOrRecalculate($viewing);
+    $: displayDayNumber = ephemeral.displayDayNumber;
+    $: displayMoons = ephemeral.displayMoons;
 
     const dispatch = createEventDispatcher();
 
@@ -92,7 +92,7 @@
             }}
         />
     </div>
-    {#if $store.static.displayMoons}
+    {#if $displayMoons}
         <div class="moon-container">
             {#each $moons as moon}
                 <MoonUI {moon} />

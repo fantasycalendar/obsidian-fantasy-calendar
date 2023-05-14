@@ -30,5 +30,6 @@
 <style scoped>
     .calendar-container {
         padding: 0 8px;
+        background: inherit;
     }
 </style>

@@ -4,11 +4,14 @@
     import { ExtraButtonComponent, Menu } from "obsidian";
     import { getTypedContext } from "../view";
     import DayView from "./DayView.svelte";
+    import { ViewState } from "src/stores/calendar.store";
+    import Year from "./Year/Year.svelte";
 
     const global = getTypedContext("store");
     const ephemeral = getTypedContext("ephemeralStore");
     $: store = $global;
     $: displaying = ephemeral.displaying;
+    $: viewState = ephemeral.viewState;
 
     $: viewing = ephemeral.viewing;
 
@@ -41,16 +44,22 @@
 </script>
 
 {#key $store}
-    <div class="name-container">
-        <h3 class="calendar-name">{$store.name}</h3>
-        {#if otherCalendars.length > 1}
-            <div use:drop on:click={(evt) => showMenu(evt)} />
-        {/if}
+    <div class="top-container">
+        <div class="name-container">
+            <h3 class="calendar-name">{$store.name}</h3>
+            {#if otherCalendars.length > 1}
+                <div use:drop on:click={(evt) => showMenu(evt)} />
+            {/if}
+        </div>
+        <Nav />
     </div>
-    <Nav />
-    {#key $displaying}
-        <Month year={$displaying.year} month={$displaying.month} />
-    {/key}
+    {#if $viewState == ViewState.Year}
+        <Year />
+    {:else if $viewState == ViewState.Month}
+        {#key $displaying}
+            <Month year={$displaying.year} month={$displaying.month} />
+        {/key}
+    {/if}
     {#if $viewing}
         <hr />
         <DayView />
@@ -58,6 +67,13 @@
 {/key}
 
 <style scoped>
+    .top-container {
+        position: sticky;
+        top: 0;
+        background: inherit;
+        z-index: 10;
+        padding-top: var(--size-4-4);
+    }
     .name-container {
         display: flex;
         align-items: center;

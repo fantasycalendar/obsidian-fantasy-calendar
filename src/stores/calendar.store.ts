@@ -18,14 +18,7 @@ export function createCalendarStore(
 
     const staticStore = createStaticStore(store);
 
-    const displayWeeks = derived(store, (cal) => cal.displayWeeks);
-
-    //TODO: Move this to UI
     const current = derived(store, (cal) => cal.current);
-    //TODO
-
-    const displaying = writable({ ...calendar.current });
-    const viewing = writable<FcDate | null>();
 
     /** Event Cache */
     /** This cache is a Map< year number, year event cache > */
@@ -80,7 +73,6 @@ export function createCalendarStore(
         categories,
         //Readable store containing static calendar data
         staticStore,
-        displayWeeks,
 
         getEphemeralStore: () =>
             getEphemeralStore(store, staticStore, calendar, yearCalculator),
@@ -90,6 +82,12 @@ export function createCalendarStore(
 }
 
 export type EphemeralStore = ReturnType<typeof getEphemeralStore>;
+export enum ViewState {
+    Year,
+    Month,
+    Week,
+    Day,
+}
 export function getEphemeralStore(
     store: Writable<Calendar>,
     staticStore: StaticStore,
@@ -98,7 +96,21 @@ export function getEphemeralStore(
 ) {
     const displaying = writable({ ...base.current });
     const viewing = writable<FcDate | null>();
+    const yearView = writable(false);
+
+    const displayMoons = writable(base.static.displayMoons);
+    const displayDayNumber = writable(base.static.displayDayNumber);
+    const displayWeeks = writable(base.displayWeeks);
+    const viewState = writable<ViewState>(ViewState.Month);
+    let currentState = ViewState.Month;
+    viewState.subscribe((v) => (currentState = v));
     return {
+        yearView,
+        displayMoons,
+        displayDayNumber,
+        displayWeeks,
+        viewState,
+
         //Displayed Date
         displaying,
         goToToday: () => displaying.set({ ...base.current }),
@@ -132,9 +144,27 @@ export function getEphemeralStore(
             }
             return yearStore.getMonthFromCache(month);
         }),
+        getPreviousMonth: (month: number, year: number) => {
+            let yearStore = yearCalculator.getYearFromCache(year);
+            if (month == 0) {
+                year = year - 1;
+                yearStore = yearCalculator.getYearFromCache(year);
+                month = get(yearStore.months).length - 1;
+            } else {
+                month = month - 1;
+            }
+            return yearStore.getMonthFromCache(month);
+        },
         goToPrevious: () =>
             displaying.update((displaying) => {
-                return decrementMonth(displaying, yearCalculator);
+                switch (currentState) {
+                    case ViewState.Year:
+                        return { ...displaying, year: displaying.year - 1 };
+                    case ViewState.Month:
+                    case ViewState.Week:
+                    case ViewState.Day:
+                        return decrementMonth(displaying, yearCalculator);
+                }
             }),
 
         nextMonth: derived([displaying], ([displaying]) => {
@@ -151,9 +181,27 @@ export function getEphemeralStore(
             }
             return yearStore.getMonthFromCache(month);
         }),
+        getNextMonth: (month: number, year: number) => {
+            let yearStore = yearCalculator.getYearFromCache(year);
+            const months = get(yearStore.months);
+            if (month == months.length - 1) {
+                yearStore = yearCalculator.getYearFromCache(year + 1);
+                month = 0;
+            } else {
+                month = month + 1;
+            }
+            return yearStore.getMonthFromCache(month);
+        },
         goToNext: () =>
             displaying.update((displaying) => {
-                return incrementMonth(displaying, yearCalculator);
+                switch (currentState) {
+                    case ViewState.Year:
+                        return { ...displaying, year: displaying.year + 1 };
+                    case ViewState.Month:
+                    case ViewState.Week:
+                    case ViewState.Day:
+                        return incrementMonth(displaying, yearCalculator);
+                }
             }),
 
         //Viewed Date (day view)
@@ -184,8 +232,6 @@ function createStaticStore(store: Writable<Calendar>) {
         return {
             firstWeekDay: data.firstWeekDay,
             overflow: data.overflow,
-            displayMoons: data.displayMoons,
-            displayDayNumber: data.displayDayNumber,
             offset: data.offset,
             incrementDay: data.incrementDay,
             useCustomYears: data.useCustomYears,

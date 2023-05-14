@@ -1,6 +1,8 @@
 <script lang="ts">
+    import { ViewState } from "src/stores/calendar.store";
     import { getTypedContext } from "../view";
     import Day from "./Day.svelte";
+    import Year from "./Year/Year.svelte";
 
     export let year: number;
     export let month: number;
@@ -8,29 +10,36 @@
     const global = getTypedContext("store");
     const ephemeral = getTypedContext("ephemeralStore");
     const store = $global;
-    const { previousMonth, nextMonth } = ephemeral;
-    const { yearCalculator, staticStore, displayWeeks } = store;
+    const { yearCalculator, staticStore } = store;
+    $: previousMonth = ephemeral.getPreviousMonth(month, year);
+    $: nextMonth = ephemeral.getNextMonth(month, year);
+    $: displayWeeks = ephemeral.displayWeeks;
+    $: viewState = ephemeral.viewState;
 
     const { staticConfiguration } = staticStore;
     $: displayedMonth = yearCalculator
         .getYearFromCache(year)
         .getMonthFromCache(month);
     $: ({ weekdays, days, lastDay, firstWeekNumber, weeks } = displayedMonth);
-    $: ({ lastDay: previousLastDay, days: previousDays } = $previousMonth);
+    $: ({ lastDay: previousLastDay, days: previousDays } = previousMonth);
 
     $: extraWeek = $weekdays.length - $lastDay <= 3 ? 1 : 0;
     const tbody = (node: HTMLElement) => {
         let row = node.createEl("tr");
         if ($staticConfiguration.overflow) {
             for (let i = 0; i < $previousLastDay; i++) {
-                new Day({
-                    target: row,
-                    props: {
-                        adjacent: true,
-                        number: $previousDays - $previousLastDay + i + 1,
-                        month: $previousMonth,
-                    },
-                });
+                if ($viewState == ViewState.Year) {
+                    row.createEl("td");
+                } else {
+                    new Day({
+                        target: row,
+                        props: {
+                            adjacent: true,
+                            number: $previousDays - $previousLastDay + i + 1,
+                            month: previousMonth,
+                        },
+                    });
+                }
             }
         }
         for (let i = 0; i < $days; i++) {
@@ -56,19 +65,28 @@
                 if (row.childElementCount >= $weekdays.length) {
                     row = node.createEl("tr");
                 }
-                new Day({
-                    target: row,
-                    props: {
-                        adjacent: true,
-                        number: i + 1,
-                        month: $nextMonth,
-                    },
-                });
+                if ($viewState == ViewState.Year) {
+                    row.createEl("td");
+                } else {
+                    new Day({
+                        target: row,
+                        props: {
+                            adjacent: true,
+                            number: i + 1,
+                            month: nextMonth,
+                        },
+                    });
+                }
             }
         }
     };
 </script>
 
+{#if $viewState == ViewState.Year}
+    <h4 class="month-header">
+        <span class="fantasy-month month">{displayedMonth.name}</span>
+    </h4>
+{/if}
 <table class="month-container">
     <tbody>
         <tr>
@@ -81,7 +99,7 @@
                         <thead>
                             <tr>
                                 <th class="weekday">
-                                    <span>#</span>
+                                    <span>W</span>
                                 </th>
                             </tr>
                         </thead>
@@ -128,6 +146,9 @@
     table {
         height: 100%;
     }
+    .month-header {
+        margin-bottom: 0;
+    }
     .month {
         width: 100%;
         table-layout: fixed;
@@ -146,14 +167,14 @@
     }
     .week-number-table td {
         display: flex;
-        align-items: flex-start;
+        align-items: center;
+        justify-content: center;
     }
     .week-num {
         background-color: transparent;
-        color: var(--color-text-day);
+        color: var(--text-muted);
         cursor: pointer;
-        font-size: 0.8em;
+        font-size: 0.65em;
         margin-top: 6px;
-        opacity: 0.25;
     }
 </style>
