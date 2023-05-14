@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.0-b2](https://github.com/fantasycalendar/obsidian-fantasy-calendar/compare/3.1.0...4.0.0-b2) (2023-05-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* Beta
+
+### Features
+
+* Beta ([6b37ced](https://github.com/fantasycalendar/obsidian-fantasy-calendar/commit/6b37ced3281118d5b9ee4425ba0dd58dedc57489))
+* Ephemeral store ([ea34876](https://github.com/fantasycalendar/obsidian-fantasy-calendar/commit/ea34876da13a60fdf3709ef27b06c60c52d236fb))
+* ephemeral store, Year view returns ([bb42f6d](https://github.com/fantasycalendar/obsidian-fantasy-calendar/commit/bb42f6db74a6d7dce5a94129358a43af62d9fd6d))
+* Week number display ([ea34876](https://github.com/fantasycalendar/obsidian-fantasy-calendar/commit/ea34876da13a60fdf3709ef27b06c60c52d236fb))
+
+
+### Bug Fixes
+
+* fix release process ([7d9c195](https://github.com/fantasycalendar/obsidian-fantasy-calendar/commit/7d9c19505f8f4e859288a6d83c9ab423cc2e8388))
+* Move current date back to singleton ([90c3a52](https://github.com/fantasycalendar/obsidian-fantasy-calendar/commit/90c3a52b00c8d64ece2d948de1d5d9438baa908f))
+
+
+### Miscellaneous Chores
+
+* beta release 4.0.0-b2 ([5d1edd8](https://github.com/fantasycalendar/obsidian-fantasy-calendar/commit/5d1edd88086f6b8772e0c789b9fdcd85a5cc146c))
+
 ## [4.0.0](https://github.com/fantasycalendar/obsidian-fantasy-calendar/compare/3.1.0...4.0.0) (2023-05-13)
 
 
