@@ -51,6 +51,15 @@ export function createCalendarStore(
         update,
         subscribe,
 
+        current,
+        currentDisplay: derived([current, store], ([current, calendar]) => {
+            return dateString(current, calendar);
+        }),
+        setCurrentDate: (date: FcDate) =>
+            store.update((cal) => {
+                cal.current = { ...date };
+                return cal;
+            }),
         updateCalendar: (calendar: Calendar) => update((cal) => calendar),
         eventCache,
         addEvent: (date: FcDate) => {
@@ -87,21 +96,13 @@ export function getEphemeralStore(
     base: Calendar,
     yearCalculator: YearStoreCache
 ) {
-    const current = writable({ ...base.current });
-
     const displaying = writable({ ...base.current });
     const viewing = writable<FcDate | null>();
     return {
-        current,
-        currentDisplay: derived([current, store], ([current, calendar]) => {
-            return dateString(current, calendar);
-        }),
-        setCurrentDate: (date: FcDate) => current.set({ ...date }),
-
         //Displayed Date
         displaying,
-        goToToday: () => displaying.set({ ...get(current) }),
-        displayDate: (date: FcDate = get(current)) =>
+        goToToday: () => displaying.set({ ...base.current }),
+        displayDate: (date: FcDate = base.current) =>
             displaying.set({ ...date }),
         displayingDisplay: derived(
             [displaying, store],

@@ -13,7 +13,7 @@
     const ephemeral = getTypedContext("ephemeralStore");
     $: index = month.index;
     $: year = month.year;
-    $: current = ephemeral.current;
+    $: current = $store.current;
     $: eventCache = $store.eventCache;
     $: viewing = ephemeral.viewing;
     $: events = eventCache.getItemsOrRecalculate({
@@ -48,7 +48,7 @@
         }
         menu.addItem((item) => {
             item.setTitle("Set as Today").onClick(async () => {
-                ephemeral.setCurrentDate({
+                $store.setCurrentDate({
                     day: number,
                     month: $index,
                     year: year.year,

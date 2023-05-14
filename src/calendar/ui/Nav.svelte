@@ -7,8 +7,8 @@
     const ephemeral = getTypedContext("ephemeralStore");
     const plugin = getTypedContext("plugin");
     const store = $global;
-    const { displayingMonth, displayingYear, currentDisplay } = ephemeral;
-    const { staticStore } = store;
+    const { displayingMonth, displayingYear } = ephemeral;
+    const { staticStore, currentDisplay } = store;
     const { staticConfiguration } = staticStore;
     const left = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("left-arrow");

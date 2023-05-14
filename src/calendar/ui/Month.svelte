@@ -19,7 +19,6 @@
     $: ({ lastDay: previousLastDay, days: previousDays } = $previousMonth);
 
     $: extraWeek = $weekdays.length - $lastDay <= 3 ? 1 : 0;
-    $: total = $weeks + extraWeek;
     const tbody = (node: HTMLElement) => {
         let row = node.createEl("tr");
         if ($staticConfiguration.overflow) {

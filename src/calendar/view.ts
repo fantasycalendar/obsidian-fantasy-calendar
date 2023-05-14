@@ -37,6 +37,7 @@ export default class FantasyCalendarView extends ItemView {
         this.plugin.onSettingsLoad(() => this.display());
     }
     async display() {
+        //todo: inject store here, subscribe to 
         new CalendarUI({
             target: this.contentEl,
             props: {
