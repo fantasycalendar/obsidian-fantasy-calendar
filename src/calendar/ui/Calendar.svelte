@@ -6,10 +6,11 @@
     import DayView from "./DayView.svelte";
 
     const global = getTypedContext("store");
+    const ephemeral = getTypedContext("ephemeralStore");
     $: store = $global;
-    $: displaying = store.displaying;
-    
-    $: viewing = store.viewing;
+    $: displaying = ephemeral.displaying;
+
+    $: viewing = ephemeral.viewing;
 
     const plugin = getTypedContext("plugin");
     let otherCalendars = plugin.data.calendars;
@@ -24,7 +25,7 @@
         new ExtraButtonComponent(node).setIcon("chevrons-up-down");
     };
     const showMenu = (evt: MouseEvent) => {
-        const menu = new Menu(plugin.app);
+        const menu = new Menu();
         for (const calendar of plugin.data.calendars.filter(
             (c) => c.id != $store.id
         )) {

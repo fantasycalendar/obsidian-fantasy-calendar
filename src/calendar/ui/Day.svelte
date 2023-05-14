@@ -10,11 +10,12 @@
     export let adjacent: boolean;
 
     const store = getTypedContext("store");
+    const ephemeral = getTypedContext("ephemeralStore");
     $: index = month.index;
     $: year = month.year;
-    $: current = $store.current;
+    $: current = ephemeral.current;
     $: eventCache = $store.eventCache;
-    $: viewing = $store.viewing;
+    $: viewing = ephemeral.viewing;
     $: events = eventCache.getItemsOrRecalculate({
         day: number,
         month: $index,
@@ -34,7 +35,7 @@
         $viewing.year == year.year;
 
     const openMenu = (evt: MouseEvent) => {
-        const menu = new Menu(this.app);
+        const menu = new Menu();
 
         menu.setNoIcon();
 
@@ -47,7 +48,7 @@
         }
         menu.addItem((item) => {
             item.setTitle("Set as Today").onClick(async () => {
-                $store.setCurrent({
+                ephemeral.setCurrentDate({
                     day: number,
                     month: $index,
                     year: year.year,

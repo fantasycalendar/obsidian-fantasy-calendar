@@ -60,10 +60,17 @@ export class MonthStore {
         }
     );
     weeks = derived(
-        [this.weekdays, this.lastDay],
-        ([weekdays, lastDay]) =>
-            Math.ceil(this.month.length / weekdays.length) +
+        [this.weekdays, this.lastDay, this.firstDay],
+        ([weekdays, lastDay, firstDay]) =>
+            Math.ceil((firstDay + this.month.length) / weekdays.length) +
             (weekdays.length - lastDay <= 3 ? 1 : 0)
+    );
+
+    firstWeekNumber = derived(
+        [this.daysBefore, this.weekdays, this.year.firstDay],
+        ([daysBefore, week, firstDay]) => {
+            return Math.floor((daysBefore + firstDay) / week.length);
+        }
     );
     getMonthFromCache(day: number) {
         /* if (!this.dayCache.has(month)) {

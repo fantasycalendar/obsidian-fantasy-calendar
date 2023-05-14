@@ -17,7 +17,13 @@ export function createCalendarStore(
     const { set, update, subscribe } = store;
 
     const staticStore = createStaticStore(store);
+
+    const displayWeeks = derived(store, (cal) => cal.displayWeeks);
+
+    //TODO: Move this to UI
     const current = derived(store, (cal) => cal.current);
+    //TODO
+
     const displaying = writable({ ...calendar.current });
     const viewing = writable<FcDate | null>();
 
@@ -65,22 +71,37 @@ export function createCalendarStore(
         categories,
         //Readable store containing static calendar data
         staticStore,
+        displayWeeks,
 
-        //Current date
+        getEphemeralStore: () =>
+            getEphemeralStore(store, staticStore, calendar, yearCalculator),
+
+        yearCalculator,
+    };
+}
+
+export type EphemeralStore = ReturnType<typeof getEphemeralStore>;
+export function getEphemeralStore(
+    store: Writable<Calendar>,
+    staticStore: StaticStore,
+    base: Calendar,
+    yearCalculator: YearStoreCache
+) {
+    const current = writable({ ...base.current });
+
+    const displaying = writable({ ...base.current });
+    const viewing = writable<FcDate | null>();
+    return {
         current,
         currentDisplay: derived([current, store], ([current, calendar]) => {
             return dateString(current, calendar);
         }),
-        setCurrent: (date: FcDate) =>
-            update((cal) => {
-                cal.current = { ...date };
-                return cal;
-            }),
+        setCurrentDate: (date: FcDate) => current.set({ ...date }),
 
         //Displayed Date
         displaying,
-        goToToday: () => displaying.set({ ...calendar.current }),
-        displayDate: (date: FcDate = calendar.current) =>
+        goToToday: () => displaying.set({ ...get(current) }),
+        displayDate: (date: FcDate = get(current)) =>
             displaying.set({ ...date }),
         displayingDisplay: derived(
             [displaying, store],
@@ -146,10 +167,8 @@ export function createCalendarStore(
                 if (!viewing) return viewing;
                 return incrementDay(viewing, yearCalculator);
             }),
-        yearCalculator,
     };
 }
-
 export type StaticStore = ReturnType<typeof createStaticStore>;
 function createStaticStore(store: Writable<Calendar>) {
     /** Static Calendar Data */

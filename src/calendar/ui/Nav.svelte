@@ -4,10 +4,11 @@
     import { getTypedContext } from "../view";
 
     const global = getTypedContext("store");
+    const ephemeral = getTypedContext("ephemeralStore");
     const plugin = getTypedContext("plugin");
     const store = $global;
-    const { displayingMonth, displayingYear, currentDisplay, staticStore } =
-        store;
+    const { displayingMonth, displayingYear, currentDisplay } = ephemeral;
+    const { staticStore } = store;
     const { staticConfiguration } = staticStore;
     const left = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("left-arrow");
@@ -19,19 +20,28 @@
         new ExtraButtonComponent(node).setIcon("gear");
     };
     const openSettings = (evt: MouseEvent) => {
-        const menu = new Menu(app);
+        const menu = new Menu();
 
         menu.setNoIcon();
+
+        menu.addItem((item) => {
+            item.setTitle("Go to Day").onClick(() => {
+                /* openDate(); */
+            });
+        });
+        menu.addItem((item) => {
+            item.setTitle(`Show ${true ? "Month" : "Year"} View`).onClick(
+                () => {}
+            );
+        });
+        menu.addSeparator();
         menu.addItem((item) => {
             item.setTitle(
-                `${$store.displayWeeks ? "Hide" : "Show"} Weeks`
+                `${$store.displayWeeks ? "Hide" : "Display"} Week Numbers`
             ).onClick(async () => {
                 $store.displayWeeks = !$store.displayWeeks;
                 plugin.saveCalendars();
             });
-        });
-        menu.addItem((item) => {
-            item.setTitle(`Open ${true ? "Month" : "Year"}`).onClick(() => {});
         });
         menu.addItem((item) => {
             item.setTitle(
@@ -48,11 +58,6 @@
             ).onClick(async () => {
                 $store.static.displayDayNumber =
                     !$store.static.displayDayNumber;
-            });
-        });
-        menu.addItem((item) => {
-            item.setTitle("View Day").onClick(() => {
-                /* openDate(); */
             });
         });
 
@@ -72,11 +77,11 @@
             <div
                 class="arrow calendar-clickable"
                 use:left
-                on:click={() => store.goToPrevious()}
+                on:click={() => ephemeral.goToPrevious()}
             />
             <div
                 class="reset-button calendar-clickable"
-                on:click={() => store.displayDate()}
+                on:click={() => ephemeral.displayDate()}
                 aria-label="Today is {$currentDisplay}"
             >
                 <span>Today</span>
@@ -84,7 +89,7 @@
             <div
                 class="arrow right calendar-clickable"
                 use:right
-                on:click={(evt) => store.goToNext()}
+                on:click={(evt) => ephemeral.goToNext()}
             />
             <div
                 class="calendar-clickable"

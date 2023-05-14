@@ -9,10 +9,11 @@
     import { REVEAL_ICON } from "src/utils/constants";
 
     const global = getTypedContext("store");
+    const ephemeral = getTypedContext("ephemeralStore");
     $: store = $global;
     $: config = store.staticStore.staticConfiguration;
     $: displayDayNumber = $config.displayDayNumber;
-    $: viewing = store.viewing;
+    $: viewing = ephemeral.viewing;
     $: date = dateString($viewing, $store);
     $: yearCalculator = store.yearCalculator;
     $: displayedMonth = yearCalculator
@@ -53,7 +54,7 @@
             <div
                 use:reveal
                 on:click={() => {
-                    store.displayDate($viewing);
+                    ephemeral.displayDate($viewing);
                 }}
             />
             <div use:event on:click={() => store.addEvent($viewing)} />
@@ -66,9 +67,9 @@
             use:left
             aria-label="Previous"
             on:click={() => {
-                store.goToPreviousDay();
+                ephemeral.goToPreviousDay();
 
-                store.displayDate($viewing);
+                ephemeral.displayDate($viewing);
             }}
         />
         <div class="title-container">
@@ -86,8 +87,8 @@
             use:right
             aria-label="Next"
             on:click={() => {
-                store.goToNextDay();
-                store.displayDate($viewing);
+                ephemeral.goToNextDay();
+                ephemeral.displayDate($viewing);
             }}
         />
     </div>

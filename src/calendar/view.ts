@@ -2,14 +2,17 @@ import { ItemView, WorkspaceLeaf, addIcon } from "obsidian";
 import type FantasyCalendar from "src/main";
 import CalendarUI from "./ui/UI.svelte";
 import { getContext, setContext } from "svelte";
-import { CalendarStore } from "src/stores/calendar.store";
-import { Writable } from "svelte/store";
+import { CalendarStore, EphemeralStore } from "src/stores/calendar.store";
+import type { Writable } from "svelte/store";
+import type { FcDate } from "src/@types";
 
 export const VIEW_TYPE = "FANTASY_CALENDAR";
 
 interface CalendarContext {
     store: Writable<CalendarStore>;
     plugin: FantasyCalendar;
+    yearView: Writable<boolean>;
+    ephemeralStore: EphemeralStore;
 }
 
 export function setTypedContext<T extends keyof CalendarContext>(

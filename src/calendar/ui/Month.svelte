@@ -5,17 +5,21 @@
     export let year: number;
     export let month: number;
 
-    const store = getTypedContext("store");
-    const { yearCalculator, previousMonth, staticStore, nextMonth } = $store;
+    const global = getTypedContext("store");
+    const ephemeral = getTypedContext("ephemeralStore");
+    const store = $global;
+    const { previousMonth, nextMonth } = ephemeral;
+    const { yearCalculator, staticStore, displayWeeks } = store;
+
     const { staticConfiguration } = staticStore;
     $: displayedMonth = yearCalculator
         .getYearFromCache(year)
         .getMonthFromCache(month);
-    $: ({ weekdays, days, lastDay } = displayedMonth);
+    $: ({ weekdays, days, lastDay, firstWeekNumber, weeks } = displayedMonth);
     $: ({ lastDay: previousLastDay, days: previousDays } = $previousMonth);
 
     $: extraWeek = $weekdays.length - $lastDay <= 3 ? 1 : 0;
-
+    $: total = $weeks + extraWeek;
     const tbody = (node: HTMLElement) => {
         let row = node.createEl("tr");
         if ($staticConfiguration.overflow) {
@@ -66,25 +70,65 @@
     };
 </script>
 
-<table class="calendar fantasy-calendar month">
-    <colgroup>
-        {#each $weekdays as day}
-            <col />
-        {/each}
-    </colgroup>
-    <thead>
+<table class="month-container">
+    <tbody>
         <tr>
-            {#each $weekdays as day}
-                <th class="weekday">{day.name.slice(0, 3).toUpperCase()}</th>
-            {/each}
+            {#if $displayWeeks}
+                <td>
+                    <table class="week-number-table fantasy-calendar">
+                        <colgroup>
+                            <col class="week-numbers" />
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th class="weekday">
+                                    <span>#</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {#each [...Array($weeks).keys()] as week}
+                                <tr>
+                                    <td>
+                                        <span class="week-num"
+                                            >{$firstWeekNumber + 1 + week}</span
+                                        >
+                                    </td>
+                                </tr>
+                            {/each}
+                        </tbody>
+                    </table>
+                </td>
+            {/if}
+            <td>
+                <table class="calendar fantasy-calendar month">
+                    <colgroup>
+                        {#each $weekdays as day}
+                            <col class={day.name} />
+                        {/each}
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            {#each $weekdays as day}
+                                <th class="weekday"
+                                    >{day.name.slice(0, 3).toUpperCase()}</th
+                                >
+                            {/each}
+                        </tr>
+                    </thead>
+                    {#key displayedMonth}
+                        <tbody use:tbody />
+                    {/key}
+                </table>
+            </td>
         </tr>
-    </thead>
-    {#key displayedMonth}
-        <tbody use:tbody />
-    {/key}
+    </tbody>
 </table>
 
 <style scoped>
+    table {
+        height: 100%;
+    }
     .month {
         width: 100%;
         table-layout: fixed;
@@ -96,5 +140,21 @@
         letter-spacing: 1px;
         padding: 4px;
         text-transform: uppercase;
+    }
+    .week-number-table {
+        border-right: 1px solid var(--blockquote-border-color);
+        padding-right: 0.5rem;
+    }
+    .week-number-table td {
+        display: flex;
+        align-items: flex-start;
+    }
+    .week-num {
+        background-color: transparent;
+        color: var(--color-text-day);
+        cursor: pointer;
+        font-size: 0.8em;
+        margin-top: 6px;
+        opacity: 0.25;
     }
 </style>

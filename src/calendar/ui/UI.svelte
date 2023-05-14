@@ -14,6 +14,8 @@
     const store = writable(plugin.getStore(calendar));
     if (store) {
         setTypedContext("store", store);
+        const ephemeralStore = $store.getEphemeralStore();
+        setTypedContext("ephemeralStore", ephemeralStore);
     }
 </script>
 
