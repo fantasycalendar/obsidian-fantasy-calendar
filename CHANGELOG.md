@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.0-b3](https://github.com/fantasycalendar/obsidian-fantasy-calendar/compare/4.0.0-b2...4.0.0-b3) (2023-05-15)
+
+
+### Features
+
+* New View State nav ([0563a7e](https://github.com/fantasycalendar/obsidian-fantasy-calendar/commit/0563a7ee97b0ac49cbb24a1d6c6e561490303062))
+
+
+### Miscellaneous Chores
+
+* release 4.0.0-b3 ([ca7bad5](https://github.com/fantasycalendar/obsidian-fantasy-calendar/commit/ca7bad58060bc0a43e50b815ae60d5760ee8639e))
+
 ## [4.0.0-b2](https://github.com/fantasycalendar/obsidian-fantasy-calendar/compare/3.1.0...4.0.0-b2) (2023-05-14)
 
 
