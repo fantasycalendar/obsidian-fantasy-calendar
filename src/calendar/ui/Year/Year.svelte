@@ -10,6 +10,7 @@
 
     const ephemeral = getTypedContext("ephemeralStore");
     $: displaying = ephemeral.displaying;
+    $: displayedMonth = ephemeral.displayingMonth;
 
     $: yearStore = yearCalculator.getYearFromCache($displaying.year);
     $: monthArray = store.staticStore.months;
@@ -18,10 +19,14 @@
     /* const months = $monthArray.map((m) =>
         yearStore.getMonthFromCache($monthArray.indexOf(m))
     ); */
+    const focus = (year: HTMLElement) => {
+        const header = year.querySelector(`#${$displayedMonth.name}`);
+        if (header) header.scrollIntoView(true);
+    };
 </script>
 
 <div class="year-view">
-    <div class="year" bind:this={yearContainer}>
+    <div class="year" bind:this={yearContainer} use:focus>
         {#each $monthArray as month, index}
             <Month year={$displaying.year} month={index} />
         {/each}
@@ -34,6 +39,7 @@
         position: relative;
         display: flex;
         flex-direction: column;
+        overflow: auto;
     }
     .year {
         display: grid;

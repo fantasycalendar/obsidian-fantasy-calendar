@@ -3,6 +3,8 @@
     import { getTypedContext } from "../view";
     import Day from "./Day.svelte";
     import Year from "./Year/Year.svelte";
+    import { onMount } from "svelte";
+    import { get } from "svelte/store";
 
     export let year: number;
     export let month: number;
@@ -11,6 +13,7 @@
     const ephemeral = getTypedContext("ephemeralStore");
     const store = $global;
     const { yearCalculator, staticStore } = store;
+    $: displayingMonth = ephemeral.displayingMonth;
     $: previousMonth = ephemeral.getPreviousMonth(month, year);
     $: nextMonth = ephemeral.getNextMonth(month, year);
     $: displayWeeks = ephemeral.displayWeeks;
@@ -83,66 +86,75 @@
 </script>
 
 {#if $viewState == ViewState.Year}
-    <h4 class="month-header">
+    <h4 class="month-header" id={displayedMonth.name}>
         <span class="fantasy-month month">{displayedMonth.name}</span>
     </h4>
 {/if}
-<table class="month-container">
-    <tbody>
-        <tr>
-            {#if $displayWeeks}
+<div class="month-container">
+    <table>
+        <tbody>
+            <tr>
+                {#if $displayWeeks}
+                    <td>
+                        <table class="week-number-table fantasy-calendar">
+                            <colgroup>
+                                <col class="week-numbers" />
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th class="weekday">
+                                        <span>W</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {#each [...Array($weeks).keys()] as week}
+                                    <tr>
+                                        <td>
+                                            <span class="week-num"
+                                                >{$firstWeekNumber +
+                                                    1 +
+                                                    week}</span
+                                            >
+                                        </td>
+                                    </tr>
+                                {/each}
+                            </tbody>
+                        </table>
+                    </td>
+                {/if}
                 <td>
-                    <table class="week-number-table fantasy-calendar">
+                    <table class="calendar fantasy-calendar month">
                         <colgroup>
-                            <col class="week-numbers" />
+                            {#each $weekdays as day}
+                                <col class={day.name} />
+                            {/each}
                         </colgroup>
                         <thead>
                             <tr>
-                                <th class="weekday">
-                                    <span>W</span>
-                                </th>
+                                {#each $weekdays as day}
+                                    <th class="weekday"
+                                        >{day.name
+                                            .slice(0, 3)
+                                            .toUpperCase()}</th
+                                    >
+                                {/each}
                             </tr>
                         </thead>
-                        <tbody>
-                            {#each [...Array($weeks).keys()] as week}
-                                <tr>
-                                    <td>
-                                        <span class="week-num"
-                                            >{$firstWeekNumber + 1 + week}</span
-                                        >
-                                    </td>
-                                </tr>
-                            {/each}
-                        </tbody>
+                        {#key displayedMonth}
+                            <tbody use:tbody />
+                        {/key}
                     </table>
                 </td>
-            {/if}
-            <td>
-                <table class="calendar fantasy-calendar month">
-                    <colgroup>
-                        {#each $weekdays as day}
-                            <col class={day.name} />
-                        {/each}
-                    </colgroup>
-                    <thead>
-                        <tr>
-                            {#each $weekdays as day}
-                                <th class="weekday"
-                                    >{day.name.slice(0, 3).toUpperCase()}</th
-                                >
-                            {/each}
-                        </tr>
-                    </thead>
-                    {#key displayedMonth}
-                        <tbody use:tbody />
-                    {/key}
-                </table>
-            </td>
-        </tr>
-    </tbody>
-</table>
+            </tr>
+        </tbody>
+    </table>
+</div>
 
 <style scoped>
+    .month-container {
+        height: min-content;
+    }
     table {
         height: 100%;
     }

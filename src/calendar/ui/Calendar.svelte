@@ -68,11 +68,9 @@
 
 <style scoped>
     .top-container {
-        position: sticky;
-        top: 0;
-        background: inherit;
-        z-index: 10;
-        padding-top: var(--size-4-4);
+        display: flex;
+        flex-flow: column;
+        gap: 0.5rem;
     }
     .name-container {
         display: flex;

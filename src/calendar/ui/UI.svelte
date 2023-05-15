@@ -31,5 +31,9 @@
     .calendar-container {
         padding: 0 8px;
         background: inherit;
+        display: grid;
+        grid-template-rows: auto 1fr;
+        overflow: hidden;
+        height: 100%;
     }
 </style>

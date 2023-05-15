@@ -159,7 +159,11 @@ export function getEphemeralStore(
             displaying.update((displaying) => {
                 switch (currentState) {
                     case ViewState.Year:
-                        return { ...displaying, year: displaying.year - 1 };
+                        return {
+                            ...displaying,
+                            month: 0,
+                            year: displaying.year - 1,
+                        };
                     case ViewState.Month:
                     case ViewState.Week:
                     case ViewState.Day:
@@ -196,7 +200,11 @@ export function getEphemeralStore(
             displaying.update((displaying) => {
                 switch (currentState) {
                     case ViewState.Year:
-                        return { ...displaying, year: displaying.year + 1 };
+                        return {
+                            ...displaying,
+                            month: 0,
+                            year: displaying.year + 1,
+                        };
                     case ViewState.Month:
                     case ViewState.Week:
                     case ViewState.Day:

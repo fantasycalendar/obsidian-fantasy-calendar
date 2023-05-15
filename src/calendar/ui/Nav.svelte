@@ -74,45 +74,103 @@
     };
 </script>
 
-<div class="fantasy-nav nav">
-    <div class="title-container">
-        <h3 class="fantasy-title title">
-            {#if $viewState == ViewState.Month}
-                <span class="fantasy-month month">{$displayingMonth.name}</span>
-            {/if}
-            <span class="fantasy-year year">{$displayingYear}</span>
-        </h3>
+<div class="fantasy-nav-container">
+    <div class="view-state-switcher">
+        <span
+            class="view-state"
+            class:active={$viewState == ViewState.Day}
+            on:click={() => ($viewState = ViewState.Day)}>Day</span
+        >
+        <span
+            class="view-state"
+            class:active={$viewState == ViewState.Week}
+            on:click={() => ($viewState = ViewState.Week)}>Week</span
+        >
+        <span
+            class="view-state"
+            class:active={$viewState == ViewState.Month}
+            on:click={() => ($viewState = ViewState.Month)}>Month</span
+        >
+        <span
+            class="view-state"
+            class:active={$viewState == ViewState.Year}
+            on:click={() => ($viewState = ViewState.Year)}>Year</span
+        >
     </div>
-    <div class="right-nav fantasy-right-nav">
-        <div class="container">
-            <div
-                class="arrow calendar-clickable"
-                use:left
-                on:click={() => ephemeral.goToPrevious()}
-            />
-            <div
-                class="reset-button calendar-clickable"
-                on:click={() => ephemeral.displayDate()}
-                aria-label="Today is {$currentDisplay}"
-            >
-                <span>Today</span>
+    <div class="fantasy-nav nav">
+        <div class="title-container">
+            <h3 class="fantasy-title title">
+                {#if $viewState == ViewState.Month}
+                    <span class="fantasy-month month"
+                        >{$displayingMonth.name}</span
+                    >
+                {/if}
+                <span class="fantasy-year year">{$displayingYear}</span>
+            </h3>
+        </div>
+        <div class="right-nav fantasy-right-nav">
+            <div class="container">
+                <div
+                    class="arrow calendar-clickable"
+                    use:left
+                    on:click={() => ephemeral.goToPrevious()}
+                />
+                <div
+                    class="reset-button calendar-clickable"
+                    on:click={() => ephemeral.displayDate()}
+                    aria-label="Today is {$currentDisplay}"
+                >
+                    <span>Today</span>
+                </div>
+                <div
+                    class="arrow right calendar-clickable"
+                    use:right
+                    on:click={(evt) => ephemeral.goToNext()}
+                />
+                <div
+                    class="calendar-clickable"
+                    use:settings
+                    aria-label="Calendar Settings"
+                    on:click={(evt) => openSettings(evt)}
+                />
             </div>
-            <div
-                class="arrow right calendar-clickable"
-                use:right
-                on:click={(evt) => ephemeral.goToNext()}
-            />
-            <div
-                class="calendar-clickable"
-                use:settings
-                aria-label="Calendar Settings"
-                on:click={(evt) => openSettings(evt)}
-            />
         </div>
     </div>
 </div>
 
 <style>
+    .fantasy-nav-container {
+        display: flex;
+        flex-flow: column;
+        gap: 0.5rem;
+    }
+    .view-state-switcher {
+        cursor: pointer;
+        border: 1px solid var(--background-modifier-border);
+        border-radius: 4px;
+        display: flex;
+        justify-content: space-between;
+        margin: 0 0.5rem;
+    }
+    .view-state:first-of-type {
+        margin-left: 0;
+    }
+    .view-state:last-of-type {
+        margin-right: 0;
+    }
+    .view-state {
+        margin: 0 4px;
+        flex-grow: 1;
+        text-align: center;
+
+        border-radius: 4px;
+    }
+    .view-state:not(.active):hover {
+        background-color: var(--interactive-hover);
+    }
+    .view-state.active {
+        background-color: var(--interactive-accent);
+    }
     .fantasy-nav.nav.nav {
         padding: 10px 0px;
         margin: 0;

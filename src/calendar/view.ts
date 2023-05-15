@@ -35,8 +35,6 @@ export default class FantasyCalendarView extends ItemView {
     constructor(public leaf: WorkspaceLeaf, public plugin: FantasyCalendar) {
         super(leaf);
         this.plugin.onSettingsLoad(() => this.display());
-        this.containerEl.setAttr("style", "background: inherit;");
-        this.contentEl.setAttr("style", "background: inherit; padding-top: 0px;");
     }
     async display() {
         //todo: inject store here, subscribe to
