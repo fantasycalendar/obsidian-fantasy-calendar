@@ -12,6 +12,7 @@
     const ephemeral = getTypedContext("ephemeralStore");
     $: store = $global;
     $: viewing = ephemeral.viewing;
+    $: if (!$viewing) viewing = ephemeral.displaying;
     $: date = dateString($viewing, $store);
     $: yearCalculator = store.yearCalculator;
     $: displayedMonth = yearCalculator

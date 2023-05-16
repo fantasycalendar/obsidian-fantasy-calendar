@@ -2,9 +2,6 @@
     import { ViewState } from "src/stores/calendar.store";
     import { getTypedContext } from "../view";
     import Day from "./Day.svelte";
-    import Year from "./Year/Year.svelte";
-    import { onMount } from "svelte";
-    import { get } from "svelte/store";
 
     export let year: number;
     export let month: number;

@@ -6,6 +6,7 @@
     import DayView from "./DayView.svelte";
     import { ViewState } from "src/stores/calendar.store";
     import Year from "./Year/Year.svelte";
+    import Week from "./Week/Week.svelte";
 
     const global = getTypedContext("store");
     const ephemeral = getTypedContext("ephemeralStore");
@@ -59,6 +60,10 @@
         {#key $displaying}
             <Month year={$displaying.year} month={$displaying.month} />
         {/key}
+    {:else if $viewState == ViewState.Week}
+        <Week />
+    {:else if $viewState == ViewState.Day}
+        <DayView />
     {/if}
     {#if $viewing}
         <hr />

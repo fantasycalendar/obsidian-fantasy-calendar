@@ -1,7 +1,7 @@
 import type { Calendar, FcDate, MoonState } from "src/@types";
 import { Readable, Writable, derived, get, writable } from "svelte/store";
 import { YearCalculatorCache, YearStoreCache } from "./years.store";
-import { dateString } from "src/utils/functions";
+import { dateString, wrap } from "src/utils/functions";
 import { EventCache } from "./cache/event-cache";
 import { MoonCache } from "./cache/moon-cache";
 import FantasyCalendar from "src/main";
@@ -164,10 +164,46 @@ export function getEphemeralStore(
                             month: 0,
                             year: displaying.year - 1,
                         };
+                    case ViewState.Week: {
+                        const next = { ...displaying };
+                        const year = yearCalculator.getYearFromCache(next.year);
+                        const month = year.getMonthFromCache(next.month);
+
+                        const lastDay = get(month.lastDay);
+                        const weekdays = get(month.weekdays);
+
+                        //get current week day
+                        //not zero indexed, need to subtract one
+                        const currentWeekday = wrap(
+                            next.day + 1,
+                            weekdays.length
+                        );
+
+                        if (next.day - currentWeekday <= 0) {
+                            const decMonth = decrementMonth(
+                                next,
+                                yearCalculator
+                            );
+
+                            const nextYear = yearCalculator.getYearFromCache(
+                                decMonth.year
+                            );
+                            const nextMonth = nextYear.getMonthFromCache(
+                                decMonth.month
+                            );
+                            decMonth.day =
+                                get(nextMonth.days) -
+                                currentWeekday -
+                                weekdays.length;
+                            return decMonth;
+                        }
+                        next.day = next.day - currentWeekday;
+                        return next;
+                    }
                     case ViewState.Month:
-                    case ViewState.Week:
-                    case ViewState.Day:
                         return decrementMonth(displaying, yearCalculator);
+                    case ViewState.Day:
+                        return incrementDay(displaying, yearCalculator);
                 }
             }),
 
@@ -205,10 +241,35 @@ export function getEphemeralStore(
                             month: 0,
                             year: displaying.year + 1,
                         };
+                    case ViewState.Week: {
+                        const next = { ...displaying };
+                        const year = yearCalculator.getYearFromCache(next.year);
+                        const month = year.getMonthFromCache(next.month);
+
+                        const lastDay = get(month.lastDay);
+                        const weekdays = get(month.weekdays);
+
+                        //get current week day
+                        //not zero indexed, need to subtract one
+                        const currentWeekday = wrap(
+                            next.day - 1,
+                            weekdays.length
+                        );
+
+                        if (
+                            next.day + (weekdays.length - currentWeekday) >
+                            lastDay
+                        ) {
+                            next.day = 1;
+                            return incrementMonth(next, yearCalculator);
+                        }
+                        next.day += weekdays.length - currentWeekday;
+                        return next;
+                    }
                     case ViewState.Month:
-                    case ViewState.Week:
-                    case ViewState.Day:
                         return incrementMonth(displaying, yearCalculator);
+                    case ViewState.Day:
+                        return incrementDay(displaying, yearCalculator);
                 }
             }),
 
