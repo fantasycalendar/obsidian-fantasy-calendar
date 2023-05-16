@@ -100,7 +100,7 @@
     <div class="fantasy-nav nav">
         <div class="title-container">
             <h3 class="fantasy-title title">
-                {#if $viewState == ViewState.Month}
+                {#if $viewState != ViewState.Year}
                     <span class="fantasy-month month"
                         >{$displayingMonth.name}</span
                     >

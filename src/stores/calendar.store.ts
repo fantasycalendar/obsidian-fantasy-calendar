@@ -169,17 +169,17 @@ export function getEphemeralStore(
                         const year = yearCalculator.getYearFromCache(next.year);
                         const month = year.getMonthFromCache(next.month);
 
-                        const lastDay = get(month.lastDay);
                         const weekdays = get(month.weekdays);
 
-                        //get current week day
-                        //not zero indexed, need to subtract one
+                        const firstDay = get(month.firstDay);
                         const currentWeekday = wrap(
-                            next.day + 1,
+                            next.day + firstDay - 1,
                             weekdays.length
                         );
+                        //move next day to start of the week
+                        next.day = next.day - currentWeekday;
 
-                        if (next.day - currentWeekday <= 0) {
+                        if (next.day < 1) {
                             const decMonth = decrementMonth(
                                 next,
                                 yearCalculator
@@ -192,12 +192,14 @@ export function getEphemeralStore(
                                 decMonth.month
                             );
                             decMonth.day =
-                                get(nextMonth.days) -
-                                currentWeekday -
-                                weekdays.length;
+                                get(nextMonth.days) - weekdays.length;
+                            console.log(
+                                "🚀 ~ file: calendar.store.ts:190 ~ decMonth.day:",
+                                decMonth.day
+                            );
                             return decMonth;
                         }
-                        next.day = next.day - currentWeekday;
+                        next.day = next.day - weekdays.length;
                         return next;
                     }
                     case ViewState.Month:

@@ -4,13 +4,11 @@
     import { wrap } from "src/utils/functions";
     import { get } from "svelte/store";
 
-    const global = getTypedContext("store");
-    $: store = $global;
-
     const ephemeral = getTypedContext("ephemeralStore");
     $: displaying = ephemeral.displaying;
     $: displayWeeks = ephemeral.displayWeeks;
     $: displayedMonth = ephemeral.displayingMonth;
+    $: firstDay = $displayedMonth.firstDay;
     $: days = $displayedMonth.days;
     $: firstWeekNumber = $displayedMonth.firstWeekNumber;
     $: weekdays = $displayedMonth.weekdays;
@@ -22,18 +20,21 @@
     $: nextMonth = ephemeral.getNextMonth($displaying.month, $displaying.year);
 
     //not zero indexed, need to subtract one
-    $: currentWeekday = wrap($displaying.day - 1, $weekdays.length);
+    $: currentWeekday = wrap($displaying.day - 1 + $firstDay, $weekdays.length);
 
     $: week = [...Array($weekdays.length).keys()].map(
-        (k) => $displaying.day + (k - currentWeekday - 1)
+        (k) => $displaying.day + (k - currentWeekday)
     );
     $: console.log("🚀 ~ file: Week.svelte:28 ~ week:", week);
+
+    $: weekNumber =
+        $firstWeekNumber + Math.floor($displaying.day / $weekdays.length);
 
     const getMonth = (number: number) => {
         if (number <= 0)
             return {
                 month: previousMonth,
-                number: get(previousMonth.days) - number,
+                number: get(previousMonth.days) + number,
             };
         if (number > $days) {
             return {
@@ -69,7 +70,7 @@
                                 <tr>
                                     <td>
                                         <span class="week-num"
-                                            >{$firstWeekNumber}</span
+                                            >{weekNumber}</span
                                         >
                                     </td>
                                 </tr>

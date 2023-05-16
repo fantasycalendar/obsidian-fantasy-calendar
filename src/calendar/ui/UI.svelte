@@ -29,10 +29,10 @@
 
 <style scoped>
     .calendar-container {
-        padding: 0 8px;
+        padding: 0 8px 20px 8px;
         background: inherit;
-        display: grid;
-        grid-template-rows: auto 1fr;
+        display: flex;
+        flex-flow: column;
         overflow: hidden;
         height: 100%;
     }

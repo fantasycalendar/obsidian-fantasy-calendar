@@ -22,6 +22,9 @@
         .getMonthFromCache(month);
     $: ({ weekdays, days, lastDay, firstWeekNumber, weeks } = displayedMonth);
     $: ({ lastDay: previousLastDay, days: previousDays } = previousMonth);
+    $: firstDay = displayedMonth.firstDay;
+
+    $: console.log("🚀 ~ file: Month.svelte:26 ~ firstDay:", $firstDay);
 
     $: extraWeek = $weekdays.length - $lastDay <= 3 ? 1 : 0;
     const tbody = (node: HTMLElement) => {
