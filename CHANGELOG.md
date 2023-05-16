@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.0-b4](https://github.com/fantasycalendar/obsidian-fantasy-calendar/compare/4.0.0-b3...4.0.0-b4) (2023-05-16)
+
+
+### Features
+
+* Week and Day views semi-functional ([8fb2519](https://github.com/fantasycalendar/obsidian-fantasy-calendar/commit/8fb2519dbcef79a4cfbe9ed352d9d277d51b9640))
+
 ## [4.0.0-b3](https://github.com/fantasycalendar/obsidian-fantasy-calendar/compare/4.0.0-b2...4.0.0-b3) (2023-05-15)
 
 
