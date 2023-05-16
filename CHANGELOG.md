@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.1-b4](https://github.com/fantasycalendar/obsidian-fantasy-calendar/compare/4.0.0-b4...4.0.1-b4) (2023-05-16)
+
+
+### Bug Fixes
+
+* Fixes for goToPrevious week ([56ba489](https://github.com/fantasycalendar/obsidian-fantasy-calendar/commit/56ba489586cc3643c217bed7e0af5647bd2d029e))
+
 ## [4.0.0-b4](https://github.com/fantasycalendar/obsidian-fantasy-calendar/compare/4.0.0-b3...4.0.0-b4) (2023-05-16)
 
 
