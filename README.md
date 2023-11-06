@@ -1,3 +1,6 @@
+# NOTE: This repository is currently not under maintenance.
+
+
 # Fantasy Calendars
 
 **Now part of the [Fantasy Calendar](https://fantasy-calendar.com/) family!**
