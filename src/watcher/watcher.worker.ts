@@ -55,7 +55,7 @@ export type RenameMessage = {
     file: { path: string; basename: string; oldPath: string };
 };
 
-const timelineData: RegExp = /(<(span|div).*?<\/(span|div)>)/g;
+const timelineData: RegExp = /(<(span|div)[\S\s]*?<\/(span|div)>)/g;
 const ctx: Worker = self as any;
 class Parser {
     queue: string[] = [];
@@ -399,7 +399,7 @@ class Parser {
             let datebits = element.dataset.date.split(/(?<!^)-/);
             const date = {
                 year: parseInt(datebits[0]),
-                month: parseInt(datebits[1]),
+                month: parseInt(datebits[1])-1,
                 day: parseInt(datebits[2])
             };
             let end;
@@ -407,7 +407,7 @@ class Parser {
                 datebits = element.dataset.end.split(/(?<!^)-/);
                 end = {
                     year: parseInt(datebits[0]),
-                    month: parseInt(datebits[1]),
+                    month: parseInt(datebits[1])-1,
                     day: parseInt(datebits[2])
                 };
             }
